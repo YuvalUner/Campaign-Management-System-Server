@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Campaign_Management_API", "Campaign_Management_API\Campaign_Management_API.csproj", "{0FE565E3-DA50-475E-8890-BB9D917DB9FA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0FE565E3-DA50-475E-8890-BB9D917DB9FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FE565E3-DA50-475E-8890-BB9D917DB9FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FE565E3-DA50-475E-8890-BB9D917DB9FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FE565E3-DA50-475E-8890-BB9D917DB9FA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {56E0D7BF-3210-4795-9B98-4732F8ABBA7D}
+	EndGlobalSection
+EndGlobal
