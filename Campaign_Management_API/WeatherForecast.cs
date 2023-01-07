@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
+
 namespace Campaign_Management_API
 {
+    [Authorize("ApiScope")]
     public class WeatherForecast
     {
         public DateTime Date { get; set; }
