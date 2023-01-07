@@ -21,7 +21,7 @@ public class JwtController : Controller
     }
     
     
-    public async Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(string IdToken)
+    private async Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(string IdToken)
     {
         try
         {
