@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using DAL.DbAccess;
+using DAL.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -17,10 +19,14 @@ public class WeatherForecastController : ControllerBase
     };
 
     private readonly ILogger<WeatherForecastController> _logger;
+    private readonly IGenericDbAccess _dbAccess;
+    private readonly IConfiguration _configuration;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IGenericDbAccess dbAccess, IConfiguration config)
     {
         _logger = logger;
+        _dbAccess = dbAccess;
+        _configuration = config;
     }
 
     [HttpGet("Test")]
@@ -89,5 +95,13 @@ public class WeatherForecastController : ControllerBase
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+    }
+    
+    [HttpGet("TestDbConnection")]
+    public async Task<IActionResult> TestDbConnection()
+    {
+        var res = await _dbAccess.GetData<City, DBNull>(StoredProcedureNames.TestConnection,
+            DBNull.Value);
+        return Ok(res);
     }
 }
