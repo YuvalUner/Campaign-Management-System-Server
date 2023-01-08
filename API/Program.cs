@@ -1,3 +1,5 @@
+using DAL.DbAccess;
+using DAL.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Serilog;
 
@@ -9,6 +11,19 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IGenericDbAccess, GenericDbAccess>();
+builder.Services.AddScoped<IUsersService, UsersService>();
+
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll", optionsBuilder => {
+        optionsBuilder.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
+            //.WithOrigins(builder.Configuration["AllowedOrigins:React"],
+            //builder.Configuration["AllowedOrigins:WebApi"], builder.Configuration["AllowedOrigins:WebServer"])
+            .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost");
+    });
+});
+
 
 builder.Services.AddDistributedMemoryCache();
 
@@ -55,6 +70,8 @@ app.UseCookiePolicy(new CookiePolicyOptions
 {
     MinimumSameSitePolicy = SameSiteMode.Strict,
 });
+
+app.UseCors("AllowAll");
 
 app.MapControllers();
 
