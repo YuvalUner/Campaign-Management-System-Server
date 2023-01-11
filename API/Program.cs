@@ -34,13 +34,29 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
     .AddCookie(options =>
     {
         options.ExpireTimeSpan = TimeSpan.FromHours(2);
         options.SlidingExpiration = true;
-        options.AccessDeniedPath = "/Forbidden/";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
+        // Horrible workaround for making the server return 401 when user is not authorized, instead of 404.
+        options.LoginPath = "/api/AccessDenied";
     });
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = 401;
+        return Task.CompletedTask;
+    };
+});
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
