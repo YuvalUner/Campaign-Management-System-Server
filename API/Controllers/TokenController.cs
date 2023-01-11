@@ -92,6 +92,7 @@ public class TokenController : Controller
             }
 
             user.UserId = userId;
+            _logger.LogInformation("Created new user with email {Email}", payload.Email);
         }
         
         // Log the user in via cookie authentication and session
@@ -128,6 +129,47 @@ public class TokenController : Controller
     public async Task<IActionResult> SignUserOut()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return Ok();
+    }
+
+    [HttpPost("TestSignInRemoveLater")]
+    public async Task<IActionResult> TestSignInRemoveLater()
+    {
+        // The test user - me
+        var user = new User()
+        {
+            UserId = 1,
+            Email = "yuvaluner@gmail.com",
+            DisplayNameEng = "Yuval Uner",
+            FirstNameEng = "Yuval",
+            LastNameEng = "Uner"
+        };
+        // Log the user in via cookie authentication and session
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.FirstNameEng),
+            new Claim("FullName", user.DisplayNameEng),
+            new Claim(ClaimTypes.Surname, user.LastNameEng),
+        };
+
+        // Copy pasted code from
+        // https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-7.0
+        var claimsIdentity = new ClaimsIdentity(
+            claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        
+        var authProperties = new AuthenticationProperties
+        {
+            AllowRefresh = true,
+            IsPersistent = true,
+            IssuedUtc = DateTimeOffset.Now,
+        };
+        
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme, 
+            new ClaimsPrincipal(claimsIdentity), 
+            authProperties);
+        // Keep the user id in the session for future use, as it should not be exposed to the client via claims
+        HttpContext.Session.SetInt32("userId", user.UserId);
         return Ok();
     }
 }

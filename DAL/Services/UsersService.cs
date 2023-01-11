@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Dynamic;
 using DAL.DbAccess;
 using DAL.Models;
 using Dapper;
@@ -38,5 +39,16 @@ public class UsersService : IUsersService
         await _dbAccess.ModifyData(StoredProcedureNames.CreateUser, param);
         var userId = param.Get<int>("userId");
         return userId > 0 ? userId : -1;
+    }
+
+    public async Task<List<CampaignUser>?> GetUserCampaigns(int? userId)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId
+        });
+        var res = await _dbAccess.GetData<CampaignUser, DynamicParameters>
+            (StoredProcedureNames.GetUserCampaigns, param);
+        return res.ToList();
     }
 }
