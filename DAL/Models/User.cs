@@ -10,4 +10,10 @@ public class User
     public string? DisplayNameEng { get; set; }
     
     public string? ProfilePicUrl { get; set; }
+    
+    public string? FirstNameHeb { get; set; }
+    
+    public string? LastNameHeb { get; set; }
+    
+    public IEnumerable<Campaign?>? Campaigns { get; set; }
 }
