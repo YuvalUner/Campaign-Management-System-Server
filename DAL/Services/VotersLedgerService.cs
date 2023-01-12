@@ -4,7 +4,7 @@ using Dapper;
 
 namespace DAL.Services;
 
-public class VotersLedgerService
+public class VotersLedgerService : IVotersLedgerService
 {
     private readonly IGenericDbAccess _dbAccess;
     
@@ -13,7 +13,7 @@ public class VotersLedgerService
         _dbAccess = dbAccess;
     }
     
-    public async Task<VotersLedgerRecord?> GetVotersLedgerRecordAsync(int? voterId)
+    public async Task<VotersLedgerRecord?> GetSingleVotersLedgerRecord(int? voterId)
     {
         var param = new DynamicParameters(new
         {
