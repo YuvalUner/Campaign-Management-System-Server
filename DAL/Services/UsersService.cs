@@ -41,7 +41,7 @@ public class UsersService : IUsersService
         return userId > 0 ? userId : -1;
     }
 
-    public async Task<List<CampaignUser>?> GetUserCampaigns(int? userId)
+    public async Task<List<CampaignUser>> GetUserCampaigns(int? userId)
     {
         var param = new DynamicParameters(new
         {
@@ -50,5 +50,28 @@ public class UsersService : IUsersService
         var res = await _dbAccess.GetData<CampaignUser, DynamicParameters>
             (StoredProcedureNames.GetUserCampaigns, param);
         return res.ToList();
+    }
+
+    public async Task<User?> GetUserPublicInfo(int? userId)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId
+        });
+        var res = await _dbAccess.GetData<User, DynamicParameters>
+            (StoredProcedureNames.GetUserPublicInfoByUserID, param);
+        return res.FirstOrDefault();
+    }
+
+    public async Task AddUserPrivateInfo(UserPrivateInfo privateInfo, int? userId)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId,
+            privateInfo.FirstNameHeb,
+            privateInfo.LastNameHeb,
+            IdNum = privateInfo.IdNumber
+        });
+        await _dbAccess.ModifyData(StoredProcedureNames.AddUserPrivateInfo, param);
     }
 }
