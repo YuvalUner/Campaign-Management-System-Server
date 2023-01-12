@@ -39,4 +39,11 @@ public interface IUsersService
     /// <param name="userId"></param>
     /// <returns></returns>
     Task AddUserPrivateInfo(UserPrivateInfo privateInfo, int? userId);
+
+    /// <summary>
+    /// Gets a user's authentication status from the database and returns it.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<bool> IsUserAuthenticated(int? userId);
 }
