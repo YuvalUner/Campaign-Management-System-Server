@@ -15,5 +15,7 @@ public class User
     
     public string? LastNameHeb { get; set; }
     
+    public bool Authenticated { get; set; }
+    
     public IEnumerable<Campaign?>? Campaigns { get; set; }
 }

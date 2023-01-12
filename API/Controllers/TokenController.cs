@@ -95,6 +95,8 @@ public class TokenController : Controller
             _logger.LogInformation("Created new user with email {Email}", payload.Email);
         }
         
+        user.Authenticated = await _usersService.IsUserAuthenticated(user.UserId);
+        
         // Log the user in via cookie authentication and session
         var claims = new List<Claim>
         {
@@ -121,6 +123,7 @@ public class TokenController : Controller
             authProperties);
         // Keep the user id in the session for future use, as it should not be exposed to the client via claims
         HttpContext.Session.SetInt32("userId", user.UserId);
+        HttpContext.Session.SetInt32("authStatus", user.Authenticated ? 1 : 0);
         return Ok();
     }
     
@@ -144,6 +147,9 @@ public class TokenController : Controller
             FirstNameEng = "Yuval",
             LastNameEng = "Uner"
         };
+        
+        user.Authenticated = await _usersService.IsUserAuthenticated(user.UserId);
+        
         // Log the user in via cookie authentication and session
         var claims = new List<Claim>
         {
@@ -169,7 +175,8 @@ public class TokenController : Controller
             new ClaimsPrincipal(claimsIdentity), 
             authProperties);
         // Keep the user id in the session for future use, as it should not be exposed to the client via claims
-        HttpContext.Session.SetInt32("userId", user.UserId);
+        HttpContext.Session.SetInt32(Constants.UserId, user.UserId);
+        HttpContext.Session.SetInt32(Constants.UserAuthenticationStatus, user.Authenticated ? 1 : 0);
         return Ok();
     }
 }
