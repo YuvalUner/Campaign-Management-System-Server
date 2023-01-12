@@ -55,4 +55,10 @@ public static class StoredProcedureNames
     /// Params: userId (int), firstNameHeb (string), lastNameHeb (string), idNum (int).
     /// </summary>
     public static readonly string AddUserPrivateInfo = "usp_InsertUserPrivateInfo";
+
+    /// <summary>
+    /// Gets whether the user is authenticated or not.<br/>
+    /// Params: userId (int).
+    /// </summary>
+    public static readonly string GetUserAuthenticationStatus = "usp_GetUserAuthenticationStatus";
 }

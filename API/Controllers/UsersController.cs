@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.Reflection.Metadata;
+using System.Security.Claims;
 using DAL.Models;
 using DAL.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +29,7 @@ public class UsersController : Controller
     [HttpGet("HomePageInfo")]
     public async Task<IActionResult> HomePageInfo()
     {
-        int? userId = HttpContext.Session.GetInt32("userId");
+        int? userId = HttpContext.Session.GetInt32(Constants.UserId);
         List<CampaignUser> campaigns = await _usersService.GetUserCampaigns(userId);
         // The CampaignUser model also holds fields that should not be getting out, such as UserId, CampaignId, RoleId.
         // Hence, it needs to be cleaned up first.
@@ -108,24 +109,35 @@ public class UsersController : Controller
     [HttpPost("UserPrivateInfo")]
     public async Task<IActionResult> UserPrivateInfo([FromBody] UserPrivateInfo userInfo)
     {
-        var userId = HttpContext.Session.GetInt32("userId");
-        // Check that the user has not already filled out their private info.
-        if (!await this.VerifyNonDuplicatePrivateInfo(userId))
+        var userId = HttpContext.Session.GetInt32(Constants.UserId);
+        var userIsAuthenticated = Convert.ToBoolean(HttpContext.Session.GetInt32(Constants.UserAuthenticationStatus));
+        // An authenticated user should never access this method.
+        if (userIsAuthenticated)
         {
-            _logger.LogInformation("User with {UserId} tried to enter duplicate private info", userId);
-            return BadRequest();
+            _logger.LogInformation("User with id {UserId} tried to re-authenticate", userId);
+            return Unauthorized();
         }
-        // Filling in the info from the Http context
+        // Check that the user has not already filled out their private info.
+        // This is mostly a double check for the previous, as filling out private info should entail 
+        // an authenticated status. This can be commented out or deleted if needed, but kept in for now
+        // as mistakes are always possible and no one is available to review this as of yet.
+        if (!await VerifyNonDuplicatePrivateInfo(userId))
+        {
+            _logger.LogInformation("User with id {UserId} tried to enter duplicate private info", userId);
+            return Unauthorized();
+        }
+        // Filling in the info from the Http context, as our DB contains English names too.
         userInfo.FirstNameEng = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
         userInfo.LastNameEng = HttpContext.User.FindFirst(ClaimTypes.Surname)?.Value;
         // Make sure the info the user input matches that in the voters ledger.
-        if (!await this.VerifyUserPrivateInfo(userInfo))
+        if (!await VerifyUserPrivateInfo(userInfo))
         {
             return BadRequest();
         }
         
         // If all checks pass, update the user's info in the database.
         await _usersService.AddUserPrivateInfo(userInfo, userId);
+        HttpContext.Session.SetInt32(Constants.UserAuthenticationStatus, 1);
         _logger.LogInformation("User with {UserId} verified their private info", userId);
         return Ok();
     }
