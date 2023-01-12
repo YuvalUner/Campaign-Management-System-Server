@@ -14,6 +14,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IGenericDbAccess, GenericDbAccess>();
 builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IVotersLedgerService, VotersLedgerService>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", optionsBuilder => {
