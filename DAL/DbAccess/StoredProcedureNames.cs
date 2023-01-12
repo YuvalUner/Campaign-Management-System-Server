@@ -33,7 +33,7 @@ public static class StoredProcedureNames
     public static readonly string LinkUserToCampaign = "usp_LinkUserToCampaign";
 
     /// <summary>
-    /// Gets public info - name and email in English and Hebrew about a user by their user id.<br/>
+    /// Gets public info - name in English and Hebrew and profile picture by a user's user id.<br/>
     /// Params: userId (int)
     /// </summary>
     public static readonly string GetUserPublicInfoByUserID = "usp_GetUserPublicInfoById";
@@ -43,4 +43,16 @@ public static class StoredProcedureNames
     /// Params: userId (int).
     /// </summary>
     public static readonly string GetUserCampaigns = "usp_GetUserCampaigns";
+    
+    /// <summary>
+    /// Gets a single row from the voters ledger by the voter's ID number.<br/>
+    /// Params: voterId (int)
+    /// </summary>
+    public static readonly string GetFromVotersLedgerById = "usp_GetFromVotersLedgerByIdNum";
+
+    /// <summary>
+    /// Adds the user's private info to the users and dynamic ledger tables.<br/>
+    /// Params: userId (int), firstNameHeb (string), lastNameHeb (string), idNum (int).
+    /// </summary>
+    public static readonly string AddUserPrivateInfo = "usp_InsertUserPrivateInfo";
 }
