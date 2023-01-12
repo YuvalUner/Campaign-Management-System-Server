@@ -74,4 +74,15 @@ public class UsersService : IUsersService
         });
         await _dbAccess.ModifyData(StoredProcedureNames.AddUserPrivateInfo, param);
     }
+
+    public async Task<bool> IsUserAuthenticated(int? userId)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId
+        });
+        var res = await _dbAccess.GetData<User, DynamicParameters>
+            (StoredProcedureNames.GetUserAuthenticationStatus, param);
+        return res.FirstOrDefault()?.Authenticated ?? false;
+    }
 }
