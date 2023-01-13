@@ -61,4 +61,16 @@ public static class StoredProcedureNames
     /// Params: userId (int).
     /// </summary>
     public static readonly string GetUserAuthenticationStatus = "usp_GetUserAuthenticationStatus";
+
+    /// <summary>
+    /// Modifies a campaign's info in the database. <br/>
+    /// Params: campaignGuid (Guid), campaignDescription (string?), campaignLogoUrl (string?).
+    /// </summary>
+    public static readonly string ModifyCampaign = "usp_UpdateCampaign";
+    
+    /// <summary>
+    /// Gets the Guid of a campaign by its id.<br/>
+    /// Params: campaignId (int)
+    /// </summary>
+    public static readonly string GetGuidByCampaignId = "usp_GetCampaignGuidById";
 }
