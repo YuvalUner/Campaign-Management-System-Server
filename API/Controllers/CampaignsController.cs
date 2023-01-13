@@ -31,6 +31,7 @@ public class CampaignsController : Controller
             return Unauthorized();
         }
 
+        // Unauthenticated users (did not verify their identity) should not be able to create campaigns
         var authenticationStatus = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);
         if (!authenticationStatus)
         {
@@ -48,13 +49,7 @@ public class CampaignsController : Controller
         _logger.LogInformation("Created campaign called {CampaignName} for user {UserId}", campaign.CampaignName, userId);
         // After creating the new campaign, add the newly created campaign to the list of campaigns the user can access.
         Guid? campaignGuid = await _campaignService.GetCampaignGuid(campaign.CampaignId);
-        var allowedCampaigns = HttpContext.Session.Get<List<Guid?>?>(Constants.AllowedCampaigns);
-        if (allowedCampaigns == null)
-        {
-            allowedCampaigns = new List<Guid?>();
-        }
-        allowedCampaigns.Add(campaignGuid);
-        HttpContext.Session.Set(Constants.AllowedCampaigns, allowedCampaigns);
+        CampaignAuthorizationUtils.AddAuthorizationForCampaign(HttpContext, campaignGuid);
         return Ok();
     }
     
@@ -63,7 +58,7 @@ public class CampaignsController : Controller
     {
         // Check if the user has access to this campaign to begin with.
         // Not checking authentication status since if they have access then they must be authenticated.
-        if (!AuthenticationUtils.IsUserAuthorizedForCampaign(HttpContext, campaign.CampaignGuid))
+        if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaign.CampaignGuid))
         {
             return Unauthorized();
         }

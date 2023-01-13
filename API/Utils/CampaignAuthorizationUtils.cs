@@ -2,7 +2,7 @@
 
 namespace API.Utils;
 
-public static class AuthenticationUtils
+public static class CampaignAuthorizationUtils
 {
     /// <summary>
     /// Check if the campaign the user is trying to access is in their allowed campaigns list.
@@ -23,5 +23,23 @@ public static class AuthenticationUtils
         }
 
         return true;
+    }
+
+    public static void AddAuthorizationForCampaign(HttpContext context, Guid? campaignGuid)
+    {
+        if (campaignGuid == null)
+        {
+            return;
+        }
+        var allowedCampaigns = context.Session.Get<List<Guid?>?>(Constants.AllowedCampaigns);
+        if (allowedCampaigns == null)
+        {
+            allowedCampaigns = new List<Guid?>();
+        }
+        if (!allowedCampaigns.Contains(campaignGuid))
+        {
+            allowedCampaigns.Add(campaignGuid);
+        }
+        context.Session.Set(Constants.AllowedCampaigns, allowedCampaigns);
     }
 }

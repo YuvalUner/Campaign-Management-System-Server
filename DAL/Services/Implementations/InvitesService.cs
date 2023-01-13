@@ -40,4 +40,14 @@ public class InvitesService : IInvitesService
         var res = await _dbAccess.GetData<Guid?, DynamicParameters>(StoredProcedureNames.GetCampaignInviteGuid, param);
         return res.FirstOrDefault();
     }
+
+    public async Task AcceptInvite(Guid? campaignGuid, int? userId)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid,
+            userId
+        });
+        await _dbAccess.ModifyData(StoredProcedureNames.LinkUserToCampaign, param);
+    }
 }
