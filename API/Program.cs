@@ -1,3 +1,4 @@
+using API.Middleware;
 using DAL.DbAccess;
 using DAL.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -71,6 +72,8 @@ builder.Logging.AddSerilog(new LoggerConfiguration()
 );
 
 var app = builder.Build();
+
+app.UseMiddleware<AntiXssMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

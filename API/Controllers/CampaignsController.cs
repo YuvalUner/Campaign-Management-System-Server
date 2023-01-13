@@ -41,6 +41,7 @@ public class CampaignsController : Controller
             return BadRequest();
         }
         
+        
         campaign.CampaignId = await _campaignService.AddCampaign(campaign, userId);
         _logger.LogInformation("Created campaign called {CampaignName} for user {UserId}", campaign.CampaignName, userId);
         // After creating the new campaign, add the newly created campaign to the list of campaigns the user can access.
