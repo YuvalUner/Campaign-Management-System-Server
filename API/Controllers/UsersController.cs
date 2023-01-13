@@ -1,10 +1,11 @@
 ﻿using System.Reflection.Metadata;
 using System.Security.Claims;
 using DAL.Models;
-using DAL.Services;
+using DAL.Services.Implementations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using API.SessionExtensions;
+using DAL.Services.Interfaces;
 
 namespace API.Controllers;
 
@@ -94,6 +95,7 @@ public class UsersController : Controller
         // Really should not happen. Like, ever. But if it does, prevent the user from updating info.
         if (user == null)
         {
+            _logger.LogError("User made it past authentication without user id in session");
             return false;
         }
 
@@ -124,7 +126,9 @@ public class UsersController : Controller
         // as mistakes are always possible and no one is available to review this as of yet.
         if (!await VerifyNonDuplicatePrivateInfo(userId))
         {
-            _logger.LogInformation("User with id {UserId} tried to enter duplicate private info", userId);
+            // If this error never gets logged, this part of the code can be removed.
+            _logger.LogError("First check in UserPrivateInfo passed but 2nd failed for user with id {UserId}", userId);
+            _logger.LogInformation("User with id {UserId} tried to enter private info twice", userId);
             return Unauthorized();
         }
         // Filling in the info from the Http context, as our DB contains English names too.

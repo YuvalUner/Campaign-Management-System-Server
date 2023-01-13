@@ -1,8 +1,9 @@
 ﻿using DAL.DbAccess;
 using DAL.Models;
+using DAL.Services.Interfaces;
 using Dapper;
 
-namespace DAL.Services;
+namespace DAL.Services.Implementations;
 
 public class VotersLedgerService : IVotersLedgerService
 {
