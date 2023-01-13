@@ -1,6 +1,7 @@
 using API.Middleware;
 using DAL.DbAccess;
-using DAL.Services;
+using DAL.Services.Implementations;
+using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Serilog;
 
@@ -17,6 +18,7 @@ builder.Services.AddScoped<IGenericDbAccess, GenericDbAccess>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IVotersLedgerService, VotersLedgerService>();
 builder.Services.AddScoped<ICampaignsService, CampaignsService>();
+builder.Services.AddScoped<IInvitesService, InvitesService>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", optionsBuilder => {

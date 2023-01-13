@@ -16,19 +16,21 @@ public static class StoredProcedureNames
 
     /// <summary>
     /// Adds a user to the users table.<br/>
-    /// Params: email (String), firstNameEng (string), lastNameEng (string), displayNameEng(str), profilePicUrl (str)
+    /// Params: email (String), firstNameEng (string), lastNameEng (string), displayNameEng(str), profilePicUrl (str)<br/>
+    /// Returns: newly created user's id (int)
     /// </summary>
     public static readonly string CreateUser = "usp_InsertUser";
 
     /// <summary>
     /// Adds a campaign to the campaigns table.<br/>
-    /// Params: campaignName (string), campaignCreatorUserId (int), campaignDescription (string).
+    /// Params: campaignName (string), campaignCreatorUserId (int), campaignDescription (string).<br/>
+    /// Returns: newly created campaign's id (int)
     /// </summary>
     public static readonly string AddCampaign = "usp_InsertCampaign";
     
     /// <summary>
     /// Links a user to a campaign by adding a row to the campaign_users table.<br/>
-    /// Params: campaignId (int), userId (int)
+    /// Params: campaignGuid (Guid), userId (int)
     /// </summary>
     public static readonly string LinkUserToCampaign = "usp_LinkUserToCampaign";
 
@@ -36,7 +38,7 @@ public static class StoredProcedureNames
     /// Gets public info - name in English and Hebrew and profile picture by a user's user id.<br/>
     /// Params: userId (int)
     /// </summary>
-    public static readonly string GetUserPublicInfoByUserID = "usp_GetUserPublicInfoById";
+    public static readonly string GetUserPublicInfoByUserId = "usp_GetUserPublicInfoById";
 
     /// <summary>
     /// Gets all campaigns the user is a part of, along with their role in the campaign.<br/>
@@ -73,4 +75,35 @@ public static class StoredProcedureNames
     /// Params: campaignId (int)
     /// </summary>
     public static readonly string GetGuidByCampaignId = "usp_GetCampaignGuidById";
+
+    /// <summary>
+    /// Creates a new invite GUID for a campaign.<br/>
+    /// Params: campaignGuid (Guid)
+    /// </summary>
+    public static readonly string CreateCampaignInvite = "usp_SetCampaignInviteGuid";
+    
+    /// <summary>
+    /// Revokes an invite GUID for a campaign.<br/>
+    /// Params: campaignGuid (Guid)
+    /// </summary>
+    public static readonly string RevokeCampaignInvite = "usp_DeleteCampaignInviteGuid";
+    
+    /// <summary>
+    /// Gets the invite GUID for a campaign.<br/>
+    /// Params: campaignGuid (Guid)
+    /// </summary>
+    public static readonly string GetCampaignInviteGuid = "usp_GetCampaignInviteGuid";
+    
+    /// <summary>
+    /// Gets the campaign's GUID by its invite GUID.<br/>
+    /// Params: campaignInviteGuid (Guid)
+    /// </summary>
+    public static readonly string GetCampaignGuidByInviteGuid = "usp_GetCampaignGuidByInviteGuid";
+
+    /// <summary>
+    /// Checks whether or not a user is in a campaign.<br/>
+    /// Params: campaignGuid (Guid), userId (int).<br/>
+    /// Returns: 1 if the user is in the campaign, 0 if not.
+    /// </summary>
+    public static readonly string IsUserInCampaign = "usp_IsUserInCampaign";
 }

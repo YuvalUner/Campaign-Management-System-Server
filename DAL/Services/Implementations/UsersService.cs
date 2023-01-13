@@ -2,9 +2,10 @@
 using System.Dynamic;
 using DAL.DbAccess;
 using DAL.Models;
+using DAL.Services.Interfaces;
 using Dapper;
 
-namespace DAL.Services;
+namespace DAL.Services.Implementations;
 
 public class UsersService : IUsersService
 {
@@ -59,7 +60,7 @@ public class UsersService : IUsersService
             userId
         });
         var res = await _dbAccess.GetData<User, DynamicParameters>
-            (StoredProcedureNames.GetUserPublicInfoByUserID, param);
+            (StoredProcedureNames.GetUserPublicInfoByUserId, param);
         return res.FirstOrDefault();
     }
 

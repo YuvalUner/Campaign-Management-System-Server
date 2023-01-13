@@ -1,6 +1,6 @@
 ﻿using DAL.Models;
 
-namespace DAL.Services;
+namespace DAL.Services.Interfaces;
 
 public interface IVotersLedgerService
 {
