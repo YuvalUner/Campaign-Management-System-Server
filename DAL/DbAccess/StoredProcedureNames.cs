@@ -73,4 +73,22 @@ public static class StoredProcedureNames
     /// Params: campaignId (int)
     /// </summary>
     public static readonly string GetGuidByCampaignId = "usp_GetCampaignGuidById";
+
+    /// <summary>
+    /// Creates a new invite GUID for a campaign.<br/>
+    /// Params: campaignGuid (Guid)
+    /// </summary>
+    public static readonly string CreateCampaignInvite = "usp_SetCampaignInviteGuid";
+    
+    /// <summary>
+    /// Revokes an invite GUID for a campaign.<br/>
+    /// Params: campaignGuid (Guid)
+    /// </summary>
+    public static readonly string RevokeCampaignInvite = "usp_DeleteCampaignInviteGuid";
+    
+    /// <summary>
+    /// Gets the invite GUID for a campaign.<br/>
+    /// Params: campaignGuid (Guid)
+    /// </summary>
+    public static readonly string GetCampaignInviteGuid = "usp_GetCampaignInviteGuid";
 }

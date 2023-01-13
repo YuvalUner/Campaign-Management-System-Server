@@ -1,6 +1,8 @@
 ﻿using API.SessionExtensions;
+using API.Utils;
 using DAL.Models;
-using DAL.Services;
+using DAL.Services.Implementations;
+using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,22 +61,9 @@ public class CampaignsController : Controller
     [HttpPut("update")]
     public async Task<IActionResult> UpdateCampaign([FromBody] Campaign campaign)
     {
-        // Make sure the user is a legitimate user.
-        var userId = HttpContext.Session.GetInt32(Constants.UserId);
-        if (userId == null)
-        {
-            return Unauthorized();
-        }
-
-        var authenticationStatus = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);
-        if (!authenticationStatus)
-        {
-            return Unauthorized();
-        }
-
         // Check if the user has access to this campaign to begin with.
-        var userAllowedCampaigns = HttpContext.Session.Get<List<Guid?>?>(Constants.AllowedCampaigns);
-        if (userAllowedCampaigns == null || !userAllowedCampaigns.Contains(campaign.CampaignGuid))
+        // Not checking authentication status since if they have access then they must be authenticated.
+        if (!AuthenticationUtils.IsUserAuthorizedForCampaign(HttpContext, campaign.CampaignGuid))
         {
             return Unauthorized();
         }
