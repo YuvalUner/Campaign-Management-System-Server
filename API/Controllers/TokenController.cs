@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using API.SessionExtensions;
 using DAL.Models;
 using DAL.Services;
 using Google.Apis.Auth;
@@ -95,60 +96,11 @@ public class TokenController : Controller
             _logger.LogInformation("Created new user with email {Email}", payload.Email);
         }
         
+        // Get some frequently used info about the user that will be stored in the session for use in future requests
+        // without needing to query the database each time for them.
         user.Authenticated = await _usersService.IsUserAuthenticated(user.UserId);
-        
-        // Log the user in via cookie authentication and session
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.FirstNameEng),
-            new Claim("FullName", user.DisplayNameEng),
-            new Claim(ClaimTypes.Surname, user.LastNameEng),
-        };
-
-        // Copy pasted code from
-        // https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-7.0
-        var claimsIdentity = new ClaimsIdentity(
-            claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        
-        var authProperties = new AuthenticationProperties
-        {
-            AllowRefresh = true,
-            IsPersistent = true,
-            IssuedUtc = DateTimeOffset.Now,
-        };
-        
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme, 
-            new ClaimsPrincipal(claimsIdentity), 
-            authProperties);
-        // Keep the user id in the session for future use, as it should not be exposed to the client via claims
-        HttpContext.Session.SetInt32("userId", user.UserId);
-        HttpContext.Session.SetInt32("authStatus", user.Authenticated ? 1 : 0);
-        return Ok();
-    }
-    
-
-    [HttpPost("signOut")]
-    public async Task<IActionResult> SignUserOut()
-    {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        return Ok();
-    }
-
-    [HttpPost("TestSignInRemoveLater")]
-    public async Task<IActionResult> TestSignInRemoveLater()
-    {
-        // The test user - me
-        var user = new User()
-        {
-            UserId = 1,
-            Email = "yuvaluner@gmail.com",
-            DisplayNameEng = "Yuval Uner",
-            FirstNameEng = "Yuval",
-            LastNameEng = "Uner"
-        };
-        
-        user.Authenticated = await _usersService.IsUserAuthenticated(user.UserId);
+        List<CampaignUser> userCampaigns = await _usersService.GetUserCampaigns(user.UserId);
+        var allowedCampaignGuids = userCampaigns.Select(c => c.CampaignGuid).ToList();
         
         // Log the user in via cookie authentication and session
         var claims = new List<Claim>
@@ -176,7 +128,68 @@ public class TokenController : Controller
             authProperties);
         // Keep the user id in the session for future use, as it should not be exposed to the client via claims
         HttpContext.Session.SetInt32(Constants.UserId, user.UserId);
+        // Store whether the user is authenticated or not, to avoid unnecessary DB calls
         HttpContext.Session.SetInt32(Constants.UserAuthenticationStatus, user.Authenticated ? 1 : 0);
+        // Store the user's allowed campaigns (campaigns they are a part of), to avoid many unnecessary DB calls
+        HttpContext.Session.Set(Constants.AllowedCampaigns, allowedCampaignGuids);
+        return Ok();
+    }
+    
+
+    [HttpPost("signOut")]
+    public async Task<IActionResult> SignUserOut()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return Ok();
+    }
+
+    [HttpPost("TestSignInRemoveLater")]
+    public async Task<IActionResult> TestSignInRemoveLater()
+    {
+        // The test user - me
+        var user = new User()
+        {
+            UserId = 1,
+            Email = "yuvaluner@gmail.com",
+            DisplayNameEng = "Yuval Uner",
+            FirstNameEng = "Yuval",
+            LastNameEng = "Uner"
+        };
+        
+        user.Authenticated = await _usersService.IsUserAuthenticated(user.UserId);
+        List<CampaignUser> userCampaigns = await _usersService.GetUserCampaigns(user.UserId);
+        var allowedCampaignGuids = userCampaigns.Select(c => c.CampaignGuid).ToList();
+        
+        // Log the user in via cookie authentication and session
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.FirstNameEng),
+            new Claim("FullName", user.DisplayNameEng),
+            new Claim(ClaimTypes.Surname, user.LastNameEng),
+        };
+
+        // Copy pasted code from
+        // https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-7.0
+        var claimsIdentity = new ClaimsIdentity(
+            claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        
+        var authProperties = new AuthenticationProperties
+        {
+            AllowRefresh = true,
+            IsPersistent = true,
+            IssuedUtc = DateTimeOffset.Now,
+        };
+        
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme, 
+            new ClaimsPrincipal(claimsIdentity), 
+            authProperties);
+        // Keep the user id in the session for future use, as it should not be exposed to the client via claims
+        HttpContext.Session.SetInt32(Constants.UserId, user.UserId);
+        // Store whether the user is authenticated or not, to avoid unnecessary DB calls
+        HttpContext.Session.Set(Constants.UserAuthenticationStatus, user.Authenticated);
+        // Store the user's allowed campaigns (campaigns they are a part of), to avoid many unnecessary DB calls
+        HttpContext.Session.Set(Constants.AllowedCampaigns, allowedCampaignGuids);
         return Ok();
     }
 }
