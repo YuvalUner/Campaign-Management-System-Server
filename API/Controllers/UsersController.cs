@@ -4,6 +4,7 @@ using DAL.Models;
 using DAL.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using API.SessionExtensions;
 
 namespace API.Controllers;
 
@@ -63,7 +64,7 @@ public class UsersController : Controller
             return false;
         }
         
-        var matchingRecord = await _votersLedgerService.GetSingleVotersLedgerRecord(userInfo.IdNumber);
+        VotersLedgerRecord? matchingRecord = await _votersLedgerService.GetSingleVotersLedgerRecord(userInfo.IdNumber);
         // No matching record found in the voters ledger, return false.
         if (matchingRecord == null)
         {
@@ -89,7 +90,7 @@ public class UsersController : Controller
     /// <returns></returns>
     private async Task<bool> VerifyNonDuplicatePrivateInfo(int? userId)
     {
-        var user = await _usersService.GetUserPublicInfo(userId);
+        User? user = await _usersService.GetUserPublicInfo(userId);
         // Really should not happen. Like, ever. But if it does, prevent the user from updating info.
         if (user == null)
         {
@@ -106,12 +107,12 @@ public class UsersController : Controller
     }
 
     [Authorize]
-    [HttpPost("UserPrivateInfo")]
+    [HttpPut("UserPrivateInfo")]
     public async Task<IActionResult> UserPrivateInfo([FromBody] UserPrivateInfo userInfo)
     {
         var userId = HttpContext.Session.GetInt32(Constants.UserId);
-        var userIsAuthenticated = Convert.ToBoolean(HttpContext.Session.GetInt32(Constants.UserAuthenticationStatus));
-        // An authenticated user should never access this method.
+        var userIsAuthenticated = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);
+        // An authenticated user should never access this method through the client.
         if (userIsAuthenticated)
         {
             _logger.LogInformation("User with id {UserId} tried to re-authenticate", userId);
