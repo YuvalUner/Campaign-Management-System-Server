@@ -60,7 +60,7 @@ public class UsersService : IUsersService
             userId
         });
         var res = await _dbAccess.GetData<User, DynamicParameters>
-            (StoredProcedureNames.GetUserPublicInfoByUserID, param);
+            (StoredProcedureNames.GetUserPublicInfoByUserId, param);
         return res.FirstOrDefault();
     }
 
