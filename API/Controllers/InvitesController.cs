@@ -22,7 +22,7 @@ public class InvitesController : Controller
     }
 
     [Authorize]
-    [HttpGet("<campaignGuid>/GetInvite")]
+    [HttpGet("/GetInvite/{campaignGuid:guid}")]
     public async Task<IActionResult> GetInvite(Guid campaignGuid)
     {
         if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid))
@@ -39,7 +39,7 @@ public class InvitesController : Controller
     }
     
     [Authorize]
-    [HttpPut("<campaignGuid>/UpdateInvite")]
+    [HttpPut("/UpdateInvite/{campaignGuid:guid}")]
     public async Task<IActionResult> UpdateInvite(Guid campaignGuid)
     {
         if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid))
@@ -52,7 +52,7 @@ public class InvitesController : Controller
     }
     
     [Authorize]
-    [HttpDelete("<campaignGuid>/RevokeInvite")]
+    [HttpDelete("/RevokeInvite/{campaignGuid:guid}")]
     public async Task<IActionResult> RevokeInvite(Guid campaignGuid)
     {
         if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid))
@@ -65,7 +65,7 @@ public class InvitesController : Controller
     }
     
     [Authorize]
-    [HttpPost("<campaignInviteGuid>/AcceptInvite")]
+    [HttpPost("/AcceptInvite/{campaignInviteGuid:guid}")]
     public async Task<IActionResult> AcceptInvite(Guid campaignInviteGuid)
     {
         var userId = HttpContext.Session.GetInt32(Constants.UserId);
