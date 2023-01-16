@@ -42,4 +42,15 @@ public static class CampaignAuthorizationUtils
         }
         context.Session.Set(Constants.AllowedCampaigns, allowedCampaigns);
     }
+
+    public static void EnterCampaign(HttpContext context, Guid? campaignGuid)
+    {
+        context.Session.Set<Guid?>(Constants.ActiveCampaign, campaignGuid);
+    }
+    
+    public static bool DoesActiveCampaignMatch(HttpContext context, Guid? campaignGuid)
+    {
+        var activeCampaign = context.Session.Get<Guid?>(Constants.ActiveCampaign);
+        return activeCampaign == campaignGuid;
+    }
 }
