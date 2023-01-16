@@ -13,4 +13,6 @@ public class Campaign
     public bool? IsMunicipal { get; set; } 
     public bool? IsSubCampaign { get; set; } 
     public string? CampaignLogoUrl { get; set; } 
+    public int? CityId { get; set; }
+    public string? CityName { get; set; }
 }

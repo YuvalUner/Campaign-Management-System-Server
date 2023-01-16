@@ -23,7 +23,8 @@ public class CampaignsService : ICampaignsService
             campaign.CampaignDescription,
             campaign.IsMunicipal,
             campaign.CampaignLogoUrl,
-            campaignCreatorUserId
+            campaignCreatorUserId,
+            campaign.CityName
         });
         param.Add("@CampaignId", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AddCampaign, param);
@@ -72,5 +73,16 @@ public class CampaignsService : ICampaignsService
         param.Add("@IsUserInCampaign", dbType: DbType.Boolean, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.IsUserInCampaign, param);
         return param.Get<bool>("@IsUserInCampaign");
+    }
+    
+    public async Task<CampaignType> GetCampaignType(Guid? campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid
+        });
+        var res = await _dbAccess.GetData<CampaignType, DynamicParameters>
+            (StoredProcedureNames.GetCampaignType, param);
+        return res.FirstOrDefault();
     }
 }

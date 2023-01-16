@@ -36,4 +36,11 @@ public interface ICampaignsService
     /// <param name="userId"></param>
     /// <returns></returns>
     Task<bool> IsUserInCampaign(Guid? campaignGuid, int? userId);
+
+    /// <summary>
+    /// Gets the type of a campaign from the database.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <returns></returns>
+    Task<CampaignType> GetCampaignType(Guid? campaignGuid);
 }

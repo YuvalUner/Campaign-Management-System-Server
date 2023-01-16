@@ -106,4 +106,18 @@ public static class StoredProcedureNames
     /// Returns: 1 if the user is in the campaign, 0 if not.
     /// </summary>
     public static readonly string IsUserInCampaign = "usp_IsUserInCampaign";
+
+    /// <summary>
+    /// Gets filtered results from the voters ledger, by the filter's parameters.<br/>
+    /// Params: campaignGuid (Guid), idNum (int) optional, cityName (string) optional,
+    /// streetName (string) optional, ballotId (float) optional, supportStatus (bool) optional,
+    /// firstName (string) optional, lastName (string) optional.
+    /// </summary>
+    public static readonly string FilterVotersLedger = "usp_GetFilteredVotersLedgerRecords";
+
+    /// <summary>
+    /// Gets the type and city of a campaign by its GUID.<br/>
+    /// Params: campaignGuid (Guid)
+    /// </summary>
+    public static readonly string GetCampaignType = "usp_GetCampaignTypeAndCityByGuid";
 }

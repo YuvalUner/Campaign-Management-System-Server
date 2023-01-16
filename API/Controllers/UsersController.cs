@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using API.SessionExtensions;
 using DAL.Services.Interfaces;
+using API.Utils;
 
 namespace API.Controllers;
 
