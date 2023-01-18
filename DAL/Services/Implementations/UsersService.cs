@@ -64,7 +64,7 @@ public class UsersService : IUsersService
         return res.FirstOrDefault();
     }
 
-    public async Task AddUserPrivateInfo(UserPrivateInfo privateInfo, int? userId)
+    public async Task<int> AddUserPrivateInfo(UserPrivateInfo privateInfo, int? userId)
     {
         var param = new DynamicParameters(new
         {
@@ -73,7 +73,9 @@ public class UsersService : IUsersService
             privateInfo.LastNameHeb,
             IdNum = privateInfo.IdNumber
         });
+        param.Add("returnVal", DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AddUserPrivateInfo, param);
+        return param.Get<int>("returnVal");
     }
 
     public async Task<bool> IsUserAuthenticated(int? userId)
@@ -85,5 +87,14 @@ public class UsersService : IUsersService
         var res = await _dbAccess.GetData<User, DynamicParameters>
             (StoredProcedureNames.GetUserAuthenticationStatus, param);
         return res.FirstOrDefault()?.Authenticated ?? false;
+    }
+    
+    public async Task DeleteUser(int? userId)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId
+        });
+        await _dbAccess.ModifyData(StoredProcedureNames.DeleteUser, param);
     }
 }
