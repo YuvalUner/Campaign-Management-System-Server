@@ -53,7 +53,7 @@ public class Permission : IEquatable<Permission>
         {
             if (!Screens.IsValid(value))
             {
-                throw new ArgumentException("Invalid screen");
+                throw new ArgumentException("Invalid screen name");
             }
 
             _screen = value;

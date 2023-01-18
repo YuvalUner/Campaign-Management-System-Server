@@ -20,4 +20,13 @@ public interface IPermissionsService
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
     Task<IEnumerable<Permission?>> GetPermissions(int? userId, Guid? campaignGuid);
+
+    /// <summary>
+    /// Removes a permission from a user in a campaign
+    /// </summary>
+    /// <param name="permission"></param>
+    /// <param name="userId"></param>
+    /// <param name="campaignGuid"></param>
+    /// <returns></returns>
+    Task RemovePermission(Permission permission, int? userId, Guid? campaignGuid);
 }
