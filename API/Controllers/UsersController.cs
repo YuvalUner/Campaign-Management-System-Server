@@ -32,27 +32,39 @@ public class UsersController : Controller
     [HttpGet("HomePageInfo")]
     public async Task<IActionResult> HomePageInfo()
     {
-        int? userId = HttpContext.Session.GetInt32(Constants.UserId);
-        List<CampaignUser> campaigns = await _usersService.GetUserCampaigns(userId);
-        // The CampaignUser model also holds fields that should not be getting out, such as UserId, CampaignId, RoleId.
-        // Hence, it needs to be cleaned up first.
-        var campaignsCensored = campaigns.Select(x => new
+        try
         {
-            x.CampaignGuid, x.CampaignName, x.RoleName
-        });
-        User? user = await _usersService.GetUserPublicInfo(userId);
-        // Same goes for the User model - needs to be cleaned up first before sending it out.
-        // Else, there is risk of exposing DB schemas and userIds.
-        var returnObject = new { User = new
+            int? userId = HttpContext.Session.GetInt32(Constants.UserId);
+            List<CampaignUser> campaigns = await _usersService.GetUserCampaigns(userId);
+            // The CampaignUser model also holds fields that should not be getting out, such as UserId, CampaignId, RoleId.
+            // Hence, it needs to be cleaned up first.
+            var campaignsCensored = campaigns.Select(x => new
+            {
+                x.CampaignGuid, x.CampaignName, x.RoleName
+            });
+            User? user = await _usersService.GetUserPublicInfo(userId);
+            // Same goes for the User model - needs to be cleaned up first before sending it out.
+            // Else, there is risk of exposing DB schemas and userIds.
+            var returnObject = new
+            {
+                User = new
+                {
+                    user.FirstNameEng,
+                    user.LastNameEng,
+                    user.DisplayNameEng,
+                    user.ProfilePicUrl,
+                    user.FirstNameHeb,
+                    user.LastNameHeb
+                },
+                Campaigns = campaignsCensored
+            };
+            return Ok(returnObject);
+        }
+        catch (Exception e)
         {
-            user.FirstNameEng,
-            user.LastNameEng,
-            user.DisplayNameEng,
-            user.ProfilePicUrl,
-            user.FirstNameHeb,
-            user.LastNameHeb
-        }, Campaigns = campaignsCensored };
-        return Ok(returnObject);
+            _logger.LogError(e, "Error in HomePageInfo");
+            return StatusCode(500);
+        }
     }
 
     private async Task<bool> VerifyUserPrivateInfo(UserPrivateInfo userInfo)
@@ -113,45 +125,58 @@ public class UsersController : Controller
     [HttpPut("UserPrivateInfo")]
     public async Task<IActionResult> UserPrivateInfo([FromBody] UserPrivateInfo userInfo)
     {
-        var userId = HttpContext.Session.GetInt32(Constants.UserId);
-        var userIsAuthenticated = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);
-        // An authenticated user should never access this method through the client.
-        if (userIsAuthenticated)
+        try
         {
-            _logger.LogInformation("User with id {UserId} tried to re-authenticate", userId);
-            return Unauthorized();
+            var userId = HttpContext.Session.GetInt32(Constants.UserId);
+            var userIsAuthenticated = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);
+            // An authenticated user should never access this method through the client.
+            if (userIsAuthenticated)
+            {
+                _logger.LogInformation("User with id {UserId} tried to re-authenticate", userId);
+                return Unauthorized();
+            }
+
+            // Check that the user has not already filled out their private info.
+            // This is mostly a double check for the previous, as filling out private info should entail 
+            // an authenticated status. This can be commented out or deleted if needed, but kept in for now
+            // as mistakes are always possible and no one is available to review this as of yet.
+            if (!await VerifyNonDuplicatePrivateInfo(userId))
+            {
+                // If this error never gets logged, this part of the code can be removed.
+                _logger.LogError("First check in UserPrivateInfo passed but 2nd failed for user with id {UserId}",
+                    userId);
+                _logger.LogInformation("User with id {UserId} tried to enter private info twice", userId);
+                return Unauthorized();
+            }
+
+            // Filling in the info from the Http context, as our DB contains English names too.
+            userInfo.FirstNameEng = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+            userInfo.LastNameEng = HttpContext.User.FindFirst(ClaimTypes.Surname)?.Value;
+            // Make sure the info the user input matches that in the voters ledger.
+            if (!await VerifyUserPrivateInfo(userInfo))
+            {
+                return BadRequest();
+            }
+
+            // If all checks pass, update the user's info in the database.
+            int res = await _usersService.AddUserPrivateInfo(userInfo, userId);
+            if (res == -1)
+            {
+                _logger.LogInformation(
+                    "Error No. {ErrorNum}: User with id {UserId} And IP Address {IpAddress} tried to enter" +
+                    "an ID number that is already in the database",
+                    ErrorCodes.IdAlreadyExistsWhenVerifyingInfo, userId, HttpContext.Connection.RemoteIpAddress);
+                return BadRequest("Stealing people's identities is not allowed");
+            }
+
+            HttpContext.Session.SetInt32(Constants.UserAuthenticationStatus, 1);
+            _logger.LogInformation("User with {UserId} verified their private info", userId);
+            return Ok();
         }
-        // Check that the user has not already filled out their private info.
-        // This is mostly a double check for the previous, as filling out private info should entail 
-        // an authenticated status. This can be commented out or deleted if needed, but kept in for now
-        // as mistakes are always possible and no one is available to review this as of yet.
-        if (!await VerifyNonDuplicatePrivateInfo(userId))
+        catch (Exception e)
         {
-            // If this error never gets logged, this part of the code can be removed.
-            _logger.LogError("First check in UserPrivateInfo passed but 2nd failed for user with id {UserId}", userId);
-            _logger.LogInformation("User with id {UserId} tried to enter private info twice", userId);
-            return Unauthorized();
+            _logger.LogError(e, "Error in UserPrivateInfo");
+            return StatusCode(500);
         }
-        // Filling in the info from the Http context, as our DB contains English names too.
-        userInfo.FirstNameEng = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
-        userInfo.LastNameEng = HttpContext.User.FindFirst(ClaimTypes.Surname)?.Value;
-        // Make sure the info the user input matches that in the voters ledger.
-        if (!await VerifyUserPrivateInfo(userInfo))
-        {
-            return BadRequest();
-        }
-        
-        // If all checks pass, update the user's info in the database.
-        int res = await _usersService.AddUserPrivateInfo(userInfo, userId);
-        if (res == -1)
-        {
-            _logger.LogInformation("Error No. {ErrorNum}: User with id {UserId} And IP Address {IpAddress} tried to enter" +
-                                   "an ID number that is already in the database",
-                ErrorCodes.IdAlreadyExistsWhenVerifyingInfo,userId, HttpContext.Connection.RemoteIpAddress);
-            return BadRequest("Stealing people's identities is not allowed");
-        }
-        HttpContext.Session.SetInt32(Constants.UserAuthenticationStatus, 1);
-        _logger.LogInformation("User with {UserId} verified their private info", userId);
-        return Ok();
     }
 }

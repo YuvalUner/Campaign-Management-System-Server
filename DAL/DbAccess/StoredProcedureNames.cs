@@ -127,4 +127,10 @@ public static class StoredProcedureNames
     /// Params: userId (int)
     /// </summary>
     public static readonly string DeleteUser = "usp_DeleteUser";
+    
+    /// <summary>
+    /// Adds a permission to a user in a campaign.
+    /// Params: campaignGuid (Guid), userId (int), permissionType (string), permissionForScreen (string).
+    /// </summary>
+    public static readonly string AddPermission = "usp_AddPermission";
 }
