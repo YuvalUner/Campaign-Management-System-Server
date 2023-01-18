@@ -79,4 +79,34 @@ public class PermissionsController : Controller
             return StatusCode(500);
         }
     }
+    
+    [HttpDelete("delete/{campaignGuid:guid}/{userEmail}")]
+    public async Task<IActionResult> DeletePermission(Guid campaignGuid, string userEmail,
+        [FromBody] Permission permission)
+    {
+        try
+        {
+            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid)
+                || !CampaignAuthorizationUtils.DoesActiveCampaignMatch(HttpContext, campaignGuid))
+            {
+                return Unauthorized();
+            }
+
+            // TODO: Check if user has permission to edit permissions
+            // TODO: Check if user can edit this permission
+            User? user = await _usersService.GetUserByEmail(userEmail);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            await _permissionService.RemovePermission(permission, user.UserId, campaignGuid);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while removing permission");
+            return StatusCode(500);
+        }
+    }
 }

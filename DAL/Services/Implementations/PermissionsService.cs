@@ -35,4 +35,16 @@ public class PermissionsService : IPermissionsService
         });
         return await _dbAccess.GetData<Permission, DynamicParameters>(StoredProcedureNames.GetPermissions, param);
     }
+    
+    public async Task RemovePermission(Permission permission, int? userId, Guid? campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId,
+            campaignGuid,
+            permission.PermissionType,
+            permission.PermissionForScreen
+        });
+        await _dbAccess.ModifyData(StoredProcedureNames.RemovePermission, param);
+    }
 }

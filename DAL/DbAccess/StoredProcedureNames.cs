@@ -123,20 +123,26 @@ public static class StoredProcedureNames
     public static readonly string GetCampaignType = "usp_GetCampaignTypeAndCityByGuid";
     
     /// <summary>
-    /// Deletes a user from the database.
+    /// Deletes a user from the database.<br/>
     /// Params: userId (int)
     /// </summary>
     public static readonly string DeleteUser = "usp_DeleteUser";
     
     /// <summary>
-    /// Adds a permission to a user in a campaign.
+    /// Adds a permission to a user in a campaign.<br/>
     /// Params: campaignGuid (Guid), userId (int), permissionType (string), permissionForScreen (string).
     /// </summary>
     public static readonly string AddPermission = "usp_AddPermission";
 
     /// <summary>
-    /// Gets the user's permission set for a campaign.
+    /// Gets the user's permission set for a campaign.<br/>
     /// Params: campaignGuid (Guid), userId (int).
     /// </summary>
     public static readonly string GetPermissions = "usp_GetUserPermissionSet";
+    
+    /// <summary>
+    /// Removes a permission from the user in a campaign.<br/>
+    /// Params: campaignGuid (Guid), userId (int), permissionType (string), permissionForScreen (string).
+    /// </summary>
+    public static readonly string RemovePermission = "usp_RemovePermission";
 }
