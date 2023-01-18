@@ -25,4 +25,14 @@ public class PermissionsService : IPermissionsService
         });
         await _dbAccess.ModifyData(StoredProcedureNames.AddPermission, param);
     }
+    
+    public async Task<IEnumerable<Permission?>> GetPermissions(int? userId, Guid? campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId,
+            campaignGuid
+        });
+        return await _dbAccess.GetData<Permission, DynamicParameters>(StoredProcedureNames.GetPermissions, param);
+    }
 }

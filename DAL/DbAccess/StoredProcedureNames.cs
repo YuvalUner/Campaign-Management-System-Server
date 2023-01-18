@@ -133,4 +133,10 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid), userId (int), permissionType (string), permissionForScreen (string).
     /// </summary>
     public static readonly string AddPermission = "usp_AddPermission";
+
+    /// <summary>
+    /// Gets the user's permission set for a campaign.
+    /// Params: campaignGuid (Guid), userId (int).
+    /// </summary>
+    public static readonly string GetPermissions = "usp_GetUserPermissionSet";
 }
