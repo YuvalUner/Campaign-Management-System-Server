@@ -19,6 +19,7 @@ builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IVotersLedgerService, VotersLedgerService>();
 builder.Services.AddScoped<ICampaignsService, CampaignsService>();
 builder.Services.AddScoped<IInvitesService, InvitesService>();
+builder.Services.AddScoped<IPermissionsService, PermissionsService>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", optionsBuilder => {

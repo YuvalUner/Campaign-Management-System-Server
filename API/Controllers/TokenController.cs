@@ -64,85 +64,102 @@ public class TokenController : Controller
     [HttpPost("googleSignIn")]
     public async Task<IActionResult> SignUserIn([FromBody] ExternalAuthDto externalAuth)
     {
-        // Verify Google token
-        var payload = await VerifyGoogleToken(externalAuth);
-        if (payload == null)
+        try
         {
-            return BadRequest();
-        }
-        
-        // Get user from DB. If user doesn't exist, create a new one
-        var user = await _usersService.GetUserByEmail(payload.Email);
-        
-        if (user == null)
-        {
-            user = new User()
+            // Verify Google token
+            var payload = await VerifyGoogleToken(externalAuth);
+            if (payload == null)
             {
-                Email = payload.Email,
-                DisplayNameEng = payload.Name,
-                FirstNameEng = payload.GivenName,
-                LastNameEng = payload.FamilyName,
-                ProfilePicUrl = payload.Picture,
-                UserId = 0
-            };
-            int userId = await _usersService.CreateUser(user);
-            // Theoretically, this should never happen
-            // In case it does, log it as critical and return 500, because something is wrong with the DB
-            if (userId == -1)
-            {
-                _logger.LogCritical("User creation failed for email {Email}", payload.Email);
-                return StatusCode(500);
+                return BadRequest();
             }
 
-            user.UserId = userId;
-            _logger.LogInformation("Created new user with email {Email}", payload.Email);
-        }
-        
-        // Get some frequently used info about the user that will be stored in the session for use in future requests
-        // without needing to query the database each time for them.
-        user.Authenticated = await _usersService.IsUserAuthenticated(user.UserId);
-        List<CampaignUser> userCampaigns = await _usersService.GetUserCampaigns(user.UserId);
-        var allowedCampaignGuids = userCampaigns.Select(c => c.CampaignGuid).ToList();
-        
-        // Log the user in via cookie authentication and session
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.FirstNameEng),
-            new Claim("FullName", user.DisplayNameEng),
-            new Claim(ClaimTypes.Surname, user.LastNameEng),
-        };
+            // Get user from DB. If user doesn't exist, create a new one
+            var user = await _usersService.GetUserByEmail(payload.Email);
 
-        // Copy pasted code from
-        // https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-7.0
-        var claimsIdentity = new ClaimsIdentity(
-            claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        
-        var authProperties = new AuthenticationProperties
+            if (user == null)
+            {
+                user = new User()
+                {
+                    Email = payload.Email,
+                    DisplayNameEng = payload.Name,
+                    FirstNameEng = payload.GivenName,
+                    LastNameEng = payload.FamilyName,
+                    ProfilePicUrl = payload.Picture,
+                    UserId = 0
+                };
+                int userId = await _usersService.CreateUser(user);
+                // Theoretically, this should never happen
+                // In case it does, log it as critical and return 500, because something is wrong with the DB
+                if (userId == -1)
+                {
+                    _logger.LogCritical("User creation failed for email {Email}", payload.Email);
+                    return StatusCode(500);
+                }
+
+                user.UserId = userId;
+                _logger.LogInformation("Created new user with email {Email}", payload.Email);
+            }
+
+            // Get some frequently used info about the user that will be stored in the session for use in future requests
+            // without needing to query the database each time for them.
+            user.Authenticated = await _usersService.IsUserAuthenticated(user.UserId);
+            List<CampaignUser> userCampaigns = await _usersService.GetUserCampaigns(user.UserId);
+            var allowedCampaignGuids = userCampaigns.Select(c => c.CampaignGuid).ToList();
+
+            // Log the user in via cookie authentication and session
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.FirstNameEng),
+                new Claim("FullName", user.DisplayNameEng),
+                new Claim(ClaimTypes.Surname, user.LastNameEng),
+            };
+
+            // Copy pasted code from
+            // https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-7.0
+            var claimsIdentity = new ClaimsIdentity(
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var authProperties = new AuthenticationProperties
+            {
+                AllowRefresh = true,
+                IsPersistent = true,
+                IssuedUtc = DateTimeOffset.Now,
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+            // Keep the user id in the session for future use, as it should not be exposed to the client via claims
+            HttpContext.Session.SetInt32(Constants.UserId, user.UserId);
+            // Store whether the user is authenticated or not, to avoid unnecessary DB calls
+            HttpContext.Session.SetInt32(Constants.UserAuthenticationStatus, user.Authenticated ? 1 : 0);
+            // Store the user's allowed campaigns (campaigns they are a part of), to avoid many unnecessary DB calls
+            HttpContext.Session.Set(Constants.AllowedCampaigns, allowedCampaignGuids);
+            return Ok();
+        }
+        catch (Exception ex)
         {
-            AllowRefresh = true,
-            IsPersistent = true,
-            IssuedUtc = DateTimeOffset.Now,
-        };
-        
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme, 
-            new ClaimsPrincipal(claimsIdentity), 
-            authProperties);
-        // Keep the user id in the session for future use, as it should not be exposed to the client via claims
-        HttpContext.Session.SetInt32(Constants.UserId, user.UserId);
-        // Store whether the user is authenticated or not, to avoid unnecessary DB calls
-        HttpContext.Session.SetInt32(Constants.UserAuthenticationStatus, user.Authenticated ? 1 : 0);
-        // Store the user's allowed campaigns (campaigns they are a part of), to avoid many unnecessary DB calls
-        HttpContext.Session.Set(Constants.AllowedCampaigns, allowedCampaignGuids);
-        return Ok();
+            _logger.LogError(ex, "An error occurred while signing in user");
+            return StatusCode(500);
+        }
     }
     
 
     [HttpPost("signOut")]
     public async Task<IActionResult> SignUserOut()
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        return Ok();
+        try
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Session.Clear();
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while signing out user");
+            return StatusCode(500);
+        }
     }
 
     [HttpPost("TestSignInRemoveLater")]
