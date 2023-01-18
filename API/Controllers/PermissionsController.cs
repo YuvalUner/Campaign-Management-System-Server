@@ -9,12 +9,12 @@ namespace API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class PermissionsController: Controller
+public class PermissionsController : Controller
 {
     private readonly IPermissionsService _permissionService;
     private readonly ILogger<PermissionsController> _logger;
     private readonly IUsersService _usersService;
-    
+
     public PermissionsController(IPermissionsService permissionService, ILogger<PermissionsController> logger,
         IUsersService usersService)
     {
@@ -22,9 +22,10 @@ public class PermissionsController: Controller
         _logger = logger;
         _usersService = usersService;
     }
-    
-    [HttpPost("add/{userEmail}/{campaignGuid:guid}")]
-    public async Task<IActionResult> AddPermission(string userEmail, Guid campaignGuid, [FromBody] Permission permission)
+
+    [HttpPost("add/{campaignGuid:guid}/{userEmail}")]
+    public async Task<IActionResult> AddPermission(Guid campaignGuid, string userEmail,
+        [FromBody] Permission permission)
     {
         try
         {
@@ -33,6 +34,7 @@ public class PermissionsController: Controller
             {
                 return Unauthorized();
             }
+
             // TODO: Check if user has permission to edit permissions
             // TODO: Check if user can edit this permission
             User? user = await _usersService.GetUserByEmail(userEmail);
@@ -40,12 +42,40 @@ public class PermissionsController: Controller
             {
                 return NotFound();
             }
+
             await _permissionService.AddPermission(permission, user.UserId, campaignGuid);
             return Ok();
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Error while adding permission");
+            return StatusCode(500);
+        }
+    }
+
+    [HttpGet("get/{campaignGuid:guid}")]
+    public async Task<IActionResult> GetPermissions(Guid campaignGuid)
+    {
+        try
+        {
+            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid)
+                || !CampaignAuthorizationUtils.DoesActiveCampaignMatch(HttpContext, campaignGuid))
+            {
+                return Unauthorized();
+            }
+
+            var userId = HttpContext.Session.GetInt32(Constants.UserId);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var permissions = await _permissionService.GetPermissions(userId, campaignGuid);
+            return Ok(permissions);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while getting permissions");
             return StatusCode(500);
         }
     }

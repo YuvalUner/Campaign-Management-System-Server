@@ -28,8 +28,6 @@ public static class Screens
 
 public class Permission : IEquatable<Permission>
 {
-    public int? PermissionId { get; set; }
-
     private string? _permissionType;
 
     public string? PermissionType
