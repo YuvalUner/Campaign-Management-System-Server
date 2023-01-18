@@ -55,6 +55,7 @@ public static class StoredProcedureNames
     /// <summary>
     /// Adds the user's private info to the users and dynamic ledger tables.<br/>
     /// Params: userId (int), firstNameHeb (string), lastNameHeb (string), idNum (int).
+    /// Returns: 1 on success, -1 on failure.
     /// </summary>
     public static readonly string AddUserPrivateInfo = "usp_InsertUserPrivateInfo";
 
@@ -120,4 +121,10 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid)
     /// </summary>
     public static readonly string GetCampaignType = "usp_GetCampaignTypeAndCityByGuid";
+    
+    /// <summary>
+    /// Deletes a user from the database.
+    /// Params: userId (int)
+    /// </summary>
+    public static readonly string DeleteUser = "usp_DeleteUser";
 }

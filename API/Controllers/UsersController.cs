@@ -142,7 +142,14 @@ public class UsersController : Controller
         }
         
         // If all checks pass, update the user's info in the database.
-        await _usersService.AddUserPrivateInfo(userInfo, userId);
+        int res = await _usersService.AddUserPrivateInfo(userInfo, userId);
+        if (res == -1)
+        {
+            _logger.LogInformation("Error No. {ErrorNum}: User with id {UserId} And IP Address {IpAddress} tried to enter" +
+                                   "an ID number that is already in the database",
+                ErrorCodes.IdAlreadyExistsWhenVerifyingInfo,userId, HttpContext.Connection.RemoteIpAddress);
+            return BadRequest("Stealing people's identities is not allowed");
+        }
         HttpContext.Session.SetInt32(Constants.UserAuthenticationStatus, 1);
         _logger.LogInformation("User with {UserId} verified their private info", userId);
         return Ok();

@@ -38,7 +38,7 @@ public interface IUsersService
     /// <param name="privateInfo">The model with the private info</param>
     /// <param name="userId"></param>
     /// <returns></returns>
-    Task AddUserPrivateInfo(UserPrivateInfo privateInfo, int? userId);
+    Task<int> AddUserPrivateInfo(UserPrivateInfo privateInfo, int? userId);
 
     /// <summary>
     /// Gets a user's authentication status from the database and returns it.
@@ -46,4 +46,11 @@ public interface IUsersService
     /// <param name="userId"></param>
     /// <returns></returns>
     Task<bool> IsUserAuthenticated(int? userId);
+
+    /// <summary>
+    /// Deletes a user from the database.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task DeleteUser(int? userId);
 }
