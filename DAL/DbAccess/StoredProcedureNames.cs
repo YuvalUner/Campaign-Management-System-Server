@@ -145,4 +145,10 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid), userId (int), permissionType (string), permissionForScreen (string).
     /// </summary>
     public static readonly string RemovePermission = "usp_RemovePermission";
+
+    /// <summary>
+    /// Gets the role a user is assigned to in a campaign.<br/>
+    /// Params: campaignGuid (Guid), userId (int).
+    /// </summary>
+    public static readonly string GetUserRoleInCampaign = "usp_GetUserRole";
 }
