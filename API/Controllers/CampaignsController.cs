@@ -15,18 +15,24 @@ public class CampaignsController : Controller
 {
     private readonly ILogger<CampaignsController> _logger;
     private readonly ICampaignsService _campaignService;
+    private readonly IPermissionsService _permissionsService;
+    private readonly IRolesService _rolesService;
+    
 
-    public CampaignsController(ILogger<CampaignsController> logger, ICampaignsService campaignService)
+    public CampaignsController(ILogger<CampaignsController> logger, ICampaignsService campaignService,
+        IPermissionsService permissionsService, IRolesService rolesService)
     {
         _logger = logger;
         _campaignService = campaignService;
+        _permissionsService = permissionsService;
+        _rolesService = rolesService;
     }
 
     /// <summary>
     /// An action the client is expected to perform each time they load a campaign page.
     /// This sets the current active campaign for the user, and fetches data about the user's role in it.
     /// </summary>
-    /// <param name="campaign"></param>
+    /// <param name="campaignGuid"></param>
     /// <returns></returns>
     [HttpPost("/enter/{campaignGuid:guid}")]
     public async Task<IActionResult> EnterCampaign(Guid campaignGuid)
@@ -39,7 +45,11 @@ public class CampaignsController : Controller
             }
 
             CampaignAuthorizationUtils.EnterCampaign(HttpContext, campaignGuid);
-            // TODO: Get user's role in campaign and set it in the session.
+            
+            // Set the user's permissions and role in the active campaign in session
+            await PermissionUtils.SetPermissions(_permissionsService, HttpContext);
+            await RoleUtils.SetRole(_rolesService, HttpContext);
+
             return Ok();
         }
         catch (Exception e)
@@ -114,9 +124,16 @@ public class CampaignsController : Controller
                 return Unauthorized();
             }
 
-            //***********************************************************************
-            //TODO: Check that the user has permission to update this campaign.
-            //***********************************************************************
+            // Make sure that the user has permission to edit campaign settings.
+            var requiredPermission = new Permission()
+            {
+                PermissionType = PermissionTypes.Edit,
+                PermissionTarget = PermissionTargets.CampaignSettings
+            };
+            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+            {
+                return Unauthorized();
+            }
 
             await _campaignService.ModifyCampaign(campaign);
             return Ok();

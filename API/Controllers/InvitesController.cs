@@ -1,5 +1,6 @@
 ﻿using API.SessionExtensions;
 using API.Utils;
+using DAL.Models;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +33,15 @@ public class InvitesController : Controller
             {
                 return Unauthorized();
             }
+            var requiredPermission = new Permission()
+            {
+                PermissionType = PermissionTypes.View,
+                PermissionTarget = PermissionTargets.CampaignSettings
+            };
+            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+            {
+                return Unauthorized();
+            }
 
             Guid? inviteGuid = await _inviteService.GetInvite(campaignGuid);
             if (inviteGuid == null)
@@ -56,6 +66,15 @@ public class InvitesController : Controller
         {
             return Unauthorized();
         }
+        var requiredPermission = new Permission()
+        {
+            PermissionType = PermissionTypes.Edit,
+            PermissionTarget = PermissionTargets.CampaignSettings
+        };
+        if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+        {
+            return Unauthorized();
+        }
 
         await _inviteService.CreateInvite(campaignGuid);
         return Ok();
@@ -68,6 +87,15 @@ public class InvitesController : Controller
         try
         {
             if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid))
+            {
+                return Unauthorized();
+            }
+            var requiredPermission = new Permission()
+            {
+                PermissionType = PermissionTypes.Edit,
+                PermissionTarget = PermissionTargets.CampaignSettings
+            };
+            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
             {
                 return Unauthorized();
             }

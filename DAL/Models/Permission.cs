@@ -5,7 +5,7 @@ public static class PermissionTypes
     public static readonly string View = "view";
     public static readonly string Edit = "edit";
 
-    public static readonly string[] All = new string[] { View, Edit };
+    private static readonly string[] All = new string[] { View, Edit };
 
     public static bool IsValid(string permissionType)
     {
@@ -13,12 +13,14 @@ public static class PermissionTypes
     }
 }
 
-public static class Screens
+public static class PermissionTargets
 {
     public static readonly string CampaignSettings = "Campaign Settings";
     public static readonly string Permissions = "Permissions";
+    public static readonly string VotersLedger = "Voters Ledger";
+    public static readonly string CampaignUsersList = "Campaign Users List";
 
-    public static readonly string[] All = new string[] { CampaignSettings, Permissions };
+    private static readonly string[] All = new string[] { CampaignSettings, Permissions, VotersLedger };
 
     public static bool IsValid(string screen)
     {
@@ -44,19 +46,19 @@ public class Permission : IEquatable<Permission>
         }
     }
 
-    private string? _screen;
+    private string? _target;
 
-    public string? PermissionForScreen
+    public string? PermissionTarget
     {
-        get { return _screen; }
+        get { return _target; }
         set
         {
-            if (!Screens.IsValid(value))
+            if (!PermissionTargets.IsValid(value))
             {
                 throw new ArgumentException("Invalid screen name");
             }
 
-            _screen = value;
+            _target = value;
         }
     }
 
@@ -64,7 +66,7 @@ public class Permission : IEquatable<Permission>
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return _permissionType == other._permissionType && PermissionForScreen == other.PermissionForScreen;
+        return _permissionType == other._permissionType && PermissionTarget == other.PermissionTarget;
     }
 
     public override bool Equals(object? obj)
@@ -77,6 +79,6 @@ public class Permission : IEquatable<Permission>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(_permissionType, PermissionForScreen);
+        return HashCode.Combine(_permissionType, PermissionTarget);
     }
 }
