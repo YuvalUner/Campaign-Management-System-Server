@@ -71,4 +71,42 @@ public class VotersLedgerController : Controller
             return StatusCode(500, "Error while filtering voters ledger");
         }
     }
+
+    [HttpPut("/updateSupportStatus/{campaignGuid:guid}")]
+    public async Task<IActionResult> UpdateSupportStatus(Guid campaignGuid, [FromBody] UpdateSupportStatusParams updateParams)
+    {
+        try
+        {
+            // Check that the user has access to the campaign
+            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid)
+                || !CampaignAuthorizationUtils.DoesActiveCampaignMatch(HttpContext, campaignGuid))
+            {
+                return Unauthorized();
+            }
+
+            // Make sure user has view permissions for the voters ledger
+            var requiredPermission = new Permission()
+            {
+                PermissionType = PermissionTypes.Edit,
+                PermissionTarget = PermissionTargets.VotersLedger
+            };
+            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+            {
+                return Unauthorized();
+            }
+            
+            int res = await _votersLedgerService.UpdateVoterSupportStatus(updateParams, campaignGuid);
+            if (res == -1)
+            {
+                return BadRequest("No voters were updated");
+            }
+            return Ok();
+
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while updating support status");
+            return StatusCode(500, "Error while updating support status");
+        }
+    }
 }

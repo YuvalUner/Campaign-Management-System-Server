@@ -66,4 +66,21 @@ public class VotersLedgerService : IVotersLedgerService
             (StoredProcedureNames.FilterVotersLedger, param);
         return res;
     }
+
+    public async Task<int> UpdateVoterSupportStatus(UpdateSupportStatusParams updateParams, Guid campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            voterId = updateParams.IdNum,
+            campaignGuid
+        });
+        if (updateParams.SupportStatus != null)
+        {
+            param.Add("supportStatus", updateParams.SupportStatus, DbType.Boolean, ParameterDirection.Input); 
+        }
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        
+        await _dbAccess.ModifyData(StoredProcedureNames.UpdateSupportStatus, param);
+        return param.Get<int>("returnVal");
+    }
 }

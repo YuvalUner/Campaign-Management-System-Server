@@ -43,4 +43,11 @@ public interface ICampaignsService
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
     Task<CampaignType> GetCampaignType(Guid? campaignGuid);
+
+    /// <summary>
+    /// Gets the list of users in a campaign.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <returns></returns>
+    Task<IEnumerable<User>> GetUsersInCampaign(Guid? campaignGuid);
 }
