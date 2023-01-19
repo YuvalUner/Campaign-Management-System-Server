@@ -20,7 +20,7 @@ public static class PermissionTargets
     public static readonly string VotersLedger = "Voters Ledger";
     public static readonly string CampaignUsersList = "Campaign Users List";
 
-    private static readonly string[] All = new string[] { CampaignSettings, Permissions, VotersLedger };
+    private static readonly string[] All = new string[] { CampaignSettings, Permissions, VotersLedger, CampaignUsersList };
 
     public static bool IsValid(string screen)
     {
@@ -39,7 +39,7 @@ public class Permission : IEquatable<Permission>
         {
             if (!PermissionTypes.IsValid(value))
             {
-                throw new ArgumentException("Invalid permission type");
+                throw new ArgumentException($"Invalid permission type {value}");
             }
 
             _permissionType = value;
@@ -55,7 +55,7 @@ public class Permission : IEquatable<Permission>
         {
             if (!PermissionTargets.IsValid(value))
             {
-                throw new ArgumentException("Invalid screen name");
+                throw new ArgumentException($"Invalid permission target {value}");
             }
 
             _target = value;

@@ -151,4 +151,18 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid), userId (int).
     /// </summary>
     public static readonly string GetUserRoleInCampaign = "usp_GetUserRole";
+    
+    /// <summary>
+    /// Gets the list of users in a campaign.<br/>
+    /// Params: campaignGuid (Guid).
+    /// </summary>
+    public static readonly string GetUsersInCampaign = "usp_GetCampaignUsers";
+
+    /// <summary>
+    /// Updates a user's support status for a campaign.<br/>
+    /// Params: voterId (int), campaignGuid (Guid), supportStatus (bool).
+    /// If support status is unknown, pass null.<br/>
+    /// Returns: 1 on success, -1 on failure. Failure could be due to mismatch of campaign city and voter city.
+    /// </summary>
+    public static readonly string UpdateSupportStatus = "usp_UpdateSupportStatus";
 }
