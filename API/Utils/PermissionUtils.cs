@@ -47,6 +47,15 @@ public static class PermissionUtils
         {
             return false;
         }
+
+        // If the user is attempting to modify their own permissions and have passed the above 2 tests, they can do so.
+        // This is an unlikely scenario, but it's possible.
+        var userId = context.Session.GetInt32(Constants.UserId);
+        if (userId == otherUser.UserId)
+        {
+            return true;
+        }
+        
         // Third check - make sure the user is not trying to modify the permissions of someone with a higher or equal role level.
         // This is done to make sure that users cannot modify the permissions of admins.
         // Role levels are defined in the Roles table.
@@ -56,10 +65,12 @@ public static class PermissionUtils
         {
             return false;
         }
+        
         var otherUserRole = await rolesService.GetRoleInCampaign(campaignGuid, otherUser.UserId);
         // If the other user has a higher or equal role level, then the user cannot modify their permissions.
         // However, roles with level 0 - common, non admin roles, can be modified by anyone that passes the above tests.
-        if (otherUserRole == null || (userRole.RoleLevel != 0 && otherUserRole.RoleLevel >= userRole.RoleLevel))
+        if (otherUserRole == null 
+            || (userRole.RoleLevel != 0 && otherUserRole.RoleLevel >= userRole.RoleLevel))
         {
             return false;
         }

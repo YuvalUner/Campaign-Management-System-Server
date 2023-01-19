@@ -144,4 +144,47 @@ public class CampaignsController : Controller
             return StatusCode(500);
         }
     }
+    
+    [HttpGet("getUsers/{campaignGuid:guid}")]
+    public async Task<IActionResult> GetCampaignUsers(Guid campaignGuid)
+    {
+        try
+        {
+            // Check if the user has access to this campaign to begin with.
+            // Not checking authentication status since if they have access then they must be authenticated.
+            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid)
+                || !CampaignAuthorizationUtils.DoesActiveCampaignMatch(HttpContext, campaignGuid))
+            {
+                return Unauthorized();
+            }
+
+            // Make sure that the user has permission to view the campaign's user list.
+            var requiredPermission = new Permission()
+            {
+                PermissionType = PermissionTypes.View,
+                PermissionTarget = PermissionTargets.CampaignUsersList
+            };
+            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+            {
+                return Unauthorized();
+            }
+
+            var users = await _campaignService.GetUsersInCampaign(campaignGuid);
+            var usersPartialInfo = users.Select(u =>
+                new
+                {
+                    u.Email,
+                    u.FirstNameEng,
+                    u.LastNameEng,
+                    u.FirstNameHeb,
+                    u.LastNameHeb,
+                });
+            return Ok(usersPartialInfo);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting campaign users");
+            return StatusCode(500);
+        }
+    }
 }
