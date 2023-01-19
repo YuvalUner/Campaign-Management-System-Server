@@ -33,7 +33,17 @@ public class VotersLedgerController : Controller
             {
                 return Unauthorized();
             }
-            // TODO: add role checking for the user.
+
+            // Make sure user has view permissions for the voters ledger
+            var requiredPermission = new Permission()
+            {
+                PermissionType = PermissionTypes.View,
+                PermissionTarget = PermissionTargets.VotersLedger
+            };
+            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+            {
+                return Unauthorized();
+            }
 
             // Verify that the campaign type is municipal or that that the campaign type is national and 
             // either a city was given or a first and last name or id number was given.

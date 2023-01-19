@@ -19,7 +19,7 @@ public class PermissionsService : IPermissionsService
         var param = new DynamicParameters(new
         {
             permission.PermissionType,
-            permission.PermissionForScreen,
+            permission.PermissionTarget,
             userId,
             campaignGuid
         });
@@ -43,7 +43,7 @@ public class PermissionsService : IPermissionsService
             userId,
             campaignGuid,
             permission.PermissionType,
-            permission.PermissionForScreen
+            permission.PermissionTarget
         });
         await _dbAccess.ModifyData(StoredProcedureNames.RemovePermission, param);
     }
