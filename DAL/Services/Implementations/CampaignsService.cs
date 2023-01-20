@@ -70,9 +70,9 @@ public class CampaignsService : ICampaignsService
             campaignGuid,
             userId
         });
-        param.Add("@IsUserInCampaign", dbType: DbType.Boolean, direction: ParameterDirection.ReturnValue);
+        param.Add("@IsUserInCampaign", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.IsUserInCampaign, param);
-        return param.Get<bool>("@IsUserInCampaign");
+        return Convert.ToBoolean(param.Get<int>("@IsUserInCampaign"));
     }
     
     public async Task<CampaignType> GetCampaignType(Guid? campaignGuid)
@@ -94,5 +94,14 @@ public class CampaignsService : ICampaignsService
         });
         return await _dbAccess.GetData<User, DynamicParameters>
             (StoredProcedureNames.GetUsersInCampaign, param);
+    }
+
+    public async Task DeleteCampaign(Guid? campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid
+        });
+        await _dbAccess.ModifyData(StoredProcedureNames.DeleteCampaign, param);
     }
 }
