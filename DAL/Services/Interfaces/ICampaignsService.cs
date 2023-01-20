@@ -50,4 +50,11 @@ public interface ICampaignsService
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
     Task<IEnumerable<User>> GetUsersInCampaign(Guid? campaignGuid);
+    
+    /// <summary>
+    /// Deletes a campaign from the database.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <returns></returns>
+    Task DeleteCampaign(Guid? campaignGuid);
 }

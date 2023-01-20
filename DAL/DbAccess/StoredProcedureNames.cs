@@ -165,4 +165,10 @@ public static class StoredProcedureNames
     /// Returns: 1 on success, -1 on failure. Failure could be due to mismatch of campaign city and voter city.
     /// </summary>
     public static readonly string UpdateSupportStatus = "usp_UpdateSupportStatus";
+    
+    /// <summary>
+    /// Deletes a campaign.
+    /// Params: campaignGuid (Guid)
+    /// </summary>
+    public static readonly string DeleteCampaign = "usp_DeleteCampaign";
 }

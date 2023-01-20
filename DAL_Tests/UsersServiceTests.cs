@@ -2,6 +2,7 @@
 using DAL.Models;
 using DAL.Services.Implementations;
 using DAL.Services.Interfaces;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -17,7 +18,7 @@ public class UsersServiceTests
     private readonly IUsersService _usersService;
     private readonly IConfiguration _configuration;
 
-    private static readonly User testUser = new User()
+    private static readonly User TestUser = new User()
     {
         Email = "AAAA",
         FirstNameEng = "Test",
@@ -36,45 +37,140 @@ public class UsersServiceTests
     }
 
     [Fact, TestPriority(1)]
-    public void Test1_AddUserShouldWork()
+    public void AddUserShouldWork()
     {
         // Arrange
         
         // Act
-        int newUserId = _usersService.CreateUser(testUser).Result;
+        int newUserId = _usersService.CreateUser(TestUser).Result;
         
         // Assert
         Assert.True(newUserId > 0);
-        testUser.UserId = newUserId;
+        TestUser.UserId = newUserId;
     }
     
     [Fact, TestPriority(2)]
-    public void Test2_GetUserShouldWork()
+    public void AddUserShouldThrowException()
+    {
+        // Arrange
+        
+        // Act
+
+        // Assert
+        Assert.Throws<AggregateException>(() =>  _usersService.CreateUser(TestUser).Result );
+    }
+    
+    
+    [Fact, TestPriority(2)]
+    public void GetUserShouldWork()
     {
         // Arrange
 
         // Act
-        User user = _usersService.GetUserByEmail(testUser.Email).Result;
+        User user = _usersService.GetUserByEmail(TestUser.Email).Result;
 
         // Assert
         Assert.NotNull(user);
-        Assert.True(testUser.Email == user.Email && testUser.FirstNameEng == user.FirstNameEng && testUser.LastNameEng == user.LastNameEng && testUser.ProfilePicUrl == user.ProfilePicUrl);
+        Assert.True(TestUser.Email == user.Email && TestUser.FirstNameEng == user.FirstNameEng && TestUser.LastNameEng == user.LastNameEng && TestUser.ProfilePicUrl == user.ProfilePicUrl);
+    }
+    
+    [Fact, TestPriority(2)]
+    public void GetUserShouldFail()
+    {
+        // Arrange
+
+        // Act
+        User user = _usersService.GetUserByEmail("AAAAA").Result;
+
+        // Assert
+        Assert.Null(user);
     }
 
     [Fact, TestPriority(2)]
-    public void Test3_GetUserPublicInfoShouldWork()
+    public void GetUserPublicInfoShouldWork()
     {
-        var userPublicInfo = _usersService.GetUserPublicInfo(testUser.UserId).Result;
+        var userPublicInfo = _usersService.GetUserPublicInfo(TestUser.UserId).Result;
         
         Assert.NotNull(userPublicInfo);
-        Assert.True(testUser.FirstNameEng == userPublicInfo.FirstNameEng && testUser.LastNameEng == userPublicInfo.LastNameEng && testUser.ProfilePicUrl == userPublicInfo.ProfilePicUrl);
+        Assert.True(TestUser.FirstNameEng == userPublicInfo.FirstNameEng && TestUser.LastNameEng == userPublicInfo.LastNameEng && TestUser.ProfilePicUrl == userPublicInfo.ProfilePicUrl);
+    }
+    
+    [Fact, TestPriority(2)]
+    public void GetUserPublicInfoShouldFail()
+    {
+        var userPublicInfo = _usersService.GetUserPublicInfo(-1).Result;
+        
+        Assert.Null(userPublicInfo);
     }
 
-    [Fact, TestPriority(10)] 
-    public void Test4_DeleteUserShouldWork()
+    [Fact, TestPriority(2)]
+    public void IsUserAuthenticatedShouldReturnFalse()
     {
-        _usersService.DeleteUser(testUser.UserId).Wait();
-        User? user = _usersService.GetUserByEmail(testUser.Email).Result;
+        // Arrange
+        
+        // Act
+        var isAuthenticated = _usersService.IsUserAuthenticated(TestUser.UserId).Result;
+        
+        // Assert
+        Assert.False(isAuthenticated);
+    }
+    
+    [Fact, TestPriority(3)]
+    public void VerifyUserPrivateInfoShouldWork()
+    {
+        // Arrange
+        var info = new UserPrivateInfo()
+        {
+            FirstNameEng = TestUser.FirstNameEng,
+            LastNameEng = TestUser.LastNameEng,
+            IdNumber = 1,
+            CityName = "גבעתיים"
+        };
+        
+        // Act
+        var userPrivateInfo = _usersService.AddUserPrivateInfo(info, TestUser.UserId).Result;
+        
+        // Assert
+        Assert.True(userPrivateInfo == 1);
+    }
+
+    [Fact, TestPriority(4)]
+    public void IsUserAuthenticatedShouldReturnTrue()
+    {
+        // Arrange
+        
+        // Act
+        var isAuthenticated = _usersService.IsUserAuthenticated(TestUser.UserId).Result;
+        
+        // Assert
+        Assert.True(isAuthenticated);
+    }
+    
+    [Fact, TestPriority(4)]
+    public void VerifyUserPrivateInfoShouldFailForDuplicate()
+    {
+        // Arrange
+        var info = new UserPrivateInfo()
+        {
+            FirstNameEng = TestUser.FirstNameEng,
+            LastNameEng = TestUser.LastNameEng,
+            IdNumber = 1,
+            CityName = "גבעתיים"
+        };
+        
+        // Act
+        var userPrivateInfo = _usersService.AddUserPrivateInfo(info, TestUser.UserId).Result;
+        
+        // Assert
+        Assert.True(userPrivateInfo == -1);
+    }
+    
+
+    [Fact, TestPriority(10)] 
+    public void DeleteUserShouldWork()
+    {
+        _usersService.DeleteUser(TestUser.UserId).Wait();
+        User? user = _usersService.GetUserByEmail(TestUser.Email).Result;
         
         Assert.Null(user);
     }
