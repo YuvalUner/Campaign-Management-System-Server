@@ -16,7 +16,7 @@ public class EmailSendingService : IEmailSendingService
         _logger = logger;
     }
 
-    public async Task SendEmailAsync(string emailTo, string subject, string message)
+    public async Task SendEmailAsync(string emailTo, string subject, string message, string? senderName = null)
     {
 
         try
@@ -26,7 +26,12 @@ public class EmailSendingService : IEmailSendingService
             smtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
             MailMessage email = new MailMessage();
             
-            email.From = new MailAddress(_configuration["EmailConfiguration:Gmail:Email"]);
+            if (senderName != null)
+                email.From = new MailAddress(_configuration["EmailConfiguration:Gmail:Email"], senderName);
+            else
+            {
+                email.From = new MailAddress(_configuration["EmailConfiguration:Gmail:Email"]);
+            }
             email.To.Add(emailTo);
             email.Subject = subject;
             email.Body = message;
@@ -47,7 +52,7 @@ public class EmailSendingService : IEmailSendingService
     
     public async Task SendUserJoinedEmailAsync(string? userName, string? campaignName, string emailTo)
     {
-        string subject = $"Campaign: {campaignName} - user joined";
+        string subject = $"User joined campaign";
         string message = $"User {userName} joined campaign {campaignName}";
         await SendEmailAsync(emailTo, subject, message);
     }
