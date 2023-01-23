@@ -122,6 +122,12 @@ public class InvitesController : Controller
             {
                 return NotFound();
             }
+            
+            var userAccountAuthorizationStatus = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);
+            if (!userAccountAuthorizationStatus)
+            {
+                return Unauthorized();
+            }
 
             // Checks if the user is already part of the campaign and if not, adds them
             // Check is done by checking the list in the user's session, as that always contains the same data as the database

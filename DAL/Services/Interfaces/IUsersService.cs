@@ -53,4 +53,19 @@ public interface IUsersService
     /// <param name="userId"></param>
     /// <returns></returns>
     Task DeleteUser(int? userId);
+
+    /// <summary>
+    /// Adds a phone number to the user's account.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="phoneNumber"></param>
+    /// <returns></returns>
+    Task AddPhoneNumber(int? userId, string phoneNumber);
+    
+    /// <summary>
+    /// Gets the user's phone and email, if they exist.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<User?> GetUserContactInfo(int? userId);
 }

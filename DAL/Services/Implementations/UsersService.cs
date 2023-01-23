@@ -97,4 +97,25 @@ public class UsersService : IUsersService
         });
         await _dbAccess.ModifyData(StoredProcedureNames.DeleteUser, param);
     }
+
+    public async Task AddPhoneNumber(int? userId, string phoneNumber)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId,
+            phoneNumber
+        });
+        await _dbAccess.ModifyData(StoredProcedureNames.AddUserPhoneNumber, param);
+    }
+
+    public async Task<User?> GetUserContactInfo(int? userId)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId
+        });
+        var res = await _dbAccess.GetData<User, DynamicParameters>
+            (StoredProcedureNames.GetUserContactInfo, param);
+        return res.FirstOrDefault();
+    }
 }
