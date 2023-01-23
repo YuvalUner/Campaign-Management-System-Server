@@ -171,4 +171,23 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid)
     /// </summary>
     public static readonly string DeleteCampaign = "usp_DeleteCampaign";
+    
+    /// <summary>
+    /// Adds a phone number to a user, and also updates their record in the voters ledger.<br/>
+    /// Params: userId (int), phoneNumber (string)
+    /// </summary>
+    public static readonly string AddUserPhoneNumber = "usp_AddUserPhoneNumber";
+    
+    /// <summary>
+    /// Gets the email and phone number of a user.<br/>
+    /// Params: userId (int)
+    /// </summary>
+    public static readonly string GetUserContactInfo = "usp_GetUserContactInfo";
+    
+    /// <summary>
+    /// Modifies a user's notification settings for when someone joins a campaign.<br/>
+    /// Params: userId (int), campaignGuid (Guid), viaEmail (bool), viaSms (bool)<br/>
+    /// To remove the user from the notification list, pass null for both viaEmail and viaSms.
+    /// </summary>
+    public static readonly string ModifyUserToNotify = "usp_ModifyUserToNotify";
 }

@@ -3,6 +3,7 @@ using DAL.DbAccess;
 using DAL.Services.Implementations;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using RestAPIServices;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,9 @@ builder.Services.AddScoped<ICampaignsService, CampaignsService>();
 builder.Services.AddScoped<IInvitesService, InvitesService>();
 builder.Services.AddScoped<IPermissionsService, PermissionsService>();
 builder.Services.AddScoped<IRolesService, RolesService>();
+builder.Services.AddScoped<INotificationsService, NotificationsService>();
+builder.Services.AddScoped<IEmailSendingService, EmailSendingService>();
+builder.Services.AddScoped<ISmsMessageSendingService, SmsMessageSendingService>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", optionsBuilder => {
