@@ -209,4 +209,10 @@ public static class StoredProcedureNames
     /// Params: userId (int), phoneNumber (string)
     /// </summary>
     public static readonly string ApproveVerificationCode = "usp_ApproveVerificationCode";
+    
+    /// <summary>
+    /// Gets a list of users with their contact details and notification settings for a campaign.<br/>
+    /// Params: campaignGuid (Guid)
+    /// </summary>
+    public static readonly string GetUsersToNotify = "usp_GetUsersToNotify";
 }
