@@ -190,4 +190,23 @@ public static class StoredProcedureNames
     /// To remove the user from the notification list, pass null for both viaEmail and viaSms.
     /// </summary>
     public static readonly string ModifyUserToNotify = "usp_ModifyUserToNotify";
+    
+    /// <summary>
+    /// Adds a verification code for a user's phone number.<br/>
+    /// Params: userId (int), phoneNumber (string), verificationCode (string)
+    /// </summary>
+    public static readonly string AddVerificationCode = "usp_AddVerificationCode";
+    
+    /// <summary>
+    /// Gets a verification code for a user's phone number.<br/>
+    /// Params: userId (int)
+    /// </summary>
+    public static readonly string GetVerificationCode = "usp_GetVerificationCode";
+    
+    /// <summary>
+    /// Approves a user's phone number if the server completed its checks.<br/>
+    /// Deletes the verification code from the database and adds it to the user.<br/>
+    /// Params: userId (int), phoneNumber (string)
+    /// </summary>
+    public static readonly string ApproveVerificationCode = "usp_ApproveVerificationCode";
 }
