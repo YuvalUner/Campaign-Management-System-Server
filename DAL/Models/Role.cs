@@ -22,4 +22,5 @@ public class Role
     public string? RoleDescription { get; set; }
     public int? CampaignId { get; set; }
     public int RoleLevel { get; set; }
+    public bool IsCustomRole { get; set; }
 }

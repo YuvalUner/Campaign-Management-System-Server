@@ -70,6 +70,7 @@ public static class PermissionUtils
         // If the other user has a higher or equal role level, then the user cannot modify their permissions.
         // However, roles with level 0 - common, non admin roles, can be modified by anyone that passes the above tests.
         if (otherUserRole == null 
+            || (userRole.RoleLevel == 0 && otherUserRole.RoleLevel > userRole.RoleLevel)
             || (userRole.RoleLevel != 0 && otherUserRole.RoleLevel >= userRole.RoleLevel))
         {
             return false;
