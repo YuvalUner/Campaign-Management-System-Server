@@ -1,4 +1,5 @@
-﻿using API.Utils;
+﻿using API.SessionExtensions;
+using API.Utils;
 using DAL.Models;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -66,6 +67,7 @@ public class PermissionsController : Controller
     [HttpGet("getSelf/{campaignGuid:guid}")]
     public async Task<IActionResult> GetSelfPermissions(Guid campaignGuid)
     {
+        // TODO: Use SignalR to call this method when a permission is changed.
         try
         {
             if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid)
@@ -79,8 +81,11 @@ public class PermissionsController : Controller
             {
                 return Unauthorized();
             }
+            
 
             var permissions = await _permissionService.GetPermissions(userId, campaignGuid);
+            // Update user permissions in the session, as this method may be called after a permission change.
+            HttpContext.Session.Set(Constants.Permissions, permissions);
             return Ok(permissions);
         }
         catch (Exception e)
