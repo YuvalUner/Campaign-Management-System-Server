@@ -215,4 +215,18 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid)
     /// </summary>
     public static readonly string GetUsersToNotify = "usp_GetUsersToNotify";
+    
+    /// <summary>
+    /// Gets a list of all the roles in a campaign.<br/>
+    /// Params: campaignGuid (Guid)
+    /// </summary>
+    public static readonly string GetCampaignRoles = "usp_GetCampaignRoles";
+    
+    /// <summary>
+    /// Adds a custom role to a campaign.<br/>
+    /// Params: campaignGuid (Guid), roleName (string), roleDescription (string)<br/>
+    /// Returns: 1 on success, -1 on failure due to duplicate role name in campaign,
+    /// -2 on failure due to too many roles in campaign.
+    /// </summary>
+    public static readonly string AddCustomRole = "usp_AddCustomRole";
 }

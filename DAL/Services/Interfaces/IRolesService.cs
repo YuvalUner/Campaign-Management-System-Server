@@ -11,4 +11,8 @@ public interface IRolesService
     /// <param name="userId"></param>
     /// <returns></returns>
     Task<Role?> GetRoleInCampaign(Guid? campaignGuid, int? userId);
+    
+    Task<int> AddRoleToCampaign(Guid? campaignGuid, string? roleName, string? roleDescription);
+
+    Task<IEnumerable<Role>> GetRolesInCampaign(Guid? campaignGuid);
 }
