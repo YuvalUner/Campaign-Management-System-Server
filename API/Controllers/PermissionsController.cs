@@ -31,24 +31,16 @@ public class PermissionsController : Controller
     {
         try
         {
-            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid)
-                || !CampaignAuthorizationUtils.DoesActiveCampaignMatch(HttpContext, campaignGuid))
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.Permissions,
+                        PermissionType = PermissionTypes.Edit
+                    }))
             {
                 return Unauthorized();
             }
-
-            // Check if user has permission to edit permissions
-            var requiredPermission = new Permission()
-            {
-                PermissionType = PermissionTypes.Edit,
-                PermissionTarget = PermissionTargets.Permissions
-            };
-            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
-            {
-                return Unauthorized();
-            }
-            //  Check if user can edit this permission - can not edit permissions for other users if they do not have
-            // that same permission themselves.
+            
             User? user = await _usersService.GetUserByEmail(userEmail);
             if (user == null)
             {
@@ -103,18 +95,12 @@ public class PermissionsController : Controller
     {
         try
         {
-            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid)
-                || !CampaignAuthorizationUtils.DoesActiveCampaignMatch(HttpContext, campaignGuid))
-            {
-                return Unauthorized();
-            }
-
-            var requiredPermission = new Permission()
-            {
-                PermissionTarget = PermissionTargets.Permissions,
-                PermissionType = PermissionTypes.View
-            };
-            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.Permissions,
+                        PermissionType = PermissionTypes.View
+                    }))
             {
                 return Unauthorized();
             }

@@ -99,7 +99,7 @@ public static class StoredProcedureNames
     /// Gets the campaign's GUID by its invite GUID.<br/>
     /// Params: campaignInviteGuid (Guid)
     /// </summary>
-    public static readonly string GetCampaignGuidByInviteGuid = "usp_GetCampaignGuidByInviteGuid";
+    public static readonly string GetCampaignByInviteGuid = "usp_GetCampaignByInviteGuid";
 
     /// <summary>
     /// Checks whether or not a user is in a campaign.<br/>
@@ -171,4 +171,48 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid)
     /// </summary>
     public static readonly string DeleteCampaign = "usp_DeleteCampaign";
+    
+    /// <summary>
+    /// Adds a phone number to a user, and also updates their record in the voters ledger.<br/>
+    /// Params: userId (int), phoneNumber (string)
+    /// </summary>
+    public static readonly string AddUserPhoneNumber = "usp_AddUserPhoneNumber";
+    
+    /// <summary>
+    /// Gets the email and phone number of a user.<br/>
+    /// Params: userId (int)
+    /// </summary>
+    public static readonly string GetUserContactInfo = "usp_GetUserContactInfo";
+    
+    /// <summary>
+    /// Modifies a user's notification settings for when someone joins a campaign.<br/>
+    /// Params: userId (int), campaignGuid (Guid), viaEmail (bool), viaSms (bool)<br/>
+    /// To remove the user from the notification list, pass null for both viaEmail and viaSms.
+    /// </summary>
+    public static readonly string ModifyUserToNotify = "usp_ModifyUserToNotify";
+    
+    /// <summary>
+    /// Adds a verification code for a user's phone number.<br/>
+    /// Params: userId (int), phoneNumber (string), verificationCode (string)
+    /// </summary>
+    public static readonly string AddVerificationCode = "usp_AddVerificationCode";
+    
+    /// <summary>
+    /// Gets a verification code for a user's phone number.<br/>
+    /// Params: userId (int)
+    /// </summary>
+    public static readonly string GetVerificationCode = "usp_GetVerificationCode";
+    
+    /// <summary>
+    /// Approves a user's phone number if the server completed its checks.<br/>
+    /// Deletes the verification code from the database and adds it to the user.<br/>
+    /// Params: userId (int), phoneNumber (string)
+    /// </summary>
+    public static readonly string ApproveVerificationCode = "usp_ApproveVerificationCode";
+    
+    /// <summary>
+    /// Gets a list of users with their contact details and notification settings for a campaign.<br/>
+    /// Params: campaignGuid (Guid)
+    /// </summary>
+    public static readonly string GetUsersToNotify = "usp_GetUsersToNotify";
 }
