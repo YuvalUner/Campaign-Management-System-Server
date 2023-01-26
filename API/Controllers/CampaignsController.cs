@@ -164,6 +164,7 @@ public class CampaignsController : Controller
                     u.LastNameEng,
                     u.FirstNameHeb,
                     u.LastNameHeb,
+                    u.RoleName
                 });
             return Ok(usersPartialInfo);
         }

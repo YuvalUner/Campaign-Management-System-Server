@@ -19,8 +19,11 @@ public static class PermissionTargets
     public static readonly string Permissions = "Permissions";
     public static readonly string VotersLedger = "Voters Ledger";
     public static readonly string CampaignUsersList = "Campaign Users List";
+    public static readonly string CampaignRolesList = "Campaign Roles List";
+    public static readonly string CampaignRoles = "Campaign Roles";
 
-    private static readonly string[] All = new string[] { CampaignSettings, Permissions, VotersLedger, CampaignUsersList };
+    private static readonly string[] All =  { CampaignSettings, Permissions, VotersLedger,
+        CampaignUsersList, CampaignRolesList, CampaignRoles };
 
     public static bool IsValid(string screen)
     {
