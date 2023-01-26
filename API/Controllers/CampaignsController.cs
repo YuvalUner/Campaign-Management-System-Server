@@ -111,26 +111,19 @@ public class CampaignsController : Controller
         }
     }
 
-    [HttpPut("update")]
-    public async Task<IActionResult> UpdateCampaign([FromBody] Campaign campaign)
+    [HttpPut("update/{campaignGuid:guid}")]
+    public async Task<IActionResult> UpdateCampaign(Guid campaignGuid, [FromBody] Campaign campaign)
     {
         try
         {
             // Check if the user has access to this campaign to begin with.
             // Not checking authentication status since if they have access then they must be authenticated.
-            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaign.CampaignGuid)
-                || !CampaignAuthorizationUtils.DoesActiveCampaignMatch(HttpContext, campaign.CampaignGuid))
-            {
-                return Unauthorized();
-            }
-
-            // Make sure that the user has permission to edit campaign settings.
-            var requiredPermission = new Permission()
-            {
-                PermissionType = PermissionTypes.Edit,
-                PermissionTarget = PermissionTargets.CampaignSettings
-            };
-            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.CampaignSettings,
+                        PermissionType = PermissionTypes.Edit
+                    }))
             {
                 return Unauthorized();
             }
@@ -152,19 +145,12 @@ public class CampaignsController : Controller
         {
             // Check if the user has access to this campaign to begin with.
             // Not checking authentication status since if they have access then they must be authenticated.
-            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid)
-                || !CampaignAuthorizationUtils.DoesActiveCampaignMatch(HttpContext, campaignGuid))
-            {
-                return Unauthorized();
-            }
-
-            // Make sure that the user has permission to view the campaign's user list.
-            var requiredPermission = new Permission()
-            {
-                PermissionType = PermissionTypes.View,
-                PermissionTarget = PermissionTargets.CampaignUsersList
-            };
-            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.CampaignUsersList,
+                        PermissionType = PermissionTypes.View
+                    }))
             {
                 return Unauthorized();
             }

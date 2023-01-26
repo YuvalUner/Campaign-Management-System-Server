@@ -24,11 +24,11 @@ public interface ICampaignsService
     /// <returns></returns>
     Task<Guid?> GetCampaignGuid(int? campaignId);
     /// <summary>
-    /// Gets the guid of a campaign by the guid of its invite link.
+    /// Gets the guid and name of a campaign by the guid of its invite link.
     /// </summary>
     /// <param name="campaignInviteGuid"></param>
     /// <returns></returns>
-    Task<Guid?> GetCampaignGuidByInviteGuid(Guid? campaignInviteGuid);
+    Task<Campaign?> GetCampaignByInviteGuid(Guid? campaignInviteGuid);
     /// <summary>
     /// Checks whether a user is in a campaign.
     /// </summary>

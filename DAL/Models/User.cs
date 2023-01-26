@@ -12,4 +12,6 @@ public class User
     public string? FirstNameHeb { get; set; }
     public string? LastNameHeb { get; set; }
     public bool Authenticated { get; set; }
+    
+    public string? PhoneNumber { get; set; }
 }
