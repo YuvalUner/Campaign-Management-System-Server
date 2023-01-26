@@ -229,4 +229,49 @@ public static class StoredProcedureNames
     /// -2 on failure due to too many roles in campaign.
     /// </summary>
     public static readonly string AddCustomRole = "usp_AddCustomRole";
+    
+    /// <summary>
+    /// Assigns a user to an administrative role and gives them full permissions within the campaign.<br/>
+    /// Params: campaignGuid (Guid), userId (int), roleName (string)<br/>
+    /// Returns: 1 on success, -1 if the role name is invalid.
+    /// </summary>
+    public static readonly string AssignUserToAdministrativeRole = "usp_AssignUserToAdministrativeRole";
+    
+    /// <summary>
+    /// Assigns a user to a normal, non administrative role.<br/>
+    /// Params: campaignGuid (Guid), userId (int), roleName (string)<br/>
+    /// Returns: 1 on success, -1 if the role name is invalid.
+    /// </summary>
+    public static readonly string AssignUserToRole = "usp_AssignUserToRole";
+    
+    /// <summary>
+    /// Deletes a role from a campaign.<br/>
+    /// Params: campaignGuid (Guid), roleName (string)<br/>
+    /// </summary>
+    public static readonly string DeleteRole = "usp_DeleteRole";
+    
+    /// <summary>
+    /// Updates a role's description.<br/>
+    /// Params: campaignGuid (Guid), roleName (string), roleDescription (string)<br/>
+    /// </summary>
+    public static readonly string UpdateRole = "usp_UpdateRole";
+    
+    
+    /// <summary>
+    /// Removes a user from their role and sets them back to the volunteer role.<br/>
+    /// Params: campaignGuid (Guid), userEmail (string)<br/>
+    /// </summary>
+    public static readonly string RemoveUserFromRole = "usp_RemoveFromRole";
+    
+    /// <summary>
+    /// Gets a single role by its name and campaign.<br/>
+    /// Params: campaignGuid (Guid), roleName (string)<br/>
+    /// </summary>
+    public static readonly string GetRole = "usp_GetRole";
+    
+    /// <summary>
+    /// Removes a user from their administrative role. Also removes all of their permissions.<br/>
+    /// Params: campaignGuid (Guid), userEmail (string)<br/>
+    /// </summary>
+    public static readonly string RemoveUserFromAdministrativeRole = "usp_RemoveFromAdministrativeRole";
 }
