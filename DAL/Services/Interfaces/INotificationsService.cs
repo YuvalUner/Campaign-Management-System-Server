@@ -37,5 +37,5 @@ public interface INotificationsService
     /// </summary>
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
-    Task<IEnumerable<UserToNotify>> GetUsersToNotify(Guid campaignGuid);
+    Task<IEnumerable<NotificationSettings>> GetUsersToNotify(Guid campaignGuid);
 }

@@ -1,6 +1,6 @@
 ﻿namespace DAL.Models;
 
-public class UserToNotify
+public class NotificationSettings
 {
     public string? FirstNameHeb { get; set; }
     public string? LastNameHeb { get; set; }

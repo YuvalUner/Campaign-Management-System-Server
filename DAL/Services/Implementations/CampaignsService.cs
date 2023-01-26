@@ -52,15 +52,15 @@ public class CampaignsService : ICampaignsService
         return res.FirstOrDefault()?.CampaignGuid;
     }
 
-    public async Task<Guid?> GetCampaignGuidByInviteGuid(Guid? campaignInviteGuid)
+    public async Task<Campaign?> GetCampaignByInviteGuid(Guid? campaignInviteGuid)
     {
         var param = new DynamicParameters(new
         {
             campaignInviteGuid
         });
         var res = await _dbAccess.GetData<Campaign, DynamicParameters>
-            (StoredProcedureNames.GetCampaignGuidByInviteGuid, param);
-        return res.FirstOrDefault()?.CampaignGuid;
+            (StoredProcedureNames.GetCampaignByInviteGuid, param);
+        return res.FirstOrDefault();
     }
 
     public async Task<bool> IsUserInCampaign(Guid? campaignGuid, int? userId)

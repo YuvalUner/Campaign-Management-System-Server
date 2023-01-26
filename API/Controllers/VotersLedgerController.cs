@@ -28,19 +28,12 @@ public class VotersLedgerController : Controller
         try
         {
             // Check that the user has access to the campaign
-            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid)
-                || !CampaignAuthorizationUtils.DoesActiveCampaignMatch(HttpContext, campaignGuid))
-            {
-                return Unauthorized();
-            }
-
-            // Make sure user has view permissions for the voters ledger
-            var requiredPermission = new Permission()
-            {
-                PermissionType = PermissionTypes.View,
-                PermissionTarget = PermissionTargets.VotersLedger
-            };
-            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.VotersLedger,
+                        PermissionType = PermissionTypes.View
+                    }))
             {
                 return Unauthorized();
             }
@@ -78,19 +71,12 @@ public class VotersLedgerController : Controller
         try
         {
             // Check that the user has access to the campaign
-            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid)
-                || !CampaignAuthorizationUtils.DoesActiveCampaignMatch(HttpContext, campaignGuid))
-            {
-                return Unauthorized();
-            }
-
-            // Make sure user has view permissions for the voters ledger
-            var requiredPermission = new Permission()
-            {
-                PermissionType = PermissionTypes.Edit,
-                PermissionTarget = PermissionTargets.VotersLedger
-            };
-            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.VotersLedger,
+                        PermissionType = PermissionTypes.Edit
+                    }))
             {
                 return Unauthorized();
             }

@@ -99,7 +99,7 @@ public static class StoredProcedureNames
     /// Gets the campaign's GUID by its invite GUID.<br/>
     /// Params: campaignInviteGuid (Guid)
     /// </summary>
-    public static readonly string GetCampaignGuidByInviteGuid = "usp_GetCampaignGuidByInviteGuid";
+    public static readonly string GetCampaignByInviteGuid = "usp_GetCampaignByInviteGuid";
 
     /// <summary>
     /// Checks whether or not a user is in a campaign.<br/>

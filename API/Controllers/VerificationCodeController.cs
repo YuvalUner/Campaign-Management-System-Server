@@ -36,7 +36,7 @@ public class VerificationCodeController: Controller
                 return BadRequest();
             }
 
-            await _smsMessageSendingService.SendPhoneVerificationCodeAsync(phoneNumber.PhoneNumber, code);
+            await _smsMessageSendingService.SendPhoneVerificationCodeAsync(phoneNumber.PhoneNumber, code, CountryCodes.Israel);
             await _verificationCodeService.CreateVerificationCode(userId, new PhoneVerificationCode
             {
                 PhoneNumber = phoneNumber.PhoneNumber,

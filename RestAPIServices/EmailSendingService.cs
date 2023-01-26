@@ -54,6 +54,6 @@ public class EmailSendingService : IEmailSendingService
     {
         string subject = $"User joined campaign";
         string message = $"User {userName} joined campaign {campaignName}";
-        await SendEmailAsync(emailTo, subject, message);
+        await SendEmailAsync(emailTo, subject, message, campaignName);
     }
 }

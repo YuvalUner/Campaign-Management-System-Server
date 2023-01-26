@@ -21,8 +21,8 @@ public class NotificationsService : INotificationsService
         {
             userId,
             campaignGuid,
-            sms = viaSms,
-            email = viaEmail
+            viaSms,
+            viaEmail
         });
         await _dbAccess.ModifyData(StoredProcedureNames.ModifyUserToNotify, param);
     }
@@ -46,13 +46,13 @@ public class NotificationsService : INotificationsService
         await AddUserToNotify(userId, campaignGuid, viaSms, viaEmail);
     }
     
-    public async Task<IEnumerable<UserToNotify>> GetUsersToNotify(Guid campaignGuid)
+    public async Task<IEnumerable<NotificationSettings>> GetUsersToNotify(Guid campaignGuid)
     {
         var param = new DynamicParameters(new
         {
             campaignGuid
         });
-        return await _dbAccess.GetData<UserToNotify, DynamicParameters>
+        return await _dbAccess.GetData<NotificationSettings, DynamicParameters>
             (StoredProcedureNames.GetUsersToNotify, param);
     }
 }

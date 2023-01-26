@@ -4,6 +4,7 @@ using DAL.Models;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestAPIServices;
 
 namespace API.Controllers;
 
@@ -14,13 +15,23 @@ public class InvitesController : Controller
     private readonly IInvitesService _inviteService;
     private readonly ILogger<InvitesController> _logger;
     private readonly ICampaignsService _campaignsService;
+    private readonly INotificationsService _notificationsService;
+    private readonly ISmsMessageSendingService _smsMessageSendingService;
+    private readonly IEmailSendingService _emailSendingService;
+    private readonly IUsersService _usersService;
 
     public InvitesController(IInvitesService inviteService, ILogger<InvitesController> logger,
-        ICampaignsService campaignsService)
+        ICampaignsService campaignsService, INotificationsService notificationsService,
+        ISmsMessageSendingService smsMessageSendingService, IEmailSendingService emailSendingService,
+        IUsersService usersService)
     {
         _inviteService = inviteService;
         _logger = logger;
         _campaignsService = campaignsService;
+        _notificationsService = notificationsService;
+        _smsMessageSendingService = smsMessageSendingService;
+        _emailSendingService = emailSendingService;
+        _usersService = usersService;
     }
 
     [Authorize]
@@ -29,16 +40,12 @@ public class InvitesController : Controller
     {
         try
         {
-            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid))
-            {
-                return Unauthorized();
-            }
-            var requiredPermission = new Permission()
-            {
-                PermissionType = PermissionTypes.View,
-                PermissionTarget = PermissionTargets.CampaignSettings
-            };
-            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.CampaignSettings,
+                        PermissionType = PermissionTypes.View
+                    }))
             {
                 return Unauthorized();
             }
@@ -62,16 +69,12 @@ public class InvitesController : Controller
     [HttpPut("/UpdateInvite/{campaignGuid:guid}")]
     public async Task<IActionResult> UpdateInvite(Guid campaignGuid)
     {
-        if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid))
-        {
-            return Unauthorized();
-        }
-        var requiredPermission = new Permission()
-        {
-            PermissionType = PermissionTypes.Edit,
-            PermissionTarget = PermissionTargets.CampaignSettings
-        };
-        if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+        if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                new Permission()
+                {
+                    PermissionTarget = PermissionTargets.CampaignSettings,
+                    PermissionType = PermissionTypes.Edit
+                }))
         {
             return Unauthorized();
         }
@@ -86,16 +89,12 @@ public class InvitesController : Controller
     {
         try
         {
-            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid))
-            {
-                return Unauthorized();
-            }
-            var requiredPermission = new Permission()
-            {
-                PermissionType = PermissionTypes.Edit,
-                PermissionTarget = PermissionTargets.CampaignSettings
-            };
-            if (!PermissionUtils.HasPermission(HttpContext, requiredPermission))
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.CampaignSettings,
+                        PermissionType = PermissionTypes.Edit
+                    }))
             {
                 return Unauthorized();
             }
@@ -117,8 +116,8 @@ public class InvitesController : Controller
         try
         {
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
-            var campaignGuid = await _campaignsService.GetCampaignGuidByInviteGuid(campaignInviteGuid);
-            if (campaignGuid == null)
+            var campaign = await _campaignsService.GetCampaignByInviteGuid(campaignInviteGuid);
+            if (campaign == null)
             {
                 return NotFound();
             }
@@ -132,11 +131,30 @@ public class InvitesController : Controller
             // Checks if the user is already part of the campaign and if not, adds them
             // Check is done by checking the list in the user's session, as that always contains the same data as the database
             // when it comes to this (assuming no one broke into the DB), and it's faster to check than the database.
-            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid))
+            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaign.CampaignGuid))
             {
-                await _inviteService.AcceptInvite(campaignGuid, userId);
-                CampaignAuthorizationUtils.AddAuthorizationForCampaign(HttpContext, campaignGuid);
-                return Ok(new { CampaignGuid = campaignGuid });
+                //await _inviteService.AcceptInvite(campaign.CampaignGuid, userId);
+                //CampaignAuthorizationUtils.AddAuthorizationForCampaign(HttpContext, campaign.CampaignGuid);
+                
+                // Notify all users that should be notified that a new user joined the campaign
+                var usersToNotify = await _notificationsService.GetUsersToNotify(campaign.CampaignGuid.Value);
+                User? user = await _usersService.GetUserPublicInfo(userId);
+                foreach (var userToNotify in usersToNotify)
+                {
+                    // Not awaited on purpose - these should just run in the background
+                    if (userToNotify.ViaEmail)
+                    {
+                        _emailSendingService.SendUserJoinedEmailAsync(user.FirstNameHeb + " " + user.LastNameHeb,
+                            campaign.CampaignName, userToNotify.Email);
+                    }
+                    if (userToNotify.ViaSms)
+                    {
+                        _smsMessageSendingService.SendUserJoinedSmsAsync(user.FirstNameHeb + " " + user.LastNameHeb,
+                            campaign.CampaignName, userToNotify.PhoneNumber, CountryCodes.Israel);
+                    }
+                }
+                
+                return Ok(new { CampaignGuid = campaign });
             }
 
             return BadRequest();
