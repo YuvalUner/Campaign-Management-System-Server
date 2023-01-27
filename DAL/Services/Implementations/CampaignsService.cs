@@ -104,4 +104,15 @@ public class CampaignsService : ICampaignsService
         });
         await _dbAccess.ModifyData(StoredProcedureNames.DeleteCampaign, param);
     }
+
+    public async Task<string?> GetCampaignNameByGuid(Guid? campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid
+        });
+        var res = await _dbAccess.GetData<string, DynamicParameters>
+            (StoredProcedureNames.GetCampaignNameByGuid, param);
+        return res.FirstOrDefault();
+    }
 }

@@ -68,4 +68,6 @@ public interface IUsersService
     /// <param name="userId"></param>
     /// <returns></returns>
     Task<User?> GetUserContactInfo(int? userId);
+
+    Task<User?> GetUserContactInfoByEmail(string userEmail);
 }

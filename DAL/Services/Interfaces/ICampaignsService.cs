@@ -18,7 +18,7 @@ public interface ICampaignsService
     /// <returns></returns>
     Task ModifyCampaign(Campaign campaign);
     /// <summary>
-    /// Gets the Guid of a campaign by its guid.
+    /// Gets the Guid of a campaign by its id.
     /// </summary>
     /// <param name="campaignId"></param>
     /// <returns></returns>
@@ -57,4 +57,11 @@ public interface ICampaignsService
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
     Task DeleteCampaign(Guid? campaignGuid);
+    
+    /// <summary>
+    /// Gets a campaign name by its guid.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <returns></returns>
+    Task<string?> GetCampaignNameByGuid(Guid? campaignGuid);
 }

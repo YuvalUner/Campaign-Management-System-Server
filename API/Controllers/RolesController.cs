@@ -4,6 +4,7 @@ using DAL.Models;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestAPIServices;
 
 namespace API.Controllers;
 
@@ -15,12 +16,20 @@ public class RolesController : Controller
     private readonly ILogger<RolesController> _logger;
     private readonly IRolesService _rolesService;
     private readonly IUsersService _usersService;
+    private readonly IEmailSendingService _emailSendingService;
+    private readonly ISmsMessageSendingService _smsMessageSendingService;
+    private readonly ICampaignsService _campaignsService;
     
-    public RolesController(ILogger<RolesController> logger, IRolesService rolesService, IUsersService usersService)
+    public RolesController(ILogger<RolesController> logger, IRolesService rolesService, IUsersService usersService,
+        IEmailSendingService emailSendingService, ISmsMessageSendingService smsMessageSendingService,
+        ICampaignsService campaignsService)
     {
         _logger = logger;
         _rolesService = rolesService;
         _usersService = usersService;
+        _emailSendingService = emailSendingService;
+        _smsMessageSendingService = smsMessageSendingService;
+        _campaignsService = campaignsService;
     }
 
     [HttpGet("get-roles/{campaignGuid:guid}")]
@@ -143,7 +152,8 @@ public class RolesController : Controller
     }
     
     [HttpPost("assign-role/{campaignGuid:guid}/{userEmail}")]
-    public async Task<IActionResult> AssignRole(Guid campaignGuid, string userEmail, [FromBody] Role role)
+    public async Task<IActionResult> AssignRole(Guid campaignGuid, string userEmail,
+        [FromBody] Role role, [FromQuery] NotificationSettings notificationSettings)
     {
         try
         {
@@ -166,6 +176,22 @@ public class RolesController : Controller
             {
                 return BadRequest("User does not exist");
             }
+            if (notificationSettings.ViaEmail || notificationSettings.ViaSms)
+            {
+                var campaign = await _campaignsService.GetCampaignNameByGuid(campaignGuid);
+                if (notificationSettings.ViaEmail)
+                {
+                    _emailSendingService.SendRoleAssignedEmailAsync(role.RoleName, campaign, userEmail);
+                }
+                if (notificationSettings.ViaSms)
+                {
+                    var userToContact = await _usersService.GetUserContactInfoByEmail(userEmail);
+                    if (userToContact != null && !string.IsNullOrEmpty(userToContact.PhoneNumber)){
+                        _smsMessageSendingService.SendRoleAssignedSmsAsync(role.RoleName, campaign,
+                            userToContact.PhoneNumber, CountryCodes.Israel);
+                    }
+                }
+            }
             return Ok();
         }
         catch (Exception e)
@@ -176,7 +202,8 @@ public class RolesController : Controller
     }
     
     [HttpPost("assign-admin-role/{campaignGuid:guid}/{userEmail}")]
-    public async Task<IActionResult> AssignAdminRole(Guid campaignGuid, string userEmail, [FromBody] Role role)
+    public async Task<IActionResult> AssignAdminRole(Guid campaignGuid, string userEmail,
+        [FromBody] Role role, [FromQuery] NotificationSettings notificationSettings)
     {
         try
         {
@@ -210,6 +237,22 @@ public class RolesController : Controller
             if (res == -2)
             {
                 return BadRequest("User does not exist");
+            }
+            if (notificationSettings.ViaEmail || notificationSettings.ViaSms)
+            {
+                var campaign = await _campaignsService.GetCampaignNameByGuid(campaignGuid);
+                if (notificationSettings.ViaEmail)
+                {
+                    _emailSendingService.SendRoleAssignedEmailAsync(role.RoleName, campaign, userEmail);
+                }
+                if (notificationSettings.ViaSms)
+                {
+                    var userToContact = await _usersService.GetUserContactInfoByEmail(userEmail);
+                    if (userToContact != null && !string.IsNullOrEmpty(userToContact.PhoneNumber)){
+                        _smsMessageSendingService.SendRoleAssignedSmsAsync(role.RoleName, campaign,
+                            userToContact.PhoneNumber, CountryCodes.Israel);
+                    }
+                }
             }
             return Ok();
         }

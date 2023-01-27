@@ -16,7 +16,7 @@ public class EmailSendingService : IEmailSendingService
         _logger = logger;
     }
 
-    public async Task SendEmailAsync(string emailTo, string subject, string message, string? senderName = null)
+    private async Task SendEmailAsync(string emailTo, string subject, string message, string? senderName = null)
     {
 
         try
@@ -54,6 +54,13 @@ public class EmailSendingService : IEmailSendingService
     {
         string subject = $"User joined campaign";
         string message = $"User {userName} joined campaign {campaignName}";
+        await SendEmailAsync(emailTo, subject, message, campaignName);
+    }
+
+    public async Task SendRoleAssignedEmailAsync(string? roleName, string? campaignName, string? emailTo)
+    {
+        string subject = $"Role assigned";
+        string message = $"Role {roleName} was assigned to you in campaign {campaignName}";
         await SendEmailAsync(emailTo, subject, message, campaignName);
     }
 }
