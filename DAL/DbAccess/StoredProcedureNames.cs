@@ -274,4 +274,10 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid), userEmail (string)<br/>
     /// </summary>
     public static readonly string RemoveUserFromAdministrativeRole = "usp_RemoveFromAdministrativeRole";
+    
+    /// <summary>
+    /// Gets the name of a campaign by its Guid.<br/>
+    /// Params: campaignGuid (Guid)<br/>
+    /// </summary>
+    public static readonly string GetCampaignNameByGuid = "usp_GetCampaignNameByGuid";
 }

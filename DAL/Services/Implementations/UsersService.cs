@@ -118,4 +118,15 @@ public class UsersService : IUsersService
             (StoredProcedureNames.GetUserContactInfo, param);
         return res.FirstOrDefault();
     }
+
+    public async Task<User?> GetUserContactInfoByEmail(string? userEmail)
+    {
+        var param = new DynamicParameters(new
+        {
+            userEmail
+        });
+        var res = await _dbAccess.GetData<User, DynamicParameters>
+            (StoredProcedureNames.GetUserContactInfo, param);
+        return res.FirstOrDefault();
+    }
 }

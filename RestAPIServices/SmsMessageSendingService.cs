@@ -109,4 +109,12 @@ public class SmsMessageSendingService : ISmsMessageSendingService
             .Transform(phoneNumber);
         await SendSmsMessageAsync(phoneNumber, message);
     }
+    
+    public async Task SendRoleAssignedSmsAsync(string? roleName, string? campaignName, string phoneNumber, CountryCodes countryCode)
+    {
+        string message = $"You were assigned the role {roleName} in campaign {campaignName}";
+        phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
+            .Transform(phoneNumber);
+        await SendSmsMessageAsync(phoneNumber, message);
+    }
 }

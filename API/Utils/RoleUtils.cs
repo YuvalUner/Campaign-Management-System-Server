@@ -67,8 +67,10 @@ public static class RoleUtils
         // If the user's role level is higher than the role they are assigning, they can assign it.
         // Alternatively, both users have a role level of 0, AKA not admin level, therefore it is 
         // purely a matter of permissions.
-        return activeCampaignRole.RoleLevel > userRole.RoleLevel
-               || (activeCampaignRole.RoleLevel == 0 && activeCampaignRole.RoleLevel == userRole.RoleLevel);
+        return activeCampaignRole.RoleLevel > roleToAssign.RoleLevel
+               || (activeCampaignRole.RoleLevel == 0 
+                   && activeCampaignRole.RoleLevel == userRole.RoleLevel
+                   && roleToAssign.RoleLevel == 0);
 
     }
     
