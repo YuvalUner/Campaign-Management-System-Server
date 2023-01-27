@@ -1,5 +1,6 @@
 ﻿using API.SessionExtensions;
 using API.Utils;
+using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -168,13 +169,12 @@ public class RolesController : Controller
             }
 
             var res = await _rolesService.AssignUserToNormalRole(campaignGuid, userEmail, role.RoleName);
-            if (res == -1)
+            switch (res)
             {
-                return BadRequest("Role does not exist");
-            }
-            if (res == -2)
-            {
-                return BadRequest("User does not exist");
+                case (int) ErrorCodes.RoleNotFound:
+                    return BadRequest($"Error Num {res} - Role does not exist");
+                case (int) ErrorCodes.UserNotFound:
+                    return BadRequest($"Error Num {res} - User does not exist");
             }
             if (notificationSettings.ViaEmail || notificationSettings.ViaSms)
             {
@@ -230,13 +230,12 @@ public class RolesController : Controller
             }
 
             var res = await _rolesService.AssignUserToAdministrativeRole(campaignGuid, userEmail, role.RoleName);
-            if (res == -1)
+            switch (res)
             {
-                return BadRequest("Role does not exist");
-            }
-            if (res == -2)
-            {
-                return BadRequest("User does not exist");
+                 case (int) ErrorCodes.RoleNotFound:
+                    return BadRequest($"Error Num {res} Role does not exist");
+                case (int) ErrorCodes.UserNotFound:
+                    return BadRequest($"User Num {res} - User does not exist");
             }
             if (notificationSettings.ViaEmail || notificationSettings.ViaSms)
             {
