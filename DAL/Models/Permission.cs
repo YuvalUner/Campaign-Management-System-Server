@@ -5,7 +5,7 @@ public static class PermissionTypes
     public static readonly string View = "view";
     public static readonly string Edit = "edit";
 
-    private static readonly string[] All = new string[] { View, Edit };
+    private static readonly string[] All = { View, Edit };
 
     public static bool IsValid(string permissionType)
     {
@@ -21,9 +21,10 @@ public static class PermissionTargets
     public static readonly string CampaignUsersList = "Campaign Users List";
     public static readonly string CampaignRolesList = "Campaign Roles List";
     public static readonly string CampaignRoles = "Campaign Roles";
+    public static readonly string Jobs = "Jobs";
 
     private static readonly string[] All =  { CampaignSettings, Permissions, VotersLedger,
-        CampaignUsersList, CampaignRolesList, CampaignRoles };
+        CampaignUsersList, CampaignRolesList, CampaignRoles, Jobs };
 
     public static bool IsValid(string screen)
     {
