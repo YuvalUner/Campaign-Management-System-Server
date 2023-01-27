@@ -6,6 +6,8 @@ using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestAPIServices;
+using StatusCodes = DAL.DbAccess.StatusCodes;
+using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
@@ -85,13 +87,12 @@ public class RolesController : Controller
             }
 
             var res = await _rolesService.AddRoleToCampaign(campaignGuid, role.RoleName, role.RoleDescription);
-            if (res == -2)
+            switch (res)
             {
-                return BadRequest("Too many roles in campaign");
-            }
-            if (res == -1)
-            {
-                return BadRequest("Role already exists");
+                case StatusCodes.TooManyEntries:
+                    return BadRequest(FormatErrorMessage(ErrorMessages.TooManyRoles, res));
+                case StatusCodes.RoleAlreadyExists:
+                    return BadRequest(FormatErrorMessage(ErrorMessages.RoleAlreadyExists, res));
             }
             return Ok();
         }
@@ -171,9 +172,9 @@ public class RolesController : Controller
             var res = await _rolesService.AssignUserToNormalRole(campaignGuid, userEmail, role.RoleName);
             switch (res)
             {
-                case (int) ErrorCodes.RoleNotFound:
+                case StatusCodes.RoleNotFound:
                     return BadRequest($"Error Num {res} - Role does not exist");
-                case (int) ErrorCodes.UserNotFound:
+                case StatusCodes.UserNotFound:
                     return BadRequest($"Error Num {res} - User does not exist");
             }
             if (notificationSettings.ViaEmail || notificationSettings.ViaSms)
@@ -232,10 +233,10 @@ public class RolesController : Controller
             var res = await _rolesService.AssignUserToAdministrativeRole(campaignGuid, userEmail, role.RoleName);
             switch (res)
             {
-                 case (int) ErrorCodes.RoleNotFound:
-                    return BadRequest($"Error Num {res} Role does not exist");
-                case (int) ErrorCodes.UserNotFound:
-                    return BadRequest($"User Num {res} - User does not exist");
+                 case StatusCodes.RoleNotFound:
+                    return BadRequest(FormatErrorMessage(ErrorMessages.RoleNotFound, res));
+                case StatusCodes.UserNotFound:
+                    return BadRequest(FormatErrorMessage(ErrorMessages.UserNotFound, res));
             }
             if (notificationSettings.ViaEmail || notificationSettings.ViaSms)
             {

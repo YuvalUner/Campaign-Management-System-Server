@@ -5,6 +5,8 @@ using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using static API.Utils.ErrorMessages;
+using StatusCodes = DAL.DbAccess.StatusCodes;
 
 namespace API.Controllers;
 
@@ -52,8 +54,8 @@ public class JobTypesController : Controller
             var res = await _jobTypesService.AddJobType(jobType, campaignGuid);
             return res switch
             {
-                (int)ErrorCodes.CannotInsertDuplicateUniqueIndex => BadRequest($"Error Num {res} - Job type already exists"),
-                (int)ErrorCodes.TooManyEntries => BadRequest($"Error Num {res} - Too many job types"),
+                StatusCodes.CannotInsertDuplicateUniqueIndex => BadRequest(FormatErrorMessage(ErrorMessages.JobTypeAlreadyExists, res)),
+                StatusCodes.TooManyEntries => BadRequest($"Error Num {res} - Too many job types"),
                 _ => Ok()
             };
         }
@@ -142,7 +144,7 @@ public class JobTypesController : Controller
             var res = await _jobTypesService.UpdateJobType(jobType, campaignGuid, jobTypeName);
             return res switch
             {
-                (int)ErrorCodes.CannotInsertDuplicateUniqueIndex => BadRequest($"Error Num {res} - Job type already exists"),
+                StatusCodes.CannotInsertDuplicateUniqueIndex => BadRequest(FormatErrorMessage(ErrorMessages.JobTypeAlreadyExists, res)),
                 _ => Ok()
             };
         }

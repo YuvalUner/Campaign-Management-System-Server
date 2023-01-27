@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using API.SessionExtensions;
 using DAL.Services.Interfaces;
 using API.Utils;
+using StatusCodes = DAL.DbAccess.StatusCodes;
 
 namespace API.Controllers;
 
@@ -165,7 +166,7 @@ public class UsersController : Controller
                 _logger.LogInformation(
                     "Error No. {ErrorNum}: User with id {UserId} And IP Address {IpAddress} tried to enter" +
                     "an ID number that is already in the database",
-                    ErrorCodes.IdAlreadyExistsWhenVerifyingInfo, userId, HttpContext.Connection.RemoteIpAddress);
+                    StatusCodes.IdAlreadyExistsWhenVerifyingInfo, userId, HttpContext.Connection.RemoteIpAddress);
                 return BadRequest("Stealing people's identities is not allowed");
             }
 
