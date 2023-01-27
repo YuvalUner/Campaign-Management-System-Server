@@ -15,13 +15,13 @@ public class JobsController : Controller
 {
     private readonly IJobsService _jobsService;
     private readonly ILogger<JobsController> _logger;
-    
+
     public JobsController(IJobsService jobsService, ILogger<JobsController> logger)
     {
         _jobsService = jobsService;
         _logger = logger;
     }
-    
+
     [HttpPost("add/{campaignGuid:guid}")]
     public async Task<IActionResult> AddJob([FromBody] Job job, Guid campaignGuid)
     {
@@ -36,13 +36,19 @@ public class JobsController : Controller
             {
                 return Unauthorized();
             }
+            
+            if (string.IsNullOrWhiteSpace(job.JobName))
+            {
+                return BadRequest("Job name is required");
+            }
+
             var jobGuid = await _jobsService.AddJob(job, campaignGuid);
             return Ok(jobGuid);
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Error while adding job");
-            return BadRequest(e.Message);
+            return StatusCode(500, "Error while adding job");
         }
     }
 }
