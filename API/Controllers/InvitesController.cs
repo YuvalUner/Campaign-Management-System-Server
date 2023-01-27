@@ -142,12 +142,12 @@ public class InvitesController : Controller
                 foreach (var userToNotify in usersToNotify)
                 {
                     // Not awaited on purpose - these should just run in the background
-                    if (userToNotify.ViaEmail)
+                    if (userToNotify.ViaEmail && userToNotify.Email != null)
                     {
                         _emailSendingService.SendUserJoinedEmailAsync(user.FirstNameHeb + " " + user.LastNameHeb,
                             campaign.CampaignName, userToNotify.Email);
                     }
-                    if (userToNotify.ViaSms)
+                    if (userToNotify.ViaSms && userToNotify.PhoneNumber != null)
                     {
                         _smsMessageSendingService.SendUserJoinedSmsAsync(user.FirstNameHeb + " " + user.LastNameHeb,
                             campaign.CampaignName, userToNotify.PhoneNumber, CountryCodes.Israel);

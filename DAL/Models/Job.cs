@@ -2,8 +2,6 @@
 
 public class Job
 {
-    public int? JobId { get; set; } 
-    public int? CampaignId { get; set; } 
     public Guid? JobGuid { get; set; } 
     public string? JobName { get; set; } 
     public string? JobDescription { get; set; } 

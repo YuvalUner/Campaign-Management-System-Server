@@ -285,13 +285,14 @@ public static class StoredProcedureNames
     /// Adds a new job to be performed for the campaign.<br/>
     /// Params: campaignGuid (Guid), jobName (string), jobDescription (string), jobLocation (string),
     /// jobStartTime (DateTime), jobEndTime (DateTime), jobDefaultSalary (int)<br/>
-    /// Output: jobGuid (Guid)
+    /// Output: jobGuid (Guid)<br/>
     /// </summary>
     public const string AddJob = "usp_AddJob";
 
     /// <summary>
     /// Adds a new job type for the campaign to use.<br/>
     /// Params: campaignGuid (Guid), jobTypeName (string), jobTypeDescription (string)<br/>
+    /// Throws: Error status code 1 if the job name is already in use.
     /// </summary>
     public const string AddJobType = "usp_AddJobType";
 
@@ -312,4 +313,30 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid)<br/>
     /// </summary>
     public const string GetJobTypes = "usp_GetJobTypes";
+    
+    /// <summary>
+    /// Updates a job's name, description, location, start time, end time, and default salary.<br/>
+    /// Params: campaignGuid (Guid), jobGuid (Guid), jobName (string), jobDescription (string),
+    /// jobLocation (string), jobStartTime (DateTime), jobEndTime (DateTime), jobDefaultSalary (int)<br/>
+    /// All parameters but campaignGuid and jobGuid are optional - only the ones that are provided will be updated.
+    /// </summary>
+    public const string UpdateJob = "usp_UpdateJob";
+    
+    /// <summary>
+    /// Gets a list of all the jobs for a campaign.<br/>
+    /// Params: campaignGuid (Guid)<br/>
+    /// </summary>
+    public const string GetJobs = "usp_GetJobs";
+    
+    /// <summary>
+    /// Gets a single job by its Guid.<br/>
+    /// Params: campaignGuid (Guid), jobGuid (Guid)<br/>
+    /// </summary>
+    public const string GetJob = "usp_GetJob";
+    
+    /// <summary>
+    /// Deletes a job from the campaign.<br/>
+    /// Params: campaignGuid (Guid), jobGuid (Guid)<br/>
+    /// </summary>
+    public const string DeleteJob = "usp_DeleteJob";
 }

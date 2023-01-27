@@ -1,4 +1,5 @@
-﻿using DAL.DbAccess;
+﻿using System.Data;
+using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Interfaces;
 using Dapper;
@@ -14,7 +15,7 @@ public class JobTypesService: IJobTypesService
         _dbAccess = dbAccess;
     }
     
-    public async Task AddJobType(JobType jobType, Guid campaignGuid)
+    public async Task<int> AddJobType(JobType jobType, Guid campaignGuid)
     {
         var param = new DynamicParameters(new
         {
@@ -22,7 +23,9 @@ public class JobTypesService: IJobTypesService
             jobType.JobTypeDescription,
             campaignGuid
         });
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AddJobType, param);
+        return param.Get<int>("returnVal");
     }
     
     public async Task DeleteJobType(string jobTypeName, Guid campaignGuid)
@@ -35,15 +38,18 @@ public class JobTypesService: IJobTypesService
         await _dbAccess.ModifyData(StoredProcedureNames.DeleteJobType, param);
     }
     
-    public async Task UpdateJobType(JobType jobType, Guid campaignGuid)
+    public async Task<int> UpdateJobType(JobType jobType, Guid campaignGuid, string jobTypeName)
     {
         var param = new DynamicParameters(new
         {
-            jobType.JobTypeName,
-            jobType.JobTypeDescription,
-            campaignGuid
+            newJobTypeName = jobType.JobTypeName,
+            newJobTypeDescription = jobType.JobTypeDescription,
+            campaignGuid,
+            jobTypeName
         });
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.UpdateJobType, param);
+        return param.Get<int>("returnVal");
     }
     
     public async Task<IEnumerable<JobType>> GetJobTypes(Guid campaignGuid)
