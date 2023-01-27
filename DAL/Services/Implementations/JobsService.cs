@@ -25,10 +25,12 @@ public class JobsService: IJobsService
             job.JobLocation,
             job.JobStartTime,
             job.JobEndTime,
-            job.JobDefaultSalary
+            job.JobDefaultSalary,
+            job.PeopleNeeded,
+            job.JobTypeName
         });
-        param.Add("jobGuid", dbType: DbType.Guid, direction: ParameterDirection.Output);
+        param.Add("newJobGuid", dbType: DbType.Guid, direction: ParameterDirection.Output);
         await _dbAccess.ModifyData(StoredProcedureNames.AddJob, param);
-        return param.Get<Guid>("jobGuid");
+        return param.Get<Guid>("newJobGuid");
     }
 }

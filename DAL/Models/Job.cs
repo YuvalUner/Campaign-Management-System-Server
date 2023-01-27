@@ -11,4 +11,10 @@ public class Job
     public DateTime? JobStartTime { get; set; } 
     public DateTime? JobEndTime { get; set; } 
     public int? JobDefaultSalary { get; set; } 
+    
+    public int? PeopleNeeded { get; set; }
+    
+    public int? PeopleAssigned { get; set; }
+    
+    public string? JobTypeName { get; set; }
 }
