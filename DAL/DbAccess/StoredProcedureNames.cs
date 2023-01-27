@@ -280,4 +280,12 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid)<br/>
     /// </summary>
     public static readonly string GetCampaignNameByGuid = "usp_GetCampaignNameByGuid";
+    
+    /// <summary>
+    /// Adds a new job to be performed for the campaign.<br/>
+    /// Params: campaignGuid (Guid), jobName (string), jobDescription (string), jobLocation (string),
+    /// jobStartTime (DateTime), jobEndTime (DateTime), jobDefaultSalary (int)<br/>
+    /// Output: jobGuid (Guid)
+    /// </summary>
+    public static readonly string AddJob = "usp_AddJob";
 }

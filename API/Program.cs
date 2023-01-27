@@ -26,6 +26,7 @@ builder.Services.AddScoped<INotificationsService, NotificationsService>();
 builder.Services.AddScoped<IEmailSendingService, EmailSendingService>();
 builder.Services.AddScoped<ISmsMessageSendingService, SmsMessageSendingService>();
 builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+builder.Services.AddScoped<IJobsService, JobsService>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", optionsBuilder => {
