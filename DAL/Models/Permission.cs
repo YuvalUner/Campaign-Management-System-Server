@@ -2,10 +2,10 @@
 
 public static class PermissionTypes
 {
-    public static readonly string View = "view";
-    public static readonly string Edit = "edit";
+    public const string View = "view";
+    public const string Edit = "edit";
 
-    private static readonly string[] All = new string[] { View, Edit };
+    private static readonly string[] All = { View, Edit };
 
     public static bool IsValid(string permissionType)
     {
@@ -15,15 +15,25 @@ public static class PermissionTypes
 
 public static class PermissionTargets
 {
-    public static readonly string CampaignSettings = "Campaign Settings";
-    public static readonly string Permissions = "Permissions";
-    public static readonly string VotersLedger = "Voters Ledger";
-    public static readonly string CampaignUsersList = "Campaign Users List";
-    public static readonly string CampaignRolesList = "Campaign Roles List";
-    public static readonly string CampaignRoles = "Campaign Roles";
+    public const string CampaignSettings = "Campaign Settings";
+    public const string Permissions = "Permissions";
+    public const string VotersLedger = "Voters Ledger";
+    public const string CampaignUsersList = "Campaign Users List";
+    public const string CampaignRolesList = "Campaign Roles List";
+    public const string CampaignRoles = "Campaign Roles";
+    public const string Jobs = "Jobs";
+    public const string JobTypes = "Job Types";
 
-    private static readonly string[] All =  { CampaignSettings, Permissions, VotersLedger,
-        CampaignUsersList, CampaignRolesList, CampaignRoles };
+    private static readonly string[] All =  { 
+        CampaignSettings, 
+        Permissions,
+        VotersLedger,
+        CampaignUsersList,
+        CampaignRolesList, 
+        CampaignRoles,
+        Jobs,
+        JobTypes
+    };
 
     public static bool IsValid(string screen)
     {
@@ -37,7 +47,7 @@ public class Permission : IEquatable<Permission>
 
     public string? PermissionType
     {
-        get { return _permissionType; }
+        get => _permissionType;
         set
         {
             if (!PermissionTypes.IsValid(value))
@@ -53,7 +63,7 @@ public class Permission : IEquatable<Permission>
 
     public string? PermissionTarget
     {
-        get { return _target; }
+        get => _target;
         set
         {
             if (!PermissionTargets.IsValid(value))
