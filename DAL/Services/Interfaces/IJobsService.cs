@@ -9,8 +9,9 @@ public interface IJobsService
     /// </summary>
     /// <param name="job"></param>
     /// <param name="campaignGuid"></param>
+    /// <param name="userId"></param>
     /// <returns>The Guid of the newly created job</returns>
-    Task<Guid> AddJob(Job job, Guid campaignGuid);
+    Task<Guid> AddJob(Job job, Guid campaignGuid, int? userId);
 
     /// <summary>
     /// Deletes a single job from the campaign.

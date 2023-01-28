@@ -50,8 +50,10 @@ public class JobsController : Controller
             {
                 return BadRequest(FormatErrorMessage(JobRequiresPeople, CustomStatusCode.IllegalValue));
             }
+
+            var userId = HttpContext.Session.GetInt32(Constants.UserId);
             
-            var jobGuid = await _jobsService.AddJob(job, campaignGuid);
+            var jobGuid = await _jobsService.AddJob(job, campaignGuid, userId);
             return Ok(jobGuid);
         }
         catch (Exception e)

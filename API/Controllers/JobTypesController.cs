@@ -51,10 +51,12 @@ public class JobTypesController : Controller
                 return BadRequest(FormatErrorMessage(NameMustNotBeBuiltIn, CustomStatusCode.NameCanNotBeBuiltIn));
             }
             
-            var res = await _jobTypesService.AddJobType(jobType, campaignGuid);
+            var userId = HttpContext.Session.GetInt32(Constants.UserId);
+            
+            var res = await _jobTypesService.AddJobType(jobType, campaignGuid, userId);
             return res switch
             {
-                CustomStatusCode.CannotInsertDuplicateUniqueIndex => BadRequest(FormatErrorMessage(ErrorMessages.JobTypeAlreadyExists, res)),
+                CustomStatusCode.CannotInsertDuplicateUniqueIndex => BadRequest(FormatErrorMessage(JobTypeAlreadyExists, res)),
                 CustomStatusCode.TooManyEntries => BadRequest(FormatErrorMessage(TooManyJobTypes, res)),
                 _ => Ok()
             };

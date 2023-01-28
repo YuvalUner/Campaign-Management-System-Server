@@ -15,13 +15,14 @@ public class JobTypesService: IJobTypesService
         _dbAccess = dbAccess;
     }
     
-    public async Task<CustomStatusCode> AddJobType(JobType jobType, Guid campaignGuid)
+    public async Task<CustomStatusCode> AddJobType(JobType jobType, Guid campaignGuid, int? userId)
     {
         var param = new DynamicParameters(new
         {
             jobType.JobTypeName,
             jobType.JobTypeDescription,
-            campaignGuid
+            campaignGuid,
+            userId
         });
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AddJobType, param);
