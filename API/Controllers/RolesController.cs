@@ -46,7 +46,8 @@ public class RolesController : Controller
                         PermissionType = PermissionTypes.View
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
 
             var roles = await _rolesService.GetRolesInCampaign(campaignGuid);
@@ -71,7 +72,8 @@ public class RolesController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
             
             if (role.RoleName == null)
@@ -114,7 +116,8 @@ public class RolesController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
 
             await _rolesService.DeleteRole(campaignGuid, role.RoleName);
@@ -139,7 +142,8 @@ public class RolesController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
 
             await _rolesService.UpdateRole(campaignGuid, role.RoleName, role.RoleDescription);
@@ -165,7 +169,8 @@ public class RolesController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
 
             var res = await _rolesService.AssignUserToNormalRole(campaignGuid, userEmail, role.RoleName);
@@ -214,7 +219,8 @@ public class RolesController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
             
             var user = await _usersService.GetUserByEmail(userEmail);
@@ -226,7 +232,7 @@ public class RolesController : Controller
             // Check if the user is allowed to assign this role
             if (!await RoleUtils.CanAssignRole(_rolesService, HttpContext, role.RoleName, campaignGuid, user.UserId))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionError, CustomStatusCode.PermissionError));
             }
 
             var res = await _rolesService.AssignUserToAdministrativeRole(campaignGuid, userEmail, role.RoleName);
@@ -276,7 +282,8 @@ public class RolesController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
             
             var user = await _usersService.GetUserByEmail(userEmail);
@@ -288,7 +295,7 @@ public class RolesController : Controller
             // Check if the user is allowed to remove this role
             if (!await RoleUtils.CanRemoveRole(_rolesService, HttpContext, campaignGuid, user.UserId))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionError, CustomStatusCode.PermissionError));
             }
 
             await _rolesService.RemoveUserFromRole(campaignGuid, userEmail);
@@ -313,7 +320,8 @@ public class RolesController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
             
             var user = await _usersService.GetUserByEmail(userEmail);

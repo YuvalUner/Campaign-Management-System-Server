@@ -39,6 +39,8 @@ public static class ErrorMessages
     public const string RoleAlreadyAssigned = "Role already assigned to user";
     public const string PermissionNotFound = "Permission not found";
     public const string UserAlreadyHasPermission = "User already has this permission";
+    public const string NotLoggedIn = "You are not logged in";
+    public const string JobRequiresPeople = "Number of people required for job must be greater than 0";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {
