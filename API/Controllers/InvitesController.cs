@@ -135,7 +135,11 @@ public class InvitesController : Controller
             // when it comes to this (assuming no one broke into the DB), and it's faster to check than the database.
             if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaign.CampaignGuid))
             {
-                await _inviteService.AcceptInvite(campaign.CampaignGuid, userId);
+                var res = await _inviteService.AcceptInvite(campaign.CampaignGuid, userId);
+                if (res == CustomStatusCode.DuplicateKey)
+                {
+                    return BadRequest(FormatErrorMessage(AlreadyAMember, CustomStatusCode.DuplicateKey));
+                }
                 CampaignAuthorizationUtils.AddAuthorizationForCampaign(HttpContext, campaign.CampaignGuid);
                 
                 // Notify all users that should be notified that a new user joined the campaign

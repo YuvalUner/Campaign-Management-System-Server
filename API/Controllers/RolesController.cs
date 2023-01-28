@@ -236,6 +236,8 @@ public class RolesController : Controller
                     return BadRequest(FormatErrorMessage(ErrorMessages.RoleNotFound, res));
                 case CustomStatusCode.UserNotFound:
                     return BadRequest(FormatErrorMessage(ErrorMessages.UserNotFound, res));
+                case CustomStatusCode.DuplicateKey:
+                    return BadRequest(FormatErrorMessage(ErrorMessages.RoleAlreadyAssigned, res));
             }
             if (notificationSettings.ViaEmail || notificationSettings.ViaSms)
             {

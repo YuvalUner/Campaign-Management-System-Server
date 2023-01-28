@@ -86,6 +86,10 @@ public class VerificationCodeController: Controller
             }
 
             verificationCode.PhoneNumber = RemoveCountryCode(verificationCode.PhoneNumber);
+            if (string.IsNullOrEmpty(verificationCode.PhoneNumber))
+            {
+                return BadRequest(FormatErrorMessage(PhoneNumberNotFound, CustomStatusCode.ValueNotFound));
+            }
 
             await _verificationCodeService.ApproveVerificationCode(userId, verificationCode.PhoneNumber);
             return Ok();

@@ -35,6 +35,10 @@ public static class ErrorMessages
     public const string TooManyJobTypes = "Too many job types in campaign";
     public const string DuplicateVerification = "You can not verify a user more than once";
     public const string VerificationFailed = "Verification failed, please check your info and try again";
+    public const string AlreadyAMember = "You are already a member of this campaign";
+    public const string RoleAlreadyAssigned = "Role already assigned to user";
+    public const string PermissionNotFound = "Permission not found";
+    public const string UserAlreadyHasPermission = "User already has this permission";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {

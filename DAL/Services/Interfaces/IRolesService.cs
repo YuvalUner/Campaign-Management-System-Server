@@ -19,7 +19,7 @@ public interface IRolesService
     /// <param name="campaignGuid"></param>
     /// <param name="roleName"></param>
     /// <param name="roleDescription"></param>
-    /// <returns></returns>
+    /// <returns>TooManyEntries if number of roles is 50 or more, RoleAlreadyExists if role already exists for the campaign</returns>
     Task<CustomStatusCode> AddRoleToCampaign(Guid? campaignGuid, string? roleName, string? roleDescription);
 
     /// <summary>
@@ -43,7 +43,7 @@ public interface IRolesService
     /// <param name="campaignGuid"></param>
     /// <param name="userEmail"></param>
     /// <param name="roleName"></param>
-    /// <returns></returns>
+    /// <returns>UserNotFound if user not found, RoleNotFound if user not found, Ok otherwise</returns>
     Task<CustomStatusCode> AssignUserToNormalRole(Guid? campaignGuid, string? userEmail, string? roleName);
 
     /// <summary>
@@ -52,7 +52,7 @@ public interface IRolesService
     /// <param name="campaignGuid"></param>
     /// <param name="userEmail"></param>
     /// <param name="roleName"></param>
-    /// <returns></returns>
+    /// <returns>DuplicateKey if user already in admin role, UserNotFound if user not found, RoleNotFound if user not found, Ok otherwise</returns>
     Task<CustomStatusCode> AssignUserToAdministrativeRole(Guid? campaignGuid, string? userEmail, string? roleName);
 
     /// <summary>
