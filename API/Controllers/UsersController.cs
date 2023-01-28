@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using API.SessionExtensions;
 using DAL.Services.Interfaces;
 using API.Utils;
-using StatusCodes = DAL.DbAccess.StatusCodes;
+using DAL.DbAccess;
+using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
@@ -134,7 +135,7 @@ public class UsersController : Controller
             if (userIsAuthenticated)
             {
                 _logger.LogInformation("User with id {UserId} tried to re-authenticate", userId);
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(DuplicateVerification, CustomStatusCode.AlreadyVerified));
             }
 
             // Check that the user has not already filled out their private info.
@@ -156,18 +157,18 @@ public class UsersController : Controller
             // Make sure the info the user input matches that in the voters ledger.
             if (!await VerifyUserPrivateInfo(userInfo))
             {
-                return BadRequest();
+                return BadRequest(FormatErrorMessage(VerificationFailed, CustomStatusCode.ValueNotFound));
             }
 
             // If all checks pass, update the user's info in the database.
-            int res = await _usersService.AddUserPrivateInfo(userInfo, userId);
-            if (res == -1)
+            var res = await _usersService.AddUserPrivateInfo(userInfo, userId);
+            if (res == CustomStatusCode.IdAlreadyExistsWhenVerifyingInfo)
             {
                 _logger.LogInformation(
                     "Error No. {ErrorNum}: User with id {UserId} And IP Address {IpAddress} tried to enter" +
                     "an ID number that is already in the database",
-                    StatusCodes.IdAlreadyExistsWhenVerifyingInfo, userId, HttpContext.Connection.RemoteIpAddress);
-                return BadRequest("Stealing people's identities is not allowed");
+                    CustomStatusCode.IdAlreadyExistsWhenVerifyingInfo, userId, HttpContext.Connection.RemoteIpAddress);
+                return BadRequest(FormatErrorMessage(DuplicateVerification, CustomStatusCode.IdAlreadyExistsWhenVerifyingInfo));
             }
 
             HttpContext.Session.SetInt32(Constants.UserAuthenticationStatus, 1);

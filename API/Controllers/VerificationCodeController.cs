@@ -1,9 +1,11 @@
 ﻿using API.Utils;
+using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestAPIServices;
+using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
@@ -33,7 +35,7 @@ public class VerificationCodeController: Controller
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
             if (userId == null)
             {
-                return BadRequest();
+                return BadRequest(FormatErrorMessage(UserNotFound, CustomStatusCode.ValueNotFound));
             }
 
             await _smsMessageSendingService.SendPhoneVerificationCodeAsync(phoneNumber.PhoneNumber, code, CountryCodes.Israel);
@@ -75,12 +77,12 @@ public class VerificationCodeController: Controller
             var verificationCode = await _verificationCodeService.GetVerificationCode(userId);
             if (verificationCode == null)
             {
-                return BadRequest();
+                return BadRequest(FormatErrorMessage(VerificationCodeNotFound, CustomStatusCode.ValueNotFound));
             }
 
             if (verificationCode.Expires < DateTime.Now || verificationCode.VerificationCode != code.VerificationCode)
             {
-                return BadRequest();
+                return BadRequest(FormatErrorMessage(VerificationCodeExpired, CustomStatusCode.VerificationCodeExpired));
             }
 
             verificationCode.PhoneNumber = RemoveCountryCode(verificationCode.PhoneNumber);

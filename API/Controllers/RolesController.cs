@@ -6,7 +6,6 @@ using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestAPIServices;
-using StatusCodes = DAL.DbAccess.StatusCodes;
 using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
@@ -77,21 +76,21 @@ public class RolesController : Controller
             
             if (role.RoleName == null)
             {
-                return BadRequest("Role name cannot be null");
+                return BadRequest(FormatErrorMessage(RoleNameRequired, CustomStatusCode.ValueCanNotBeNull));
             }
             
             // Built-in roles cannot be added to campaigns.
             if (BuiltInRoleNames.IsBuiltInRole(role.RoleName))
             {
-                return BadRequest("Can not add built-in roles to campaigns.");
+                return BadRequest(FormatErrorMessage(NameMustNotBeBuiltIn, CustomStatusCode.NameCanNotBeBuiltIn));
             }
 
             var res = await _rolesService.AddRoleToCampaign(campaignGuid, role.RoleName, role.RoleDescription);
             switch (res)
             {
-                case StatusCodes.TooManyEntries:
+                case CustomStatusCode.TooManyEntries:
                     return BadRequest(FormatErrorMessage(ErrorMessages.TooManyRoles, res));
-                case StatusCodes.RoleAlreadyExists:
+                case CustomStatusCode.RoleAlreadyExists:
                     return BadRequest(FormatErrorMessage(ErrorMessages.RoleAlreadyExists, res));
             }
             return Ok();
@@ -172,10 +171,10 @@ public class RolesController : Controller
             var res = await _rolesService.AssignUserToNormalRole(campaignGuid, userEmail, role.RoleName);
             switch (res)
             {
-                case StatusCodes.RoleNotFound:
-                    return BadRequest($"Error Num {res} - Role does not exist");
-                case StatusCodes.UserNotFound:
-                    return BadRequest($"Error Num {res} - User does not exist");
+                case CustomStatusCode.RoleNotFound:
+                    return BadRequest(FormatErrorMessage(RoleNotFound, res));
+                case CustomStatusCode.UserNotFound:
+                    return BadRequest(FormatErrorMessage(UserNotFound, res));
             }
             if (notificationSettings.ViaEmail || notificationSettings.ViaSms)
             {
@@ -221,7 +220,7 @@ public class RolesController : Controller
             var user = await _usersService.GetUserByEmail(userEmail);
             if (user == null)
             {
-                return BadRequest("User does not exist");
+                return BadRequest(FormatErrorMessage(UserNotFound, CustomStatusCode.UserNotFound));
             }
 
             // Check if the user is allowed to assign this role
@@ -233,9 +232,9 @@ public class RolesController : Controller
             var res = await _rolesService.AssignUserToAdministrativeRole(campaignGuid, userEmail, role.RoleName);
             switch (res)
             {
-                 case StatusCodes.RoleNotFound:
+                 case CustomStatusCode.RoleNotFound:
                     return BadRequest(FormatErrorMessage(ErrorMessages.RoleNotFound, res));
-                case StatusCodes.UserNotFound:
+                case CustomStatusCode.UserNotFound:
                     return BadRequest(FormatErrorMessage(ErrorMessages.UserNotFound, res));
             }
             if (notificationSettings.ViaEmail || notificationSettings.ViaSms)
@@ -281,7 +280,7 @@ public class RolesController : Controller
             var user = await _usersService.GetUserByEmail(userEmail);
             if (user == null)
             {
-                return BadRequest("User not found");
+                return BadRequest(FormatErrorMessage(ErrorMessages.UserNotFound, CustomStatusCode.UserNotFound));
             }
             
             // Check if the user is allowed to remove this role
@@ -318,7 +317,7 @@ public class RolesController : Controller
             var user = await _usersService.GetUserByEmail(userEmail);
             if (user == null)
             {
-                return BadRequest("User not found");
+                return BadRequest(FormatErrorMessage(ErrorMessages.UserNotFound, CustomStatusCode.UserNotFound));
             }
             
             // Check if the user is allowed to remove this role

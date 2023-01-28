@@ -67,7 +67,7 @@ public class VotersLedgerService : IVotersLedgerService
         return res;
     }
 
-    public async Task<int> UpdateVoterSupportStatus(UpdateSupportStatusParams updateParams, Guid campaignGuid)
+    public async Task<CustomStatusCode> UpdateVoterSupportStatus(UpdateSupportStatusParams updateParams, Guid campaignGuid)
     {
         var param = new DynamicParameters(new
         {
@@ -81,6 +81,6 @@ public class VotersLedgerService : IVotersLedgerService
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         
         await _dbAccess.ModifyData(StoredProcedureNames.UpdateSupportStatus, param);
-        return param.Get<int>("returnVal");
+        return (CustomStatusCode)param.Get<int>("returnVal");
     }
 }

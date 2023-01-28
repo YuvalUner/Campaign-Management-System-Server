@@ -1,9 +1,11 @@
 ﻿using API.Utils;
+using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
@@ -35,12 +37,13 @@ public class JobsController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
             
             if (string.IsNullOrWhiteSpace(job.JobName))
             {
-                return BadRequest("Job name is required");
+                return BadRequest(FormatErrorMessage(JobNameRequired, CustomStatusCode.ValueCanNotBeNull));
             }
             
             var jobGuid = await _jobsService.AddJob(job, campaignGuid);
@@ -65,7 +68,8 @@ public class JobsController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
             
             await _jobsService.DeleteJob(jobGuid, campaignGuid);
@@ -148,13 +152,14 @@ public class JobsController : Controller
                         PermissionType = PermissionTypes.View
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
             
             var job = await _jobsService.GetJob(jobGuid, campaignGuid);
             if (job == null)
             {
-                return NotFound();
+                return NotFound(FormatErrorMessage(JobNotFound, CustomStatusCode.ValueNotFound));
             }
             return Ok(job);
         }

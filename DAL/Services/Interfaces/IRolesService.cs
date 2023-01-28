@@ -20,7 +20,7 @@ public interface IRolesService
     /// <param name="roleName"></param>
     /// <param name="roleDescription"></param>
     /// <returns></returns>
-    Task<StatusCodes> AddRoleToCampaign(Guid? campaignGuid, string? roleName, string? roleDescription);
+    Task<CustomStatusCode> AddRoleToCampaign(Guid? campaignGuid, string? roleName, string? roleDescription);
 
     /// <summary>
     /// Gets the list of roles in a campaign.
@@ -44,7 +44,7 @@ public interface IRolesService
     /// <param name="userEmail"></param>
     /// <param name="roleName"></param>
     /// <returns></returns>
-    Task<StatusCodes> AssignUserToNormalRole(Guid? campaignGuid, string? userEmail, string? roleName);
+    Task<CustomStatusCode> AssignUserToNormalRole(Guid? campaignGuid, string? userEmail, string? roleName);
 
     /// <summary>
     /// Assigns a user to an administrative role in a campaign and gives them all permissions.
@@ -53,7 +53,7 @@ public interface IRolesService
     /// <param name="userEmail"></param>
     /// <param name="roleName"></param>
     /// <returns></returns>
-    Task<StatusCodes> AssignUserToAdministrativeRole(Guid? campaignGuid, string? userEmail, string? roleName);
+    Task<CustomStatusCode> AssignUserToAdministrativeRole(Guid? campaignGuid, string? userEmail, string? roleName);
 
     /// <summary>
     /// Updates a role's description.

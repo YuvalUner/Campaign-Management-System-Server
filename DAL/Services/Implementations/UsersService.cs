@@ -64,7 +64,7 @@ public class UsersService : IUsersService
         return res.FirstOrDefault();
     }
 
-    public async Task<int> AddUserPrivateInfo(UserPrivateInfo privateInfo, int? userId)
+    public async Task<CustomStatusCode> AddUserPrivateInfo(UserPrivateInfo privateInfo, int? userId)
     {
         var param = new DynamicParameters(new
         {
@@ -75,7 +75,7 @@ public class UsersService : IUsersService
         });
         param.Add("returnVal", DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AddUserPrivateInfo, param);
-        return param.Get<int>("returnVal");
+        return (CustomStatusCode) param.Get<int>("returnVal");
     }
 
     public async Task<bool> IsUserAuthenticated(int? userId)
