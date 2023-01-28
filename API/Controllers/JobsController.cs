@@ -46,6 +46,11 @@ public class JobsController : Controller
                 return BadRequest(FormatErrorMessage(JobNameRequired, CustomStatusCode.ValueCanNotBeNull));
             }
             
+            if (job.PeopleNeeded <= 0)
+            {
+                return BadRequest(FormatErrorMessage(JobRequiresPeople, CustomStatusCode.IllegalValue));
+            }
+            
             var jobGuid = await _jobsService.AddJob(job, campaignGuid);
             return Ok(jobGuid);
         }
@@ -94,7 +99,8 @@ public class JobsController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
 
             job.JobGuid = jobGuid;
@@ -121,17 +127,13 @@ public class JobsController : Controller
                         PermissionType = PermissionTypes.View
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
             
             var jobs = await _jobsService.GetJobs(campaignGuid);
-            var jobsList = jobs.ToList();
-            if (jobsList.Count == 0)
-            {
-                return NotFound();
-            }
 
-            return Ok(jobsList);
+            return Ok(jobs);
         }
         catch (Exception e)
         {
@@ -167,6 +169,33 @@ public class JobsController : Controller
         {
             _logger.LogError(e, "Error while getting job");
             return StatusCode(500, "Error while getting job");
+        }
+    }
+    
+    [HttpGet("get-by-manned-status/{campaignGuid:guid}/{fullyManned:bool}")]
+    public async Task<IActionResult> GetJobsByMannedStatus(Guid campaignGuid, bool fullyManned)
+    {
+        try
+        {
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.Jobs,
+                        PermissionType = PermissionTypes.View
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            var jobs = await _jobsService.GetsJobsByMannedStatus(campaignGuid, fullyManned);
+
+            return Ok(jobs);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while getting jobs by manned status");
+            return StatusCode(500, "Error while getting jobs by manned status");
         }
     }
     

@@ -10,7 +10,8 @@ public interface IJobTypesService
     /// </summary>
     /// <param name="jobType"></param>
     /// <param name="campaignGuid"></param>
-    /// <returns></returns>
+    /// <returns>TooManyEntries if there are already 40 job types for the campaign,
+    /// CannotInsertDuplicateUniqueIndex if job type name already exists for that campaign</returns>
     Task<CustomStatusCode> AddJobType(JobType jobType, Guid campaignGuid);
     
     /// <summary>
