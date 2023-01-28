@@ -9,7 +9,7 @@ public interface IJobsService
     /// </summary>
     /// <param name="job"></param>
     /// <param name="campaignGuid"></param>
-    /// <returns></returns>
+    /// <returns>The Guid of the newly created job</returns>
     Task<Guid> AddJob(Job job, Guid campaignGuid);
 
     /// <summary>
@@ -44,4 +44,12 @@ public interface IJobsService
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
     Task<Job?> GetJob(Guid jobGuid, Guid campaignGuid);
+
+    /// <summary>
+    /// Gets a list of all jobs in the campaign that are fully manned or not fully manned, depending on the value of fullyManned.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <param name="fullyManned"></param>
+    /// <returns></returns>
+    Task<IEnumerable<Job>> GetsJobsByMannedStatus(Guid campaignGuid, bool fullyManned);
 }

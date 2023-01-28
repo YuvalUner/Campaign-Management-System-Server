@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DAL.DbAccess;
+using Microsoft.AspNetCore.Mvc;
+using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
@@ -13,6 +15,7 @@ public class AccessDeniedController: Controller
     [HttpGet]
     public IActionResult Get()
     {
-        return Unauthorized();
+        return Unauthorized(FormatErrorMessage(NotLoggedIn,
+            CustomStatusCode.NotLoggedIn));
     }
 }

@@ -49,7 +49,8 @@ public class InvitesController : Controller
                         PermissionType = PermissionTypes.View
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
 
             Guid? inviteGuid = await _inviteService.GetInvite(campaignGuid);
@@ -78,7 +79,8 @@ public class InvitesController : Controller
                     PermissionType = PermissionTypes.Edit
                 }))
         {
-            return Unauthorized();
+            return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                CustomStatusCode.PermissionOrAuthorizationError));
         }
 
         await _inviteService.CreateInvite(campaignGuid);
@@ -98,7 +100,8 @@ public class InvitesController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
 
             await _inviteService.RevokeInvite(campaignGuid);
@@ -121,7 +124,7 @@ public class InvitesController : Controller
             var campaign = await _campaignsService.GetCampaignByInviteGuid(campaignInviteGuid);
             if (campaign == null)
             {
-                return NotFound();
+                return NotFound(FormatErrorMessage(CampaignNotFound, CustomStatusCode.ValueNotFound));
             }
             
             var userAccountAuthorizationStatus = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);

@@ -81,4 +81,14 @@ public class JobsService: IJobsService
         var res =  await _dbAccess.GetData<Job, DynamicParameters>(StoredProcedureNames.GetJob, param);
         return res.FirstOrDefault();
     }
+    
+    public async Task<IEnumerable<Job>> GetsJobsByMannedStatus(Guid campaignGuid, bool fullyManned)
+    {
+        var param = new DynamicParameters(new
+        {
+            fullyManned,
+            campaignGuid
+        });
+        return await _dbAccess.GetData<Job, DynamicParameters>(StoredProcedureNames.GetJobsByMannedStatus, param);
+    }
 }
