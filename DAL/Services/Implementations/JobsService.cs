@@ -15,7 +15,7 @@ public class JobsService: IJobsService
         _dbAccess = dbAccess;
     }
 
-    public async Task<Guid> AddJob(Job job, Guid campaignGuid)
+    public async Task<Guid> AddJob(Job job, Guid campaignGuid, int? userId)
     {
         var param = new DynamicParameters(new
         {
@@ -27,7 +27,8 @@ public class JobsService: IJobsService
             job.JobEndTime,
             job.JobDefaultSalary,
             job.PeopleNeeded,
-            job.JobTypeName
+            job.JobTypeName,
+            userId
         });
         param.Add("newJobGuid", dbType: DbType.Guid, direction: ParameterDirection.Output);
         await _dbAccess.ModifyData(StoredProcedureNames.AddJob, param);

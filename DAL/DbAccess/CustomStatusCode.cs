@@ -35,4 +35,6 @@ public enum CustomStatusCode
     PermissionDoesNotExist = 50009,
     UserAlreadyHasPermission = 50010,
     CityNotFound = 50011,
+    JobNotFound = 50012,
+    JobTypeNotFound = 50013,
 }

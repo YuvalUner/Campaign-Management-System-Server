@@ -28,6 +28,8 @@ builder.Services.AddScoped<ISmsMessageSendingService, SmsMessageSendingService>(
 builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
 builder.Services.AddScoped<IJobsService, JobsService>();
 builder.Services.AddScoped<IJobTypesService, JobTypesService>();
+builder.Services.AddScoped<IJobTypeAssignmentCapabilityService, JobTypeAssignmentCapabilityService>();
+builder.Services.AddScoped<IJobAssignmentCapabilityService, JobAssignmentCapabilityService>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", optionsBuilder => {
