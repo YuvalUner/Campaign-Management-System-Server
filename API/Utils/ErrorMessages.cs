@@ -41,6 +41,8 @@ public static class ErrorMessages
     public const string UserAlreadyHasPermission = "User already has this permission";
     public const string NotLoggedIn = "You are not logged in";
     public const string JobRequiresPeople = "Number of people required for job must be greater than 0";
+    public const string CanAlreadyAssignToJob = "User can already assign to this job";
+    public const string CanAlreadyAssignToJobType = "User can already assign to this job type";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {
