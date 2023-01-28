@@ -40,7 +40,7 @@ public class RolesService : IRolesService
         return res;
     }
 
-    public async Task<int> AddRoleToCampaign(Guid? campaignGuid, string? roleName, string? roleDescription)
+    public async Task<CustomStatusCode> AddRoleToCampaign(Guid? campaignGuid, string? roleName, string? roleDescription)
     {
         var param = new DynamicParameters(new
         {
@@ -50,7 +50,7 @@ public class RolesService : IRolesService
         });
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AddCustomRole, param);
-        return param.Get<int>("returnVal");
+        return (CustomStatusCode) param.Get<int>("returnVal");
     }
     
     public async Task DeleteRole(Guid? campaignGuid, string? roleName)
@@ -63,7 +63,7 @@ public class RolesService : IRolesService
         await _dbAccess.ModifyData(StoredProcedureNames.DeleteRole, param);
     }
 
-    public async Task<int> AssignUserToNormalRole(Guid? campaignGuid, string? userEmail, string? roleName)
+    public async Task<CustomStatusCode> AssignUserToNormalRole(Guid? campaignGuid, string? userEmail, string? roleName)
     {
         var param = new DynamicParameters(new
         {
@@ -73,10 +73,10 @@ public class RolesService : IRolesService
         });
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AssignUserToRole, param);
-        return param.Get<int>("returnVal");
+        return (CustomStatusCode) param.Get<int>("returnVal");
     }
     
-    public async Task<int> AssignUserToAdministrativeRole(Guid? campaignGuid, string? userEmail, string? roleName)
+    public async Task<CustomStatusCode> AssignUserToAdministrativeRole(Guid? campaignGuid, string? userEmail, string? roleName)
     {
         var param = new DynamicParameters(new
         {
@@ -86,7 +86,7 @@ public class RolesService : IRolesService
         });
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AssignUserToAdministrativeRole, param);
-        return param.Get<int>("returnVal");
+        return (CustomStatusCode) param.Get<int>("returnVal");
     }
     
     public async Task UpdateRole(Guid? campaignGuid, string? roleName, string? roleDescription)

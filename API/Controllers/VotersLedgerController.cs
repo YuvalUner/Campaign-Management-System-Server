@@ -1,13 +1,17 @@
 ﻿using API.Utils;
 using DAL.Models;
 using DAL.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic.CompilerServices;
+using CustomStatusCode = DAL.DbAccess.CustomStatusCode;
+using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class VotersLedgerController : Controller
 {
     private readonly IVotersLedgerService _votersLedgerService;
@@ -46,8 +50,7 @@ public class VotersLedgerController : Controller
                                           && String.IsNullOrEmpty(filter.LastName)
                                           && filter.IdNum == null)
             {
-                return BadRequest("City name is required for non-municipal" +
-                                  " campaigns when the search is not by first name, last name or id");
+                return BadRequest(FormatErrorMessage(CityNameRequired, CustomStatusCode.CityNameRequired));
             }
 
             if (campaignType.IsMunicipal)
@@ -78,15 +81,17 @@ public class VotersLedgerController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
             
-            int res = await _votersLedgerService.UpdateVoterSupportStatus(updateParams, campaignGuid);
-            if (res == -1)
+            var res = await _votersLedgerService.UpdateVoterSupportStatus(updateParams, campaignGuid);
+            return res switch
             {
-                return BadRequest("No voters were updated");
-            }
-            return Ok();
+                CustomStatusCode.CityNotFound => BadRequest(FormatErrorMessage(CityNotFound,
+                    CustomStatusCode.CityNotFound)),
+                _ => Ok()
+            };
 
         }
         catch (Exception e)

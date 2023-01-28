@@ -1,4 +1,5 @@
-﻿using DAL.DbAccess;
+﻿using System.Data;
+using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Interfaces;
 using Dapper;
@@ -14,7 +15,7 @@ public class PermissionsService : IPermissionsService
         _dbAccess = dbAccess;
     }
 
-    public async Task AddPermission(Permission permission, int? userId, Guid? campaignGuid)
+    public async Task<CustomStatusCode> AddPermission(Permission permission, int? userId, Guid? campaignGuid)
     {
         var param = new DynamicParameters(new
         {
@@ -23,7 +24,9 @@ public class PermissionsService : IPermissionsService
             userId,
             campaignGuid
         });
+        param.Add("returnCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AddPermission, param);
+        return (CustomStatusCode)param.Get<int>("returnCode");
     }
     
     public async Task<IEnumerable<Permission?>> GetPermissions(int? userId, Guid? campaignGuid)

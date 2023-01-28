@@ -1,4 +1,5 @@
-﻿using DAL.Models;
+﻿using DAL.DbAccess;
+using DAL.Models;
 
 namespace DAL.Services.Interfaces;
 
@@ -38,7 +39,7 @@ public interface IUsersService
     /// <param name="privateInfo">The model with the private info</param>
     /// <param name="userId"></param>
     /// <returns></returns>
-    Task<int> AddUserPrivateInfo(UserPrivateInfo privateInfo, int? userId);
+    Task<CustomStatusCode> AddUserPrivateInfo(UserPrivateInfo privateInfo, int? userId);
 
     /// <summary>
     /// Gets a user's authentication status from the database and returns it.

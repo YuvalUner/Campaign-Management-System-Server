@@ -1,10 +1,12 @@
 ﻿using API.SessionExtensions;
 using API.Utils;
+using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Implementations;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
@@ -41,7 +43,8 @@ public class CampaignsController : Controller
         {
             if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(AuthorizationError,
+                    CustomStatusCode.AuthorizationError));
             }
 
             CampaignAuthorizationUtils.EnterCampaign(HttpContext, campaignGuid);
@@ -74,7 +77,8 @@ public class CampaignsController : Controller
             var authenticationStatus = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);
             if (!authenticationStatus)
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(VerificationStatusError,
+                    CustomStatusCode.VerificationStatusError));
             }
 
             // Verify that the user submitted all the necessary data
@@ -82,7 +86,7 @@ public class CampaignsController : Controller
                 || campaign.IsMunicipal == null
                 || campaign.IsMunicipal == true && string.IsNullOrEmpty(campaign.CityName))
             {
-                return BadRequest();
+                return BadRequest(FormatErrorMessage(CampaignNameOrCityNameRequired, CustomStatusCode.ValueCanNotBeNull));
             }
 
             if (campaign.IsMunicipal == false)
@@ -94,7 +98,7 @@ public class CampaignsController : Controller
             campaign.CampaignId = await _campaignService.AddCampaign(campaign, userId);
             if (campaign.CampaignId == -1)
             {
-                return BadRequest("Error with city name");
+                return BadRequest(FormatErrorMessage(CityNotFound, CustomStatusCode.CityNotFound));
             }
 
             _logger.LogInformation("Created campaign called {CampaignName} for user {UserId}", campaign.CampaignName,
@@ -125,7 +129,8 @@ public class CampaignsController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
 
             await _campaignService.ModifyCampaign(campaign);
@@ -152,7 +157,8 @@ public class CampaignsController : Controller
                         PermissionType = PermissionTypes.View
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
 
             var users = await _campaignService.GetUsersInCampaign(campaignGuid);

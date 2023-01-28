@@ -1,4 +1,5 @@
-﻿using DAL.Models;
+﻿using DAL.DbAccess;
+using DAL.Models;
 
 namespace DAL.Services.Interfaces;
 
@@ -18,8 +19,8 @@ public interface IRolesService
     /// <param name="campaignGuid"></param>
     /// <param name="roleName"></param>
     /// <param name="roleDescription"></param>
-    /// <returns></returns>
-    Task<int> AddRoleToCampaign(Guid? campaignGuid, string? roleName, string? roleDescription);
+    /// <returns>TooManyEntries if number of roles is 50 or more, RoleAlreadyExists if role already exists for the campaign</returns>
+    Task<CustomStatusCode> AddRoleToCampaign(Guid? campaignGuid, string? roleName, string? roleDescription);
 
     /// <summary>
     /// Gets the list of roles in a campaign.
@@ -42,8 +43,8 @@ public interface IRolesService
     /// <param name="campaignGuid"></param>
     /// <param name="userEmail"></param>
     /// <param name="roleName"></param>
-    /// <returns></returns>
-    Task<int> AssignUserToNormalRole(Guid? campaignGuid, string? userEmail, string? roleName);
+    /// <returns>UserNotFound if user not found, RoleNotFound if user not found, Ok otherwise</returns>
+    Task<CustomStatusCode> AssignUserToNormalRole(Guid? campaignGuid, string? userEmail, string? roleName);
 
     /// <summary>
     /// Assigns a user to an administrative role in a campaign and gives them all permissions.
@@ -51,8 +52,8 @@ public interface IRolesService
     /// <param name="campaignGuid"></param>
     /// <param name="userEmail"></param>
     /// <param name="roleName"></param>
-    /// <returns></returns>
-    Task<int> AssignUserToAdministrativeRole(Guid? campaignGuid, string? userEmail, string? roleName);
+    /// <returns>DuplicateKey if user already in admin role, UserNotFound if user not found, RoleNotFound if user not found, Ok otherwise</returns>
+    Task<CustomStatusCode> AssignUserToAdministrativeRole(Guid? campaignGuid, string? userEmail, string? roleName);
 
     /// <summary>
     /// Updates a role's description.

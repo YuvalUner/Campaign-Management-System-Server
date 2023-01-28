@@ -128,10 +128,10 @@ public class UsersServiceTests
         };
         
         // Act
-        var userPrivateInfo = _usersService.AddUserPrivateInfo(info, TestUser.UserId).Result;
+        var userPrivateInfoResult = _usersService.AddUserPrivateInfo(info, TestUser.UserId).Result;
         
         // Assert
-        Assert.True(userPrivateInfo == 1);
+        Assert.True(userPrivateInfoResult == CustomStatusCode.Ok);
     }
 
     [Fact, TestPriority(4)]
@@ -159,10 +159,10 @@ public class UsersServiceTests
         };
         
         // Act
-        var userPrivateInfo = _usersService.AddUserPrivateInfo(info, TestUser.UserId).Result;
+        var userPrivateInfoResult = _usersService.AddUserPrivateInfo(info, TestUser.UserId).Result;
         
         // Assert
-        Assert.True(userPrivateInfo == -1);
+        Assert.True(userPrivateInfoResult == CustomStatusCode.IdAlreadyExistsWhenVerifyingInfo);
     }
     
 

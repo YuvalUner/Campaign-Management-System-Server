@@ -1,4 +1,6 @@
-﻿namespace DAL.Services.Interfaces;
+﻿using DAL.DbAccess;
+
+namespace DAL.Services.Interfaces;
 
 public interface IInvitesService
 {
@@ -26,5 +28,5 @@ public interface IInvitesService
     /// <param name="campaignGuid"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
-    Task AcceptInvite(Guid? campaignGuid, int? userId);
+    Task<CustomStatusCode> AcceptInvite(Guid? campaignGuid, int? userId);
 }
