@@ -1,4 +1,5 @@
-﻿using DAL.DbAccess;
+﻿using System.Data;
+using DAL.DbAccess;
 using DAL.Services.Interfaces;
 using Dapper;
 
@@ -41,13 +42,15 @@ public class InvitesService : IInvitesService
         return res.FirstOrDefault();
     }
 
-    public async Task AcceptInvite(Guid? campaignGuid, int? userId)
+    public async Task<CustomStatusCode> AcceptInvite(Guid? campaignGuid, int? userId)
     {
         var param = new DynamicParameters(new
         {
             campaignGuid,
             userId
         });
+        param.Add("returnCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.LinkUserToCampaign, param);
+        return (CustomStatusCode) param.Get<int>("returnCode");
     }
 }

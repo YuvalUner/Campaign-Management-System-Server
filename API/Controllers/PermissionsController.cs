@@ -56,8 +56,13 @@ public class PermissionsController : Controller
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError, CustomStatusCode.AuthorizationError));
             }
 
-            await _permissionService.AddPermission(permission, user.UserId, campaignGuid);
-            return Ok();
+            var res = await _permissionService.AddPermission(permission, user.UserId, campaignGuid);
+            return res switch
+            {
+                CustomStatusCode.PermissionDoesNotExist => NotFound(FormatErrorMessage(PermissionNotFound, res)),
+                CustomStatusCode.UserAlreadyHasPermission => BadRequest(FormatErrorMessage(UserAlreadyHasPermission, res)),
+                _ => Ok()
+            };
         }
         catch (Exception e)
         {
