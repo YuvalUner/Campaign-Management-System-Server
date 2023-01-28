@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using static API.Utils.ErrorMessages;
-using StatusCodes = DAL.DbAccess.StatusCodes;
 
 namespace API.Controllers;
 
@@ -38,24 +37,25 @@ public class JobTypesController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(AuthorizationError,
+                    CustomStatusCode.AuthorizationError));
             }
 
             if (string.IsNullOrWhiteSpace(jobType.JobTypeName))
             {
-                return BadRequest("Job type name cannot be empty");
+                return BadRequest(FormatErrorMessage(JobTypeRequired, CustomStatusCode.ValueCanNotBeNull));
             }
 
             if (BuiltInJobTypes.IsBuiltIn(jobType.JobTypeName))
             {
-                return BadRequest("Job type name cannot be a built-in job type name");
+                return BadRequest(FormatErrorMessage(NameMustNotBeBuiltIn, CustomStatusCode.NameCanNotBeBuiltIn));
             }
             
             var res = await _jobTypesService.AddJobType(jobType, campaignGuid);
             return res switch
             {
-                StatusCodes.CannotInsertDuplicateUniqueIndex => BadRequest(FormatErrorMessage(ErrorMessages.JobTypeAlreadyExists, res)),
-                StatusCodes.TooManyEntries => BadRequest($"Error Num {res} - Too many job types"),
+                CustomStatusCode.CannotInsertDuplicateUniqueIndex => BadRequest(FormatErrorMessage(ErrorMessages.JobTypeAlreadyExists, res)),
+                CustomStatusCode.TooManyEntries => BadRequest(FormatErrorMessage(TooManyJobTypes, res)),
                 _ => Ok()
             };
         }
@@ -78,12 +78,13 @@ public class JobTypesController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(AuthorizationError,
+                    CustomStatusCode.AuthorizationError));
             }
             
             if (BuiltInJobTypes.IsBuiltIn(jobTypeName))
             {
-                return BadRequest("Cannot delete built-in job type");
+                return BadRequest(FormatErrorMessage(NameMustNotBeBuiltIn, CustomStatusCode.NameCanNotBeBuiltIn));
             }
             
             await _jobTypesService.DeleteJobType(jobTypeName, campaignGuid);
@@ -108,7 +109,8 @@ public class JobTypesController : Controller
                         PermissionType = PermissionTypes.View
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(AuthorizationError,
+                    CustomStatusCode.AuthorizationError));
             }
 
             var jobTypes = await _jobTypesService.GetJobTypes(campaignGuid);
@@ -133,18 +135,19 @@ public class JobTypesController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(AuthorizationError,
+                    CustomStatusCode.AuthorizationError));
             }
             
             if (jobType.JobTypeName != null && BuiltInJobTypes.IsBuiltIn(jobType.JobTypeName))
             {
-                return BadRequest("Job type name cannot be a built-in job type name");
+                return BadRequest(FormatErrorMessage(NameMustNotBeBuiltIn, CustomStatusCode.NameCanNotBeBuiltIn));
             }
             
             var res = await _jobTypesService.UpdateJobType(jobType, campaignGuid, jobTypeName);
             return res switch
             {
-                StatusCodes.CannotInsertDuplicateUniqueIndex => BadRequest(FormatErrorMessage(ErrorMessages.JobTypeAlreadyExists, res)),
+                CustomStatusCode.CannotInsertDuplicateUniqueIndex => BadRequest(FormatErrorMessage(ErrorMessages.JobTypeAlreadyExists, res)),
                 _ => Ok()
             };
         }

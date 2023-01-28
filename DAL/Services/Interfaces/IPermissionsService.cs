@@ -1,4 +1,5 @@
-﻿using DAL.Models;
+﻿using DAL.DbAccess;
+using DAL.Models;
 
 namespace DAL.Services.Interfaces;
 
@@ -11,7 +12,7 @@ public interface IPermissionsService
     /// <param name="userId"></param>
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
-    Task AddPermission(Permission permission, int? userId, Guid? campaignGuid);
+    Task<CustomStatusCode> AddPermission(Permission permission, int? userId, Guid? campaignGuid);
 
     /// <summary>
     /// Gets all permissions for a user in a campaign

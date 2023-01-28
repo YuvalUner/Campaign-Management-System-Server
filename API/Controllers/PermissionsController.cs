@@ -1,9 +1,11 @@
 ﻿using API.SessionExtensions;
 using API.Utils;
+using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
@@ -39,19 +41,19 @@ public class PermissionsController : Controller
                         PermissionType = PermissionTypes.Edit
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError, CustomStatusCode.AuthorizationError));
             }
             
             User? user = await _usersService.GetUserByEmail(userEmail);
             if (user == null)
             {
-                return NotFound();
+                return NotFound(FormatErrorMessage(UserNotFound, CustomStatusCode.UserNotFound));
             }
             
             // Check if the user is permitted to delete this permission
             if (!await PermissionUtils.CanEditPermission(HttpContext, permission, user, _rolesService))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError, CustomStatusCode.AuthorizationError));
             }
 
             await _permissionService.AddPermission(permission, user.UserId, campaignGuid);
@@ -73,13 +75,13 @@ public class PermissionsController : Controller
             if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid)
                 || !CampaignAuthorizationUtils.DoesActiveCampaignMatch(HttpContext, campaignGuid))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(AuthorizationError, CustomStatusCode.AuthorizationError));
             }
 
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
             if (userId == null)
             {
-                return Unauthorized();
+                return BadRequest(FormatErrorMessage(UserNotFound, CustomStatusCode.ValueNotFound));
             }
             
 
@@ -107,13 +109,14 @@ public class PermissionsController : Controller
                         PermissionType = PermissionTypes.View
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.AuthorizationError));
             }
 
             User? user = await _usersService.GetUserByEmail(userEmail);
             if (user == null)
             {
-                return NotFound();
+                return NotFound(FormatErrorMessage(UserNotFound, CustomStatusCode.ValueNotFound));
             }
 
             var permissions = await _permissionService.GetPermissions(user.UserId, campaignGuid);

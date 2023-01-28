@@ -11,7 +11,7 @@ public interface IJobTypesService
     /// <param name="jobType"></param>
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
-    Task<StatusCodes> AddJobType(JobType jobType, Guid campaignGuid);
+    Task<CustomStatusCode> AddJobType(JobType jobType, Guid campaignGuid);
     
     /// <summary>
     /// Deletes a single job type from the campaign.
@@ -30,7 +30,7 @@ public interface IJobTypesService
     /// <param name="campaignGuid"></param>
     /// <param name="jobTypeName"></param>
     /// <returns></returns>
-    Task<StatusCodes> UpdateJobType(JobType jobType, Guid campaignGuid, string jobTypeName);
+    Task<CustomStatusCode> UpdateJobType(JobType jobType, Guid campaignGuid, string jobTypeName);
     
     /// <summary>
     /// Gets a list of all job types in the campaign.

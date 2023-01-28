@@ -162,9 +162,9 @@ public static class StoredProcedureNames
     /// Updates a user's support status for a campaign.<br/>
     /// Params: voterId (int), campaignGuid (Guid), supportStatus (bool).
     /// If support status is unknown, pass null.<br/>
-    /// Returns: 1 on success, -1 on failure. Failure could be due to mismatch of campaign city and voter city.
+    /// Returns: Status code CityNotFound if the city was not found, Ok if the update was successful.
     /// </summary>
-    public const string UpdateSupportStatus = "usp_UpdateSupportStatus";
+    public const string UpdateSupportStatus = "usp_SupportStatusUpdate";
     
     /// <summary>
     /// Deletes a campaign.
@@ -254,7 +254,7 @@ public static class StoredProcedureNames
     /// Updates a role's description.<br/>
     /// Params: campaignGuid (Guid), roleName (string), roleDescription (string)<br/>
     /// </summary>
-    public const string UpdateRole = "usp_UpdateRole";
+    public const string UpdateRole = "usp_RoleUpdate";
 
 
     /// <summary>
@@ -306,7 +306,7 @@ public static class StoredProcedureNames
     /// Updates a job type's name and / or description.<br/>
     /// Params: campaignGuid (Guid), jobTypeName (string), jobTypeDescription (string)<br/>
     /// </summary>
-    public const string UpdateJobType = "usp_UpdateJobType";
+    public const string UpdateJobType = "usp_JobTypeUpdate";
 
     /// <summary>
     /// Gets the custom and built in job types for a campaign.<br/>
@@ -320,7 +320,7 @@ public static class StoredProcedureNames
     /// jobLocation (string), jobStartTime (DateTime), jobEndTime (DateTime), jobDefaultSalary (int)<br/>
     /// All parameters but campaignGuid and jobGuid are optional - only the ones that are provided will be updated.
     /// </summary>
-    public const string UpdateJob = "usp_UpdateJob";
+    public const string UpdateJob = "usp_JobUpdate";
     
     /// <summary>
     /// Gets a list of all the jobs for a campaign.<br/>

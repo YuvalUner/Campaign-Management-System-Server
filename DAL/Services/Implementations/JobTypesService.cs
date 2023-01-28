@@ -15,7 +15,7 @@ public class JobTypesService: IJobTypesService
         _dbAccess = dbAccess;
     }
     
-    public async Task<StatusCodes> AddJobType(JobType jobType, Guid campaignGuid)
+    public async Task<CustomStatusCode> AddJobType(JobType jobType, Guid campaignGuid)
     {
         var param = new DynamicParameters(new
         {
@@ -25,7 +25,7 @@ public class JobTypesService: IJobTypesService
         });
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AddJobType, param);
-        return (StatusCodes) param.Get<int>("returnVal");
+        return (CustomStatusCode) param.Get<int>("returnVal");
     }
     
     public async Task DeleteJobType(string jobTypeName, Guid campaignGuid)
@@ -38,7 +38,7 @@ public class JobTypesService: IJobTypesService
         await _dbAccess.ModifyData(StoredProcedureNames.DeleteJobType, param);
     }
     
-    public async Task<StatusCodes> UpdateJobType(JobType jobType, Guid campaignGuid, string jobTypeName)
+    public async Task<CustomStatusCode> UpdateJobType(JobType jobType, Guid campaignGuid, string jobTypeName)
     {
         var param = new DynamicParameters(new
         {
@@ -49,7 +49,7 @@ public class JobTypesService: IJobTypesService
         });
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.UpdateJobType, param);
-        return (StatusCodes) param.Get<int>("returnVal");
+        return (CustomStatusCode) param.Get<int>("returnVal");
     }
     
     public async Task<IEnumerable<JobType>> GetJobTypes(Guid campaignGuid)
