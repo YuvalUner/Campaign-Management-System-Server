@@ -27,4 +27,6 @@ public class JobType
 {
     public string? JobTypeName { get; set; }
     public string? JobTypeDescription { get; set; }
+    
+    public bool IsCustomJobType { get; set; }
 }

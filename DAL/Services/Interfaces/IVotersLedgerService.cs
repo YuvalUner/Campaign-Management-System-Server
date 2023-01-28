@@ -1,4 +1,5 @@
-﻿using DAL.Models;
+﻿using DAL.DbAccess;
+using DAL.Models;
 
 namespace DAL.Services.Interfaces;
 
@@ -25,5 +26,5 @@ public interface IVotersLedgerService
     /// <param name="updateParams">An object containing the voter's id number and support status</param>
     /// <param name="campaignGuid"></param>
     /// <returns>The success or error code from the database</returns>
-    Task<int> UpdateVoterSupportStatus(UpdateSupportStatusParams updateParams, Guid campaignGuid);
+    Task<CustomStatusCode> UpdateVoterSupportStatus(UpdateSupportStatusParams updateParams, Guid campaignGuid);
 }

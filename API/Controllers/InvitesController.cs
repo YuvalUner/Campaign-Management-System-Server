@@ -1,10 +1,12 @@
 ﻿using API.SessionExtensions;
 using API.Utils;
+using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RestAPIServices;
+using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
@@ -53,7 +55,7 @@ public class InvitesController : Controller
             Guid? inviteGuid = await _inviteService.GetInvite(campaignGuid);
             if (inviteGuid == null)
             {
-                return NotFound();
+                return NotFound(FormatErrorMessage(RequestedValueNotFound, CustomStatusCode.ValueNotFound));
             }
 
             return Ok(new { InviteGuid = inviteGuid });
@@ -125,7 +127,7 @@ public class InvitesController : Controller
             var userAccountAuthorizationStatus = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);
             if (!userAccountAuthorizationStatus)
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(VerificationStatusError, CustomStatusCode.VerificationStatusError));
             }
 
             // Checks if the user is already part of the campaign and if not, adds them
@@ -133,8 +135,12 @@ public class InvitesController : Controller
             // when it comes to this (assuming no one broke into the DB), and it's faster to check than the database.
             if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaign.CampaignGuid))
             {
-                //await _inviteService.AcceptInvite(campaign.CampaignGuid, userId);
-                //CampaignAuthorizationUtils.AddAuthorizationForCampaign(HttpContext, campaign.CampaignGuid);
+                var res = await _inviteService.AcceptInvite(campaign.CampaignGuid, userId);
+                if (res == CustomStatusCode.DuplicateKey)
+                {
+                    return BadRequest(FormatErrorMessage(AlreadyAMember, CustomStatusCode.DuplicateKey));
+                }
+                CampaignAuthorizationUtils.AddAuthorizationForCampaign(HttpContext, campaign.CampaignGuid);
                 
                 // Notify all users that should be notified that a new user joined the campaign
                 var usersToNotify = await _notificationsService.GetUsersToNotify(campaign.CampaignGuid.Value);
@@ -142,12 +148,12 @@ public class InvitesController : Controller
                 foreach (var userToNotify in usersToNotify)
                 {
                     // Not awaited on purpose - these should just run in the background
-                    if (userToNotify.ViaEmail)
+                    if (userToNotify.ViaEmail && userToNotify.Email != null)
                     {
                         _emailSendingService.SendUserJoinedEmailAsync(user.FirstNameHeb + " " + user.LastNameHeb,
                             campaign.CampaignName, userToNotify.Email);
                     }
-                    if (userToNotify.ViaSms)
+                    if (userToNotify.ViaSms && userToNotify.PhoneNumber != null)
                     {
                         _smsMessageSendingService.SendUserJoinedSmsAsync(user.FirstNameHeb + " " + user.LastNameHeb,
                             campaign.CampaignName, userToNotify.PhoneNumber, CountryCodes.Israel);

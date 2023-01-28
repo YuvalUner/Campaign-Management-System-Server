@@ -33,4 +33,52 @@ public class JobsService: IJobsService
         await _dbAccess.ModifyData(StoredProcedureNames.AddJob, param);
         return param.Get<Guid>("newJobGuid");
     }
+    
+    public async Task DeleteJob(Guid jobGuid, Guid campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            jobGuid,
+            campaignGuid
+        });
+        await _dbAccess.ModifyData(StoredProcedureNames.DeleteJob, param);
+    }
+    
+    public async Task UpdateJob(Job job, Guid campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            job.JobGuid,
+            campaignGuid,
+            job.JobName,
+            job.JobDescription,
+            job.JobLocation,
+            job.JobStartTime,
+            job.JobEndTime,
+            job.JobDefaultSalary,
+            job.PeopleNeeded,
+            job.JobTypeName
+        });
+        await _dbAccess.ModifyData(StoredProcedureNames.UpdateJob, param);
+    }
+    
+    public async Task<IEnumerable<Job>> GetJobs(Guid campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid
+        });
+        return await _dbAccess.GetData<Job, DynamicParameters>(StoredProcedureNames.GetJobs, param);
+    }
+    
+    public async Task<Job?> GetJob(Guid jobGuid, Guid campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            jobGuid,
+            campaignGuid
+        });
+        var res =  await _dbAccess.GetData<Job, DynamicParameters>(StoredProcedureNames.GetJob, param);
+        return res.FirstOrDefault();
+    }
 }

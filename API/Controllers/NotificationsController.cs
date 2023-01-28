@@ -1,13 +1,17 @@
 ﻿using System.Reflection.Metadata;
 using API.Utils;
+using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class NotificationsController : Controller
 {
     private readonly INotificationsService _notificationsService;
@@ -31,7 +35,8 @@ public class NotificationsController : Controller
                     PermissionType = PermissionTypes.View
                 }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
 
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
@@ -58,7 +63,8 @@ public class NotificationsController : Controller
                         PermissionType = PermissionTypes.View
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
             
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
@@ -85,7 +91,8 @@ public class NotificationsController : Controller
                     PermissionType = PermissionTypes.View
                 }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
 
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
