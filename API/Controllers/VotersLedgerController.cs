@@ -39,7 +39,8 @@ public class VotersLedgerController : Controller
                         PermissionType = PermissionTypes.View
                     }))
             {
-                return Unauthorized();
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
 
             // Verify that the campaign type is municipal or that that the campaign type is national and 

@@ -342,4 +342,10 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid), jobGuid (Guid)<br/>
     /// </summary>
     public const string DeleteJob = "usp_JobDelete";
+    
+    /// <summary>
+    /// Gets a list of jobs for a campaign by whether they are fully manned or not.<br/>
+    /// Params: campaignGuid (Guid), fullyManned (bool)<br/>
+    /// </summary>
+    public const string GetJobsByMannedStatus= "usp_JobsByMannedStatusGet";
 }
