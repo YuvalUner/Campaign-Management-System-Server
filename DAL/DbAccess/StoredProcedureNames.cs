@@ -348,4 +348,47 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid), fullyManned (bool)<br/>
     /// </summary>
     public const string GetJobsByMannedStatus= "usp_JobsByMannedStatusGet";
+
+    /// <summary>
+    /// Adds a new user who can assign other users to a job.<br/>
+    /// Params: campaignGuid (Guid), jobGuid (Guid), userEmail (string)<br/>
+    /// Returns: Status code UserNotFound if the user does not exist, JobNotFound if the job does not exist,
+    /// DuplicateKey if the user is already capable of assigning to the job.
+    /// </summary>
+    public const string AddUserWhoCanAssignToJob = "usp_JobAssignCapableUsersAdd";
+    
+    /// <summary>
+    /// Adds a new user who can assign other users to any job with a specific job type.<br/>
+    /// Params: campaignGuid (Guid), jobTypeName (string), userEmail (string)<br/>
+    /// Returns: Status code UserNotFound if the user does not exist, JobTypeNotFound if the job type does not exist,
+    /// DuplicateKey if the user is already capable of assigning to the job type.
+    /// </summary>
+    public const string AddUserWhoCanAssignToJobType = "usp_JobTypeAssignCapableUserAdd";
+    
+    /// <summary>
+    /// Removes a user from being capable of assigning other users to a job.<br/>
+    /// Params: campaignGuid (Guid), jobGuid (Guid), userEmail (string)<br/>
+    /// </summary>
+    public const string RemoveUserWhoCanAssignToJob = "usp_JobAssignCapableUsersRemove";
+    
+    /// <summary>
+    /// Removes a user from being capable of assigning other users to any job with a specific job type.<br/>
+    /// Params: campaignGuid (Guid), jobTypeName (string), userEmail (string)<br/>
+    /// </summary>
+    public const string RemoveUserWhoCanAssignToJobType = "usp_JobTypeAssignCapableUsersRemove";
+    
+    /// <summary>
+    /// Gets the list of users who can assign other users to a job.<br/>
+    /// Params: campaignGuid (Guid), jobGuid (Guid), viaJobType (bool) - optional.<br/>
+    /// Setting viaJobType to true will return the list of anyone who can assign to that job, regardless of whether
+    /// it is job specific or job type specific.<br/>
+    /// Setting it to false will return the list of anyone who can assign to that job specifically, and not via job type.<br/>
+    /// </summary>
+    public const string GetUsersWhoCanAssignToJob = "usp_JobAssignCapableUsersGet";
+    
+    /// <summary>
+    /// Gets the list of users who can assign other users to any job with a specific job type.<br/>
+    /// Params: campaignGuid (Guid), jobTypeName (string)<br/>
+    /// </summary>
+    public const string GetUsersWhoCanAssignToJobType = "usp_JobTypeAssignCapableUsersGet";
 }
