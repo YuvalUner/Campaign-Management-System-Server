@@ -2,6 +2,6 @@
 
 public class JobAssignmentParams
 {
-    public IEnumerable<string>? UserEmailAddress { get; set; }
-    public IEnumerable<int>? Salaries { get; set; }
+    public string? UserEmail { get; set; }
+    public int? Salary { get; set; }
 }

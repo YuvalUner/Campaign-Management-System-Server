@@ -18,11 +18,14 @@ public class JobsController : Controller
 {
     private readonly IJobsService _jobsService;
     private readonly ILogger<JobsController> _logger;
+    private readonly IJobAssignmentCapabilityService _jobAssignmentCapabilityService;
 
-    public JobsController(IJobsService jobsService, ILogger<JobsController> logger)
+    public JobsController(IJobsService jobsService, ILogger<JobsController> logger,
+        IJobAssignmentCapabilityService jobAssignmentCapabilityService)
     {
         _jobsService = jobsService;
         _logger = logger;
+        _jobAssignmentCapabilityService = jobAssignmentCapabilityService;
     }
 
     [HttpPost("add/{campaignGuid:guid}")]
@@ -198,6 +201,51 @@ public class JobsController : Controller
         {
             _logger.LogError(e, "Error while getting jobs by manned status");
             return StatusCode(500, "Error while getting jobs by manned status");
+        }
+    }
+    
+    [HttpPost("assign/{campaignGuid:guid}/{jobGuid:guid}")]
+    public async Task<IActionResult> AssignJob(Guid campaignGuid, Guid jobGuid, [FromBody] JobAssignmentParams jobAssignmentParams)
+    {
+        try
+        {
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.Jobs,
+                        PermissionType = PermissionTypes.Edit
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+
+
+            if (!await JobAssignmentUtils.CanAssignToJob(_jobAssignmentCapabilityService, HttpContext, jobGuid, campaignGuid))
+            {
+                return Unauthorized(FormatErrorMessage(NoPermissionToAssignToJob, CustomStatusCode.PermissionError));
+            }
+
+            if (string.IsNullOrWhiteSpace(jobAssignmentParams.UserEmail))
+            {
+                return BadRequest(FormatErrorMessage(EmailNullOrEmpty, CustomStatusCode.ValueCanNotBeNull));
+            }
+            
+            var res = await _jobsService.AddJobAssignment(jobGuid, campaignGuid,
+                jobAssignmentParams.UserEmail, jobAssignmentParams.Salary);
+            return res switch
+            {
+                CustomStatusCode.JobNotFound => NotFound(FormatErrorMessage(JobNotFound, res)),
+                CustomStatusCode.UserNotFound => NotFound(FormatErrorMessage(UserNotFound, res)),
+                CustomStatusCode.JobFullyManned => BadRequest(FormatErrorMessage(JobFullyManned, res)),
+                CustomStatusCode.DuplicateKey => BadRequest(FormatErrorMessage(AlreadyAssignedToJob, res)),
+                _ => Ok()
+            };
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while assigning job");
+            return StatusCode(500, "Error while assigning job");
         }
     }
     

@@ -30,5 +30,5 @@ public interface IJobAssignmentCapabilityService
     /// <param name="viaJobType">True if everyone who can assign to the job (via job type as well) is needed,
     /// False if only those who can assign to that job specifically is needed</param>
     /// <returns></returns>
-    Task<IEnumerable<UserPublicInfo>> GetJobAssignmentCapableUsers(Guid campaignGuid, Guid? jobGuid, bool? viaJobType);
+    Task<IEnumerable<User>> GetJobAssignmentCapableUsers(Guid campaignGuid, Guid? jobGuid, bool? viaJobType);
 }

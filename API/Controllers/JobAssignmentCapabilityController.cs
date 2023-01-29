@@ -100,7 +100,16 @@ public class JobAssignmentCapabilityController : Controller
             }
             
             var result = await _jobAssignmentCapabilityService.GetJobAssignmentCapableUsers(campaignGuid, jobGuid, viaJobType);
-            return Ok(result);
+            var resultWithoutIds = result.Select(x => new
+            {
+                x.DisplayNameEng,
+                x.FirstNameHeb,
+                x.LastNameHeb,
+                x.Email,
+                x.PhoneNumber,
+                x.ProfilePicUrl
+            });
+            return Ok(resultWithoutIds);
         }
         catch (Exception e)
         {
