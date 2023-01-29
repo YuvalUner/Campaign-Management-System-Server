@@ -347,7 +347,7 @@ public static class StoredProcedureNames
     /// Gets a list of jobs for a campaign by whether they are fully manned or not.<br/>
     /// Params: campaignGuid (Guid), fullyManned (bool)<br/>
     /// </summary>
-    public const string GetJobsByMannedStatus= "usp_JobsByMannedStatusGet";
+    public const string GetJobsFiltered= "usp_JobsByFilterGet";
 
     /// <summary>
     /// Adds a new user who can assign other users to a job.<br/>
