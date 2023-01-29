@@ -135,4 +135,59 @@ public class JobsService: IJobsService
         }
         return await _dbAccess.GetData<Job, DynamicParameters>(StoredProcedureNames.GetJobsFiltered, param);
     }
+
+    public async Task<CustomStatusCode> AddJobAssignment(Guid campaignGuid, Guid jobGuid,
+        JobAssignmentParams jobAssignmentParams)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid,
+            jobGuid,
+            jobAssignmentParams.UserEmail,
+        });
+        if (jobAssignmentParams.Salary.HasValue)
+        {
+            param.Add("salary", jobAssignmentParams.Salary.Value);
+        }
+        param.Add("statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        await _dbAccess.ModifyData(StoredProcedureNames.AssignToJob, param);
+        return (CustomStatusCode) param.Get<int>("statusCode");
+    }
+    
+    public async Task<CustomStatusCode> RemoveJobAssignment(Guid campaignGuid, Guid jobGuid, string userEmail)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid,
+            jobGuid,
+            userEmail
+        });
+        param.Add("statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        await _dbAccess.ModifyData(StoredProcedureNames.RemoveJobAssignment, param);
+        return (CustomStatusCode) param.Get<int>("statusCode");
+    }
+    
+    public async Task<IEnumerable<JobAssignment>> GetJobAssignments(Guid campaignGuid, Guid jobGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid,
+            jobGuid
+        });
+        return await _dbAccess.GetData<JobAssignment, DynamicParameters>(StoredProcedureNames.GetUsersAssignedToJob, param);
+    }
+    
+    public async Task<CustomStatusCode> UpdateJobAssignment(Guid campaignGuid, Guid jobGuid, JobAssignmentParams jobAssignmentParams)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid,
+            jobGuid,
+            jobAssignmentParams.UserEmail,
+            jobAssignmentParams.Salary
+        });
+        param.Add("statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        await _dbAccess.ModifyData(StoredProcedureNames.UpdateJobAssignment, param);
+        return (CustomStatusCode) param.Get<int>("statusCode");
+    }
 }

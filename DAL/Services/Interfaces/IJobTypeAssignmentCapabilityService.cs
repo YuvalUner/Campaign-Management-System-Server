@@ -28,5 +28,5 @@ public interface IJobTypeAssignmentCapabilityService
     /// <param name="campaignGuid"></param>
     /// <param name="jobTypeName"></param>
     /// <returns></returns>
-    Task<IEnumerable<UserPublicInfo>> GetJobTypeAssignmentCapableUsers(Guid campaignGuid, string jobTypeName);
+    Task<IEnumerable<User>> GetJobTypeAssignmentCapableUsers(Guid campaignGuid, string jobTypeName);
 }

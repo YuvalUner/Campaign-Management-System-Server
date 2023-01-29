@@ -39,7 +39,7 @@ public class JobAssignmentCapabilityService: IJobAssignmentCapabilityService
         await _dbAccess.ModifyData(StoredProcedureNames.RemoveUserWhoCanAssignToJob, param);
     }
 
-    public async Task<IEnumerable<UserPublicInfo>> GetJobAssignmentCapableUsers(Guid campaignGuid, Guid? jobGuid, bool? viaJobType)
+    public async Task<IEnumerable<User>> GetJobAssignmentCapableUsers(Guid campaignGuid, Guid? jobGuid, bool? viaJobType)
     {
         if (viaJobType == null)
             viaJobType = true;
@@ -50,6 +50,6 @@ public class JobAssignmentCapabilityService: IJobAssignmentCapabilityService
             jobGuid,
             viaJobType
         });
-        return await _dbAccess.GetData<UserPublicInfo, DynamicParameters>(StoredProcedureNames.GetUsersWhoCanAssignToJob, param);
+        return await _dbAccess.GetData<User, DynamicParameters>(StoredProcedureNames.GetUsersWhoCanAssignToJob, param);
     }
 }
