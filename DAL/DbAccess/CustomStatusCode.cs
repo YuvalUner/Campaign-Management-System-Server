@@ -1,8 +1,14 @@
 ﻿namespace DAL.DbAccess;
 
+/// <summary>
+/// Custom status codes for the application.
+/// Holds both application errors and SQL errors.
+/// </summary>
 public enum CustomStatusCode
 {
     // 0 is the default return value for stored procedures, so we use it for success
+    // Outside of tests, this should never be used.
+    // However, as it is needed to be defined for the enum to work, it is here and removing it will break literally everything.
     Ok = 0,
     // 1 and above are custom error codes, relating to specific errors that can happen within the app.
     // Some relate to SQL, but are not SQL errors but rather errors due to user input or other logic
@@ -20,6 +26,7 @@ public enum CustomStatusCode
     AlreadyVerified = 12,
     NotLoggedIn = 13,
     IllegalValue = 14,
+    ValueNullOrEmpty = 15,
     
     // 50000 and above are SQL errors, meant to match requirement of throwing between 50000 and 2147483647
     // These are for errors that would have been thrown by the database if not caught by the stored procedure
@@ -37,4 +44,5 @@ public enum CustomStatusCode
     CityNotFound = 50011,
     JobNotFound = 50012,
     JobTypeNotFound = 50013,
+    JobFullyManned = 50014,
 }

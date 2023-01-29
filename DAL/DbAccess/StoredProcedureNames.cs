@@ -391,4 +391,32 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid), jobTypeName (string)<br/>
     /// </summary>
     public const string GetUsersWhoCanAssignToJobType = "usp_JobTypeAssignCapableUsersGet";
+    
+    /// <summary>
+    /// Assigns a user to a job, and increments the number of people assigned to that job.<br/>
+    /// Params: campaignGuid (Guid), jobGuid (Guid), userEmail (string), salary (int) optional.<br/>
+    /// Returns: Status code UserNotFound if the user does not exist, JobNotFound if the job does not exist,
+    /// JobFullyManned if the job is already fully manned, DuplicateKey if user is already assigned to job.<br/>
+    /// </summary>
+    public const string AssignToJob = "usp_JobAssign";
+    
+    /// <summary>
+    /// Removes a user from being assigned to a job, and decrements the number of people assigned to that job.<br/>
+    /// Params: campaignGuid (Guid), jobGuid (Guid), userEmail (string)<br/>
+    /// Returns: Status code UserNotFound if the user does not exist, JobNotFound if the job does not exist.
+    /// </summary>
+    public const string RemoveJobAssignment = "usp_JobAssignmentRemove";
+    
+    /// <summary>
+    /// Gets the list of users who are assigned to a job.<br/>
+    /// Params: campaignGuid (Guid), jobGuid (Guid)<br/>
+    /// </summary>
+    public const string GetUsersAssignedToJob = "usp_JobAssignedUsersGet";
+    
+    /// <summary>
+    /// Updates the salary of a user assigned to a job.<br/>
+    /// Params: campaignGuid (Guid), jobGuid (Guid), userEmail (string), salary (int)<br/>
+    /// Returns: Status code UserNotFound if the user does not exist, JobNotFound if the job does not exist.
+    /// </summary>
+    public const string UpdateJobAssignment = "usp_JobAssignmentUpdate";
 }

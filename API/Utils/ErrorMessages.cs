@@ -43,6 +43,11 @@ public static class ErrorMessages
     public const string JobRequiresPeople = "Number of people required for job must be greater than 0";
     public const string CanAlreadyAssignToJob = "User can already assign to this job";
     public const string CanAlreadyAssignToJobType = "User can already assign to this job type";
+    public const string JobFullyManned = "Job is fully manned, can not assign more people";
+    public const string AlreadyAssignedToJob = "User is already assigned to this job";
+    public const string NoPermissionToAssignToJob = "User does not have permission to assign to this job";
+    public const string EmailNullOrEmpty = "Email can not be null or empty";
+    public const string SalaryNullOrEmpty = "Salary can not be null or empty";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {
