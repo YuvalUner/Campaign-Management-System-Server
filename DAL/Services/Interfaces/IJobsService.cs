@@ -71,15 +71,24 @@ public interface IJobsService
     /// <param name="jobGuid"></param>
     /// <param name="userEmail"></param>
     /// <returns></returns>
-    Task RemoveJobAssignment(Guid campaignGuid, Guid jobGuid, string userEmail);
+    Task<CustomStatusCode> RemoveJobAssignment(Guid campaignGuid, Guid jobGuid, string userEmail);
 
     /// <summary>
     /// Adds a user to a job.
     /// </summary>
     /// <param name="campaignGuid"></param>
     /// <param name="jobGuid"></param>
-    /// <param name="userEmail"></param>
-    /// <param name="salary"></param>
+    /// <param name="jobAssignmentParams"></param>
     /// <returns></returns>
-    Task<CustomStatusCode> AddJobAssignment(Guid campaignGuid, Guid jobGuid, string userEmail, int? salary);
+    Task<CustomStatusCode> AddJobAssignment(Guid campaignGuid, Guid jobGuid, JobAssignmentParams jobAssignmentParams);
+
+    /// <summary>
+    /// Updates the salary of a user assigned to a job.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <param name="jobGuid"></param>
+    /// <param name="jobAssignmentParams"></param>
+    /// <returns></returns>
+    Task<CustomStatusCode> UpdateJobAssignment(Guid campaignGuid, Guid jobGuid,
+        JobAssignmentParams jobAssignmentParams);
 }
