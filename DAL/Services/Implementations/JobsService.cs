@@ -83,13 +83,56 @@ public class JobsService: IJobsService
         return res.FirstOrDefault();
     }
     
-    public async Task<IEnumerable<Job>> GetsJobsByMannedStatus(Guid campaignGuid, bool fullyManned)
+    public async Task<IEnumerable<Job>> GetJobsByFilter(Guid campaignGuid, JobsFilterParameters filterParameters)
     {
         var param = new DynamicParameters(new
         {
-            fullyManned,
             campaignGuid
         });
-        return await _dbAccess.GetData<Job, DynamicParameters>(StoredProcedureNames.GetJobsByMannedStatus, param);
+        if (filterParameters.FullyManned.HasValue)
+        {
+            param.Add("fullyManned", filterParameters.FullyManned.Value);
+        }
+        if (filterParameters.JobName != null)
+        {
+            param.Add("jobName", filterParameters.JobName);
+        }
+        if (filterParameters.JobTypeName != null)
+        {
+            param.Add("jobTypeName", filterParameters.JobTypeName);
+        }
+        if (filterParameters.JobLocation != null)
+        {
+            param.Add("jobLocation", filterParameters.JobLocation);
+        }
+        if (filterParameters.JobStartTime.HasValue)
+        {
+            param.Add("jobStartTime", filterParameters.JobStartTime.Value);
+        }
+        if (filterParameters.JobEndTime.HasValue)
+        {
+            param.Add("jobEndTime", filterParameters.JobEndTime.Value);
+        }
+        if (filterParameters.TimeFromStart.HasValue)
+        {
+            param.Add("timeFromStart", filterParameters.TimeFromStart.Value);
+        }
+        if (filterParameters.TimeBeforeStart.HasValue)
+        {
+            param.Add("timeBeforeStart", filterParameters.TimeBeforeStart.Value);
+        }
+        if (filterParameters.TimeFromEnd.HasValue)
+        {
+            param.Add("timeFromEnd", filterParameters.TimeFromEnd.Value);
+        }
+        if (filterParameters.TimeBeforeEnd.HasValue)
+        {
+            param.Add("timeBeforeEnd", filterParameters.TimeBeforeEnd.Value);
+        }
+        if (filterParameters.OnlyCustomJobTypes.HasValue)
+        {
+            param.Add("onlyCustomJobTypes", filterParameters.OnlyCustomJobTypes.Value);
+        }
+        return await _dbAccess.GetData<Job, DynamicParameters>(StoredProcedureNames.GetJobsFiltered, param);
     }
 }

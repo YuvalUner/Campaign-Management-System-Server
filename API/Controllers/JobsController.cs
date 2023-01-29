@@ -174,8 +174,8 @@ public class JobsController : Controller
         }
     }
     
-    [HttpGet("get-by-manned-status/{campaignGuid:guid}/{fullyManned:bool}")]
-    public async Task<IActionResult> GetJobsByMannedStatus(Guid campaignGuid, bool fullyManned)
+    [HttpGet("get-filtered/{campaignGuid:guid}")]
+    public async Task<IActionResult> GetJobsByMannedStatus(Guid campaignGuid, [FromQuery] JobsFilterParameters filterParameters)
     {
         try
         {
@@ -190,7 +190,7 @@ public class JobsController : Controller
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
             
-            var jobs = await _jobsService.GetsJobsByMannedStatus(campaignGuid, fullyManned);
+            var jobs = await _jobsService.GetJobsByFilter(campaignGuid, filterParameters);
 
             return Ok(jobs);
         }
