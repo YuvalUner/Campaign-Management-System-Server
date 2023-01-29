@@ -51,6 +51,7 @@ public interface IJobsService
     /// </summary>
     /// <param name="campaignGuid"></param>
     /// <param name="fullyManned"></param>
+    /// <param name="filterParameters"></param>
     /// <returns></returns>
-    Task<IEnumerable<Job>> GetsJobsByMannedStatus(Guid campaignGuid, bool fullyManned);
+    Task<IEnumerable<Job>> GetJobsByFilter(Guid campaignGuid, JobsFilterParameters filterParameters);
 }
