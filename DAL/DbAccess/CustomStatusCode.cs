@@ -37,4 +37,5 @@ public enum CustomStatusCode
     CityNotFound = 50011,
     JobNotFound = 50012,
     JobTypeNotFound = 50013,
+    JobFullyManned = 50014,
 }
