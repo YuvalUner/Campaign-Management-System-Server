@@ -43,13 +43,13 @@ public class JobTypeAssignmentCapabilityService: IJobTypeAssignmentCapabilitySer
         await _dbAccess.ModifyData(StoredProcedureNames.RemoveUserWhoCanAssignToJobType, param);
     }
     
-    public async Task<IEnumerable<UserPublicInfo>> GetJobTypeAssignmentCapableUsers(Guid campaignGuid, string jobTypeName)
+    public async Task<IEnumerable<User>> GetJobTypeAssignmentCapableUsers(Guid campaignGuid, string jobTypeName)
     {
         var param = new DynamicParameters(new
         {
             campaignGuid,
             jobTypeName
         });
-        return await _dbAccess.GetData<UserPublicInfo, DynamicParameters>(StoredProcedureNames.GetUsersWhoCanAssignToJobType, param);
+        return await _dbAccess.GetData<User, DynamicParameters>(StoredProcedureNames.GetUsersWhoCanAssignToJobType, param);
     }
 }

@@ -1,4 +1,5 @@
-﻿using DAL.Models;
+﻿using DAL.DbAccess;
+using DAL.Models;
 
 namespace DAL.Services.Interfaces;
 
@@ -54,4 +55,31 @@ public interface IJobsService
     /// <param name="filterParameters"></param>
     /// <returns></returns>
     Task<IEnumerable<Job>> GetJobsByFilter(Guid campaignGuid, JobsFilterParameters filterParameters);
+
+    /// <summary>
+    /// Gets the list of users assigned to a job.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <param name="jobGuid"></param>
+    /// <returns></returns>
+    Task<IEnumerable<JobAssignment>> GetJobAssignments(Guid campaignGuid, Guid jobGuid);
+
+    /// <summary>
+    /// Removes a user from a job.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <param name="jobGuid"></param>
+    /// <param name="userEmail"></param>
+    /// <returns></returns>
+    Task RemoveJobAssignment(Guid campaignGuid, Guid jobGuid, string userEmail);
+
+    /// <summary>
+    /// Adds a user to a job.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <param name="jobGuid"></param>
+    /// <param name="userEmail"></param>
+    /// <param name="salary"></param>
+    /// <returns></returns>
+    Task<CustomStatusCode> AddJobAssignment(Guid campaignGuid, Guid jobGuid, string userEmail, int? salary);
 }
