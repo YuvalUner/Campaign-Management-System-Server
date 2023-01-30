@@ -240,8 +240,10 @@ public class JobsController : Controller
             {
                 return BadRequest(FormatErrorMessage(EmailNullOrEmpty, CustomStatusCode.ValueCanNotBeNull));
             }
+
+            var userId = HttpContext.Session.GetInt32(Constants.UserId);
             
-            var res = await _jobsService.AddJobAssignment(campaignGuid, jobGuid, jobAssignmentParams);
+            var res = await _jobsService.AddJobAssignment(campaignGuid, jobGuid, jobAssignmentParams, userId);
             switch (res)
             {
                 case CustomStatusCode.JobNotFound:
@@ -417,6 +419,22 @@ public class JobsController : Controller
         {
             _logger.LogError(e, "Error while updating job assignment");
             return StatusCode(500, "Error while updating job assignment");
+        }
+    }
+
+    [HttpGet("get-self-jobs")]
+    public async Task<IActionResult> GetSelfJobs([FromQuery] Guid? campaignGuid)
+    {
+        try
+        {
+            var userId = HttpContext.Session.GetInt32(Constants.UserId);
+            var jobs = await _jobsService.GetUserJobs(userId, campaignGuid);
+            return Ok(jobs);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while getting self jobs");
+            return StatusCode(500, "Error while getting self jobs");
         }
     }
     
