@@ -31,4 +31,27 @@ public interface ISmsMessageSendingService
     /// <param name="countryCode"></param>
     /// <returns></returns>
     Task SendRoleAssignedSmsAsync(string? roleName, string? campaignName, string phoneNumber, CountryCodes countryCode);
+
+    /// <summary>
+    /// Sends a standard job assigned message to the phone number
+    /// </summary>
+    /// <param name="jobName"></param>
+    /// <param name="jobStartTime"></param>
+    /// <param name="jobEndTime"></param>
+    /// <param name="location"></param>
+    /// <param name="phoneNumber"></param>
+    /// <param name="countryCode"></param>
+    /// <returns></returns>
+    Task SendJobAssignedSmsAsync(string? jobName, DateTime? jobStartTime, DateTime? jobEndTime, string? location,
+        string phoneNumber, CountryCodes countryCode);
+
+    /// <summary>
+    /// Sends a standard job unassigned message to the phone number
+    /// </summary>
+    /// <param name="jobName"></param>
+    /// <param name="location"></param>
+    /// <param name="phoneNumber"></param>
+    /// <param name="countryCode"></param>
+    /// <returns></returns>
+    Task SendJobUnAssignedSmsAsync(string? jobName, string? location, string phoneNumber, CountryCodes countryCode);
 }

@@ -63,4 +63,18 @@ public class EmailSendingService : IEmailSendingService
         string message = $"Role {roleName} was assigned to you in campaign {campaignName}";
         await SendEmailAsync(emailTo, subject, message, campaignName);
     }
+    
+    public async Task SendJobAssignedEmailAsync(string? jobName, DateTime? jobStartTime, DateTime? jobEndTime, string? location, string? emailTo)
+    {
+        string subject = $"Job assigned";
+        string message = $"You were assigned the job {jobName} from {jobStartTime} to {jobEndTime} at {location}";
+        await SendEmailAsync(emailTo, subject, message, jobName);
+    }
+    
+    public async Task SendJobUnAssignedEmailAsync(string? jobName, string? location, string? emailTo)
+    {
+        string subject = $"Job unassigned";
+        string message = $"You were unassigned from the job {jobName} at {location}";
+        await SendEmailAsync(emailTo, subject, message, jobName);
+    }
 }
