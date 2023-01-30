@@ -419,4 +419,12 @@ public static class StoredProcedureNames
     /// Returns: Status code UserNotFound if the user does not exist, JobNotFound if the job does not exist.
     /// </summary>
     public const string UpdateJobAssignment = "usp_JobAssignmentUpdate";
+
+    /// <summary>
+    /// Gets the list of jobs that a user is assigned to.<br/>
+    /// Params: userId (int), campaignGuid (Guid) - optional.<br/>
+    /// Leaving campaignGuid blank will return all jobs for all campaigns that the user is assigned to, as well as
+    /// the campaign names and guids of those campaigns.<br/>
+    /// </summary>
+    public const string GetUserJobs = "usp_UserJobsGet";
 }

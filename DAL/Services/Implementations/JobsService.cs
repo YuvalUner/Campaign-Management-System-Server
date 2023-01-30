@@ -137,13 +137,14 @@ public class JobsService: IJobsService
     }
 
     public async Task<CustomStatusCode> AddJobAssignment(Guid campaignGuid, Guid jobGuid,
-        JobAssignmentParams jobAssignmentParams)
+        JobAssignmentParams jobAssignmentParams, int? assigningUserId)
     {
         var param = new DynamicParameters(new
         {
             campaignGuid,
             jobGuid,
             jobAssignmentParams.UserEmail,
+            assigningUserId
         });
         if (jobAssignmentParams.Salary.HasValue)
         {
@@ -189,5 +190,18 @@ public class JobsService: IJobsService
         param.Add("statusCode", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.UpdateJobAssignment, param);
         return (CustomStatusCode) param.Get<int>("statusCode");
+    }
+
+    public async Task<IEnumerable<UserJob>> GetUserJobs(int? userId, Guid? campaignGuid = null)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId
+        });
+        if (campaignGuid.HasValue)
+        {
+            param.Add("campaignGuid", campaignGuid.Value);
+        }
+        return await _dbAccess.GetData<UserJob, DynamicParameters>(StoredProcedureNames.GetUserJobs, param);
     }
 }
