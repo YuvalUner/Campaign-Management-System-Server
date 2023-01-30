@@ -117,4 +117,20 @@ public class SmsMessageSendingService : ISmsMessageSendingService
             .Transform(phoneNumber);
         await SendSmsMessageAsync(phoneNumber, message);
     }
+    
+    public async Task SendJobAssignedSmsAsync(string? jobName, DateTime? jobStartTime, DateTime? jobEndTime, string? location, string phoneNumber, CountryCodes countryCode)
+    {
+        string message = $"You were assigned the job {jobName} from {jobStartTime} to {jobEndTime} at {location}";
+        phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
+            .Transform(phoneNumber);
+        await SendSmsMessageAsync(phoneNumber, message);
+    }
+    
+    public async Task SendJobUnAssignedSmsAsync(string? jobName, string? location, string phoneNumber, CountryCodes countryCode)
+    {
+        string message = $"You were unassigned from the job {jobName} at {location}";
+        phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
+            .Transform(phoneNumber);
+        await SendSmsMessageAsync(phoneNumber, message);
+    }
 }
