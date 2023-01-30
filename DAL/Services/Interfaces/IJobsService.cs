@@ -79,8 +79,10 @@ public interface IJobsService
     /// <param name="campaignGuid"></param>
     /// <param name="jobGuid"></param>
     /// <param name="jobAssignmentParams"></param>
+    /// <param name="assigningUserId"></param>
     /// <returns></returns>
-    Task<CustomStatusCode> AddJobAssignment(Guid campaignGuid, Guid jobGuid, JobAssignmentParams jobAssignmentParams);
+    Task<CustomStatusCode> AddJobAssignment(Guid campaignGuid, Guid jobGuid,
+        JobAssignmentParams jobAssignmentParams, int? assigningUserId);
 
     /// <summary>
     /// Updates the salary of a user assigned to a job.
@@ -91,4 +93,13 @@ public interface IJobsService
     /// <returns></returns>
     Task<CustomStatusCode> UpdateJobAssignment(Guid campaignGuid, Guid jobGuid,
         JobAssignmentParams jobAssignmentParams);
+
+    /// <summary>
+    /// Gets a list of jobs that a user is assigned to.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="campaignGuid">The campaign's guid. Keep blank to get all jobs user is assigned to from all campaigns,
+    /// along with their campaign name and Guid.</param>
+    /// <returns></returns>
+    Task<IEnumerable<UserJob>> GetUserJobs(int? userId, Guid? campaignGuid = null);
 }
