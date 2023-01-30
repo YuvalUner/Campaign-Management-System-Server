@@ -5,6 +5,7 @@ using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using RestAPIServices;
 using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
@@ -19,13 +20,21 @@ public class JobsController : Controller
     private readonly IJobsService _jobsService;
     private readonly ILogger<JobsController> _logger;
     private readonly IJobAssignmentCapabilityService _jobAssignmentCapabilityService;
+    private readonly ISmsMessageSendingService _smsMessageSendingService;
+    private readonly IEmailSendingService _emailSendingService;
+    private readonly IUsersService _usersService;
 
     public JobsController(IJobsService jobsService, ILogger<JobsController> logger,
-        IJobAssignmentCapabilityService jobAssignmentCapabilityService)
+        IJobAssignmentCapabilityService jobAssignmentCapabilityService, 
+        ISmsMessageSendingService smsMessageSendingService, IEmailSendingService emailSendingService,
+        IUsersService usersService)
     {
         _jobsService = jobsService;
         _logger = logger;
         _jobAssignmentCapabilityService = jobAssignmentCapabilityService;
+        _smsMessageSendingService = smsMessageSendingService;
+        _emailSendingService = emailSendingService;
+        _usersService = usersService;
     }
 
     [HttpPost("add/{campaignGuid:guid}")]
@@ -205,7 +214,8 @@ public class JobsController : Controller
     }
     
     [HttpPost("assign/{campaignGuid:guid}/{jobGuid:guid}")]
-    public async Task<IActionResult> AssignJob(Guid campaignGuid, Guid jobGuid, [FromBody] JobAssignmentParams jobAssignmentParams)
+    public async Task<IActionResult> AssignJob(Guid campaignGuid, Guid jobGuid,
+        [FromBody] JobAssignmentParams jobAssignmentParams, [FromQuery] bool sendNotification = true)
     {
         try
         {
@@ -232,14 +242,38 @@ public class JobsController : Controller
             }
             
             var res = await _jobsService.AddJobAssignment(campaignGuid, jobGuid, jobAssignmentParams);
-            return res switch
+            switch (res)
             {
-                CustomStatusCode.JobNotFound => NotFound(FormatErrorMessage(JobNotFound, res)),
-                CustomStatusCode.UserNotFound => NotFound(FormatErrorMessage(UserNotFound, res)),
-                CustomStatusCode.JobFullyManned => BadRequest(FormatErrorMessage(JobFullyManned, res)),
-                CustomStatusCode.DuplicateKey => BadRequest(FormatErrorMessage(AlreadyAssignedToJob, res)),
-                _ => Ok()
-            };
+                case CustomStatusCode.JobNotFound:
+                    return NotFound(FormatErrorMessage(JobNotFound, res));
+                case CustomStatusCode.UserNotFound:
+                    return NotFound(FormatErrorMessage(UserNotFound, res));
+                case CustomStatusCode.JobFullyManned:
+                    return BadRequest(FormatErrorMessage(JobFullyManned, res));
+                case CustomStatusCode.DuplicateKey:
+                    return BadRequest(FormatErrorMessage(AlreadyAssignedToJob, res));
+            }
+
+            if (sendNotification)
+            {
+                var contactInfo = await _usersService.GetUserContactInfoByEmail(jobAssignmentParams.UserEmail);
+                var job = await _jobsService.GetJob(jobGuid, campaignGuid);
+                if (contactInfo != null && job != null)
+                {
+                    if (contactInfo.PhoneNumber != null)
+                    {
+                        _smsMessageSendingService.SendJobAssignedSmsAsync(job.JobName, job.JobStartTime, job.JobEndTime,
+                            job.JobLocation, contactInfo.PhoneNumber, CountryCodes.Israel);
+                    }
+                    if (contactInfo.Email != null)
+                    {
+                        _emailSendingService.SendJobAssignedEmailAsync(job.JobName, job.JobStartTime, job.JobEndTime,
+                            job.JobLocation, contactInfo.Email);
+                    }
+                }
+            }
+
+            return Ok();
         }
         catch (Exception e)
         {
@@ -249,7 +283,8 @@ public class JobsController : Controller
     }
     
     [HttpDelete("unassign/{campaignGuid:guid}/{jobGuid:guid}")]
-    public async Task<IActionResult> UnassignJob(Guid campaignGuid, Guid jobGuid, [FromBody] JobAssignmentParams jobAssignmentParams)
+    public async Task<IActionResult> UnassignJob(Guid campaignGuid, Guid jobGuid,
+        [FromBody] JobAssignmentParams jobAssignmentParams, [FromQuery] bool sendNotification = true)
     {
         try
         {
@@ -277,12 +312,33 @@ public class JobsController : Controller
             }
             
             var res = await _jobsService.RemoveJobAssignment(campaignGuid, jobGuid, jobAssignmentParams.UserEmail);
-            return res switch
+            switch (res)
             {
-                CustomStatusCode.JobNotFound => NotFound(FormatErrorMessage(JobNotFound, res)),
-                CustomStatusCode.UserNotFound => NotFound(FormatErrorMessage(UserNotFound, res)),
-                _ => Ok()
-            };
+                case CustomStatusCode.UserNotFound:
+                    return NotFound(FormatErrorMessage(UserNotFound, res));
+                case CustomStatusCode.JobNotFound:
+                    return NotFound(FormatErrorMessage(JobNotFound, res));
+            }
+            if (sendNotification)
+            {
+                var contactInfo = await _usersService.GetUserContactInfoByEmail(jobAssignmentParams.UserEmail);
+                var job = await _jobsService.GetJob(jobGuid, campaignGuid);
+                if (contactInfo != null && job != null)
+                {
+                    if (contactInfo.PhoneNumber != null)
+                    {
+                        _smsMessageSendingService.SendJobUnAssignedSmsAsync(job.JobName,
+                            job.JobLocation, contactInfo.PhoneNumber, CountryCodes.Israel);
+                    }
+                    if (contactInfo.Email != null)
+                    {
+                        _emailSendingService.SendJobUnAssignedEmailAsync(job.JobName,
+                            job.JobLocation, contactInfo.Email);
+                    }
+                }
+            }
+
+            return Ok();
         }
         catch (Exception e)
         {
