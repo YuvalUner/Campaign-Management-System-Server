@@ -427,4 +427,19 @@ public static class StoredProcedureNames
     /// the campaign names and guids of those campaigns.<br/>
     /// </summary>
     public const string GetUserJobs = "usp_UserJobsGet";
+    
+    /// <summary>
+    /// Modifies the user's preferences for the jobs and conditions they prefer.<br/>
+    /// If the user has no preferences yet, they will be added.<br/>
+    /// If the user has preferences already, they will be updated.<br/>
+    /// Params: userId (int), campaignGuid (Guid), userPreferencesText (string)<br/>
+    /// If userPreferencesText is null, the user's preferences will be deleted.<br/>
+    /// </summary>
+    public const string ModifyUserJobPreferences = "usp_UserPreferencesModify";
+    
+    /// <summary>
+    /// Gets the user's preferences for the jobs and conditions they prefer.<br/>
+    /// Params: userId (int), campaignGuid (Guid)<br/>
+    /// </summary>
+    public const string GetUserJobPreferences = "usp_UserPreferencesGet";
 }
