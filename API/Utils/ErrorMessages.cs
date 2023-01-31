@@ -48,6 +48,7 @@ public static class ErrorMessages
     public const string NoPermissionToAssignToJob = "User does not have permission to assign to this job";
     public const string EmailNullOrEmpty = "Email can not be null or empty";
     public const string SalaryNullOrEmpty = "Salary can not be null or empty";
+    public const string PreferencesNullOrEmpty = "Preferences can not be null or empty";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {
