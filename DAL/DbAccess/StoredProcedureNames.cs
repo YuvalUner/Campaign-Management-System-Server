@@ -442,4 +442,10 @@ public static class StoredProcedureNames
     /// Params: userId (int), campaignGuid (Guid)<br/>
     /// </summary>
     public const string GetUserJobPreferences = "usp_UserPreferencesGet";
+
+    /// <summary>
+    /// Gets the basic info of a campaign - name, description, guid, type, creation date, city and logo url.<br/>
+    /// Params: campaignGuid (Guid)<br/>
+    /// </summary>
+    public const string GetCampaignBasicInfo = "usp_CampaignBasicInfoGet";
 }
