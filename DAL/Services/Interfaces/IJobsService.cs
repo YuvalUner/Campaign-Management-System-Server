@@ -70,7 +70,7 @@ public interface IJobsService
     /// <param name="campaignGuid"></param>
     /// <param name="jobGuid"></param>
     /// <param name="userEmail"></param>
-    /// <returns></returns>
+    /// <returns>Status code UserNotFound if the user does not exist, JobNotFound if the job does not exist.</returns>
     Task<CustomStatusCode> RemoveJobAssignment(Guid campaignGuid, Guid jobGuid, string userEmail);
 
     /// <summary>
@@ -80,7 +80,8 @@ public interface IJobsService
     /// <param name="jobGuid"></param>
     /// <param name="jobAssignmentParams"></param>
     /// <param name="assigningUserId"></param>
-    /// <returns></returns>
+    /// <returns>Status code UserNotFound if the user does not exist, JobNotFound if the job does not exist,
+    /// JobFullyManned if the job is already fully manned, DuplicateKey if user is already assigned to job.</returns>
     Task<CustomStatusCode> AddJobAssignment(Guid campaignGuid, Guid jobGuid,
         JobAssignmentParams jobAssignmentParams, int? assigningUserId);
 
@@ -90,7 +91,7 @@ public interface IJobsService
     /// <param name="campaignGuid"></param>
     /// <param name="jobGuid"></param>
     /// <param name="jobAssignmentParams"></param>
-    /// <returns></returns>
+    /// <returns>Status code UserNotFound if the user does not exist, JobNotFound if the job does not exist</returns>
     Task<CustomStatusCode> UpdateJobAssignment(Guid campaignGuid, Guid jobGuid,
         JobAssignmentParams jobAssignmentParams);
 
