@@ -34,13 +34,13 @@ public class JobPreferencesController : Controller
                 return Unauthorized();
             }
 
-            if (string.IsNullOrWhiteSpace(userJobPreference.userPreferencesText))
+            if (string.IsNullOrWhiteSpace(userJobPreference.UserPreferencesText))
             {
                 return BadRequest(FormatErrorMessage(PreferencesNullOrEmpty, CustomStatusCode.ValueNullOrEmpty));
             }
             
             int? userId = HttpContext.Session.GetInt32(Constants.UserId);
-            await _jobPreferencesService.AddUserPreferences(userId, campaignGuid, userJobPreference.userPreferencesText);
+            await _jobPreferencesService.AddUserPreferences(userId, campaignGuid, userJobPreference.UserPreferencesText);
             return Ok();
         }
         catch (Exception e)
@@ -82,13 +82,13 @@ public class JobPreferencesController : Controller
                 return Unauthorized();
             }
             
-            if (string.IsNullOrWhiteSpace(userJobPreference.userPreferencesText))
+            if (string.IsNullOrWhiteSpace(userJobPreference.UserPreferencesText))
             {
                 return BadRequest(FormatErrorMessage(PreferencesNullOrEmpty, CustomStatusCode.ValueNullOrEmpty));
             }
             
             int? userId = HttpContext.Session.GetInt32(Constants.UserId);
-            await _jobPreferencesService.UpdateUserPreferences(userId, campaignGuid, userJobPreference.userPreferencesText);
+            await _jobPreferencesService.UpdateUserPreferences(userId, campaignGuid, userJobPreference.UserPreferencesText);
             return Ok();
         }
         catch (Exception e)
@@ -117,7 +117,7 @@ public class JobPreferencesController : Controller
                 // Doing it this way is more convenient for the client.
                 userJobPreference = new UserJobPreference()
                 {
-                    userPreferencesText = string.Empty
+                    UserPreferencesText = string.Empty
                 };
             }
             return Ok(userJobPreference);

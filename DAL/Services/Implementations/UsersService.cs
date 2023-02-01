@@ -129,4 +129,13 @@ public class UsersService : IUsersService
             (StoredProcedureNames.GetUserContactInfo, param);
         return res.FirstOrDefault();
     }
+
+    public async Task RemovePhoneNumber(int? userId)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId
+        });
+        await _dbAccess.ModifyData(StoredProcedureNames.RemoveUserPhoneNumber, param);
+    }
 }

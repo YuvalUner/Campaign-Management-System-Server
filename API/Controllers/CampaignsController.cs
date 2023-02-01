@@ -180,4 +180,28 @@ public class CampaignsController : Controller
             return StatusCode(500);
         }
     }
+    
+    [HttpGet("get-basic-info/{campaignGuid:guid}")]
+    public async Task<IActionResult> GetCampaignBasicInfo(Guid campaignGuid)
+    {
+        try
+        {
+            var campaign = await _campaignService.GetCampaignBasicInfo(campaignGuid);
+            return Ok(new
+            {
+                campaign.CampaignName,
+                campaign.CityName,
+                campaign.IsMunicipal,
+                campaign.CampaignDescription,
+                campaign.CampaignGuid,
+                campaign.CampaignCreationDate,
+                campaign.CampaignLogoUrl
+            });
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting campaign basic info");
+            return StatusCode(500);
+        }
+    }
 }
