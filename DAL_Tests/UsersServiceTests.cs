@@ -164,6 +164,74 @@ public class UsersServiceTests
         // Assert
         Assert.True(userPrivateInfoResult == CustomStatusCode.IdAlreadyExistsWhenVerifyingInfo);
     }
+
+    [Fact, TestPriority(4)]
+    public void AddPhoneNumberAndGetPhoneNumberShouldWork()
+    {
+        // Arrange
+        TestUser.PhoneNumber = "0521234567";
+
+        // Act
+        _usersService.AddPhoneNumber(TestUser.UserId, TestUser.PhoneNumber).Wait();
+        
+        var contactDetails = _usersService.GetUserContactInfo(TestUser.UserId).Result;
+        
+        // Assert
+        Assert.NotNull(contactDetails);
+        Assert.True(contactDetails.PhoneNumber == TestUser.PhoneNumber);
+    }
+    
+    [Fact, TestPriority(5)]
+    public void GetUserContactInfoShouldWork()
+    {
+        // Arrange
+        
+        // Act
+        var contactDetails = _usersService.GetUserContactInfo(TestUser.UserId).Result;
+        
+        // Assert
+        Assert.NotNull(contactDetails);
+        Assert.True(contactDetails.PhoneNumber == TestUser.PhoneNumber);
+        Assert.True(contactDetails.Email == TestUser.Email);
+    }
+    
+    [Fact, TestPriority(5)]
+    public void GetUserContactInfoShouldFail()
+    {
+        // Arrange
+        
+        // Act
+        var contactDetails = _usersService.GetUserContactInfo(-1).Result;
+        
+        // Assert
+        Assert.Null(contactDetails);
+    }
+
+    [Fact, TestPriority(5)]
+    public void GetContactInfoByEmailShouldWork()
+    {
+        // Arrange
+        
+        // Act
+        var contactDetails = _usersService.GetUserContactInfoByEmail(TestUser.Email).Result;
+        
+        // Assert
+        Assert.NotNull(contactDetails);
+        Assert.True(contactDetails.PhoneNumber == TestUser.PhoneNumber);
+        Assert.True(contactDetails.Email == TestUser.Email);
+    }
+    
+    [Fact, TestPriority(5)]
+    public void GetContactInfoByEmailShouldFail()
+    {
+        // Arrange
+        
+        // Act
+        var contactDetails = _usersService.GetUserContactInfoByEmail("AAAAA").Result;
+        
+        // Assert
+        Assert.Null(contactDetails);
+    }
     
 
     [Fact, TestPriority(10)] 

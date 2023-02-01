@@ -71,4 +71,11 @@ public interface IUsersService
     Task<User?> GetUserContactInfo(int? userId);
 
     Task<User?> GetUserContactInfoByEmail(string userEmail);
+    
+    /// <summary>
+    /// Removes a user's phone number from their account.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task RemovePhoneNumber(int? userId);
 }

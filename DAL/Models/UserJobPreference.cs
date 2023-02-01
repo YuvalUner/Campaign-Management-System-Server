@@ -2,5 +2,5 @@
 
 public class UserJobPreference
 {
-    public string? userPreferencesText { get; set; }
+    public string? UserPreferencesText { get; set; }
 }

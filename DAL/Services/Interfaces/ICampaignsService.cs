@@ -64,4 +64,12 @@ public interface ICampaignsService
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
     Task<string?> GetCampaignNameByGuid(Guid? campaignGuid);
+
+    /// <summary>
+    /// Gets the basic info of a campaign.
+    /// This includes the campaign's name, logo url, description, creation date, guid and type.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <returns></returns>
+    Task<Campaign?> GetCampaignBasicInfo(Guid? campaignGuid);
 }

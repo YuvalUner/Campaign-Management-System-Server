@@ -23,7 +23,7 @@ public class JobPreferencesService : IJobPreferencesService
         });
         if (userPreferencesText != null)
         {
-            param.Add("userPreferencesText", userPreferencesText);
+            param.Add("UserPreferencesText", userPreferencesText);
         }
         await _dbAccess.ModifyData(StoredProcedureNames.ModifyUserJobPreferences, param);
     }
@@ -31,7 +31,7 @@ public class JobPreferencesService : IJobPreferencesService
     public async Task DeleteUserPreferences(int? userId, Guid campaignGuid)
     {
         // As ModifyUserJobPreferences is a stored procedure that handles all add, update and delete operations,
-        // we can just pass in null for userPreferencesText and it will delete the record.
+        // we can just pass in null for UserPreferencesText and it will delete the record.
         // Therefore, this method is just a wrapper for AddUserPreferences, used for clarity.
         await AddUserPreferences(userId, campaignGuid, null);
     }
@@ -39,7 +39,7 @@ public class JobPreferencesService : IJobPreferencesService
     public async Task UpdateUserPreferences(int? userId, Guid campaignGuid, string? userPreferencesText)
     {
         // As ModifyUserJobPreferences is a stored procedure that handles all add, update and delete operations,
-        // we can just pass in the new value for userPreferencesText and it will update the record.
+        // we can just pass in the new value for UserPreferencesText and it will update the record.
         // Therefore, this method is just a wrapper for AddUserPreferences, used for clarity.
         await AddUserPreferences(userId, campaignGuid, userPreferencesText);
     }

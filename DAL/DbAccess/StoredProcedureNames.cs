@@ -432,8 +432,8 @@ public static class StoredProcedureNames
     /// Modifies the user's preferences for the jobs and conditions they prefer.<br/>
     /// If the user has no preferences yet, they will be added.<br/>
     /// If the user has preferences already, they will be updated.<br/>
-    /// Params: userId (int), campaignGuid (Guid), userPreferencesText (string)<br/>
-    /// If userPreferencesText is null, the user's preferences will be deleted.<br/>
+    /// Params: userId (int), campaignGuid (Guid), UserPreferencesText (string)<br/>
+    /// If UserPreferencesText is null, the user's preferences will be deleted.<br/>
     /// </summary>
     public const string ModifyUserJobPreferences = "usp_UserPreferencesModify";
     
@@ -442,4 +442,16 @@ public static class StoredProcedureNames
     /// Params: userId (int), campaignGuid (Guid)<br/>
     /// </summary>
     public const string GetUserJobPreferences = "usp_UserPreferencesGet";
+
+    /// <summary>
+    /// Gets the basic info of a campaign - name, description, guid, type, creation date, city and logo url.<br/>
+    /// Params: campaignGuid (Guid)<br/>
+    /// </summary>
+    public const string GetCampaignBasicInfo = "usp_CampaignBasicInfoGet";
+
+    /// <summary>
+    /// Removes a user's phone number from their account.<br/>
+    /// Params: userId (int)<br/>
+    /// </summary>
+    public const string RemoveUserPhoneNumber = "usp_UserPhoneNumberRemove";
 }
