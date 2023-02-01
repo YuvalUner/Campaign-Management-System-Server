@@ -432,8 +432,8 @@ public static class StoredProcedureNames
     /// Modifies the user's preferences for the jobs and conditions they prefer.<br/>
     /// If the user has no preferences yet, they will be added.<br/>
     /// If the user has preferences already, they will be updated.<br/>
-    /// Params: userId (int), campaignGuid (Guid), userPreferencesText (string)<br/>
-    /// If userPreferencesText is null, the user's preferences will be deleted.<br/>
+    /// Params: userId (int), campaignGuid (Guid), UserPreferencesText (string)<br/>
+    /// If UserPreferencesText is null, the user's preferences will be deleted.<br/>
     /// </summary>
     public const string ModifyUserJobPreferences = "usp_UserPreferencesModify";
     
