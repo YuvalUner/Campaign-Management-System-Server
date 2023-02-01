@@ -11,7 +11,8 @@ public interface IPermissionsService
     /// <param name="permission"></param>
     /// <param name="userId"></param>
     /// <param name="campaignGuid"></param>
-    /// <returns></returns>
+    /// <returns>Status Code PermissionDoesNotExist if the permission does not exist,
+    /// UserAlreadyHasPermission if the user already has the permission.</returns>
     Task<CustomStatusCode> AddPermission(Permission permission, int? userId, Guid? campaignGuid);
 
     /// <summary>
