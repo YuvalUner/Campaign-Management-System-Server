@@ -448,4 +448,10 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid)<br/>
     /// </summary>
     public const string GetCampaignBasicInfo = "usp_CampaignBasicInfoGet";
+
+    /// <summary>
+    /// Removes a user's phone number from their account.<br/>
+    /// Params: userId (int)<br/>
+    /// </summary>
+    public const string RemoveUserPhoneNumber = "usp_UserPhoneNumberRemove";
 }
