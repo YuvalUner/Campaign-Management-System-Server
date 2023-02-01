@@ -25,7 +25,8 @@ public class JobRelatedServicesTestsTests
 
     private static User TestUser = new User()
     {
-        UserId = 2
+        UserId = 53,
+        Email = "bbb",
     };
     
 
@@ -48,6 +49,23 @@ public class JobRelatedServicesTestsTests
         JobEndTime = DateTime.Parse("2023-02-05 00:00:00"),
     };
     
+    private static JobAssignmentCapabilityParams testJobAssignmentCapabilityParams = new ()
+    {
+        UserEmail = TestUser.Email,
+        JobGuid = Guid.Empty
+    };
+    
+    private static JobTypeAssignmentCapabilityParams TestJobTypeAssignmentParams = new ()
+    {
+        UserEmail = TestUser.Email,
+        JobTypeName = TestJobType.JobTypeName
+    };
+    
+    private static JobAssignmentParams TestJobAssignmentParams = new ()
+    {
+        UserEmail = TestUser.Email,
+    };
+
     public JobRelatedServicesTestsTests(ITestOutputHelper helper)
     {
         _configuration = new ConfigurationBuilder().
@@ -85,6 +103,20 @@ public class JobRelatedServicesTestsTests
         
         // Assert
         Assert.Equal(CustomStatusCode.Ok, result);
+    }
+
+    [Fact, TestPriority(1)]
+    public void DeleteJobTypeAssignmentCapabilityShouldWork()
+    {
+        // Arrange
+        TestJobTypeAssignmentParams.JobTypeName = TestJobType.JobTypeName;
+        
+        // Act
+        _jobTypeAssignmentCapabilityService.RemoveJobTypeAssignmentCapableUser(TestCampaign.CampaignGuid.Value, TestJobTypeAssignmentParams).Wait();
+        var result = _jobTypeAssignmentCapabilityService.GetJobTypeAssignmentCapableUsers(TestCampaign.CampaignGuid.Value, TestJobTypeAssignmentParams.JobTypeName).Result;
+        
+        // Assert
+        Assert.Empty(result);
     }
 
     [Fact, TestPriority(2)]
@@ -187,6 +219,20 @@ public class JobRelatedServicesTestsTests
         
         // Assert
         Assert.NotEqual(Guid.Empty, TestJob.JobGuid);
+    }
+
+    [Fact, TestPriority(3)]
+    public void DeleteAssignmentCapabilityShouldWork()
+    {
+        // Arrange
+        testJobAssignmentCapabilityParams.JobGuid = TestJob.JobGuid.Value;
+        
+        // Act
+        _jobAssignmentCapabilityService.RemoveJobAssignmentCapableUser(TestCampaign.CampaignGuid.Value, testJobAssignmentCapabilityParams).Wait();
+        var result = _jobAssignmentCapabilityService.GetJobAssignmentCapableUsers(TestCampaign.CampaignGuid.Value, TestJob.JobGuid.Value, false).Result;
+        
+        // Assert
+        Assert.Empty(result);
     }
     
     [Fact, TestPriority(3)]
@@ -915,6 +961,479 @@ public class JobRelatedServicesTestsTests
         Assert.Empty(result);
     }
 
+    [Fact, TestPriority(5)]
+    public void GetJobAssignmentCapableUsersShouldBeEmpty()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobAssignmentCapabilityService.GetJobAssignmentCapableUsers(
+            TestCampaign.CampaignGuid.Value, TestJob.JobGuid, false).Result;
+        
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact, TestPriority(6)]
+    public void AddJobAssignmentCapabilityShouldWork()
+    {
+        // Arrange
+        testJobAssignmentCapabilityParams.JobGuid = TestJob.JobGuid.Value;
+        
+        // Act
+        var result = _jobAssignmentCapabilityService.AddJobAssignmentCapableUser(TestCampaign.CampaignGuid.Value, testJobAssignmentCapabilityParams).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, result);
+    }
+
+    [Fact, TestPriority(7)]
+    public void AddJobAssignmentCapabilityShouldFailForDuplicateKey()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobAssignmentCapabilityService.AddJobAssignmentCapableUser(TestCampaign.CampaignGuid.Value, testJobAssignmentCapabilityParams).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.DuplicateKey, result);
+    }
+    
+    [Fact, TestPriority(7)]
+    public void AddJobAssignmentCapabilityShouldFailForWrongJobGuid()
+    {
+        // Arrange
+        var param = new JobAssignmentCapabilityParams()
+        {
+            JobGuid = Guid.Empty,
+            UserEmail = TestUser.Email
+        };
+
+        // Act
+        var result = _jobAssignmentCapabilityService.AddJobAssignmentCapableUser(TestCampaign.CampaignGuid.Value, param).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.JobNotFound, result);
+    }
+    
+    [Fact, TestPriority(7)]
+    public void AddJobAssignmentCapabilityShouldFailForWrongUserEmail()
+    {
+        // Arrange
+        var param = new JobAssignmentCapabilityParams()
+        {
+            JobGuid = TestJob.JobGuid.Value,
+            UserEmail = ""
+        };
+
+        // Act
+        var result = _jobAssignmentCapabilityService.AddJobAssignmentCapableUser(TestCampaign.CampaignGuid.Value, param).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.UserNotFound, result);
+    }
+    
+    [Fact, TestPriority(7)]
+    public void GetJobAssignmentCapableUsersShouldReturnOne()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobAssignmentCapabilityService.GetJobAssignmentCapableUsers(
+            TestCampaign.CampaignGuid.Value, TestJob.JobGuid, false).Result;
+        
+        // Assert
+        Assert.NotEmpty(result);
+        Assert.Contains(result, x => x.Email == TestUser.Email);
+    }
+    
+    [Fact, TestPriority(7)]
+    public void GetJobAssignmentCapableUsersShouldReturnEmptyForWrongJobGuid()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobAssignmentCapabilityService.GetJobAssignmentCapableUsers(
+            TestCampaign.CampaignGuid.Value, Guid.Empty, false).Result;
+        
+        // Assert
+        Assert.Empty(result);
+    }
+    
+    [Fact, TestPriority(7)]
+    public void AddJobTypeAssignmentCapableUserShouldWork()
+    {
+        // Arrange
+        TestJobTypeAssignmentParams.JobTypeName = TestJobType.JobTypeName;
+
+        // Act
+        var result = _jobTypeAssignmentCapabilityService.AddJobTypeAssignmentCapableUser(
+            TestCampaign.CampaignGuid.Value, TestJobTypeAssignmentParams).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, result);
+    }
+    
+    [Fact, TestPriority(8)]
+    public void AddJobTypeAssignmentCapableUserShouldFailForDuplicateKey()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobTypeAssignmentCapabilityService.AddJobTypeAssignmentCapableUser(
+            TestCampaign.CampaignGuid.Value, TestJobTypeAssignmentParams).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.DuplicateKey, result);
+    }
+    
+    [Fact, TestPriority(8)]
+    public void AddJobTypeAssignmentCapableUserShouldFailForWrongJobTypeName()
+    {
+        // Arrange
+        var param = new JobTypeAssignmentCapabilityParams()
+        {
+            JobTypeName = "",
+            UserEmail = TestUser.Email
+        };
+
+        // Act
+        var result = _jobTypeAssignmentCapabilityService.AddJobTypeAssignmentCapableUser(
+            TestCampaign.CampaignGuid.Value, param).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.JobTypeNotFound, result);
+    }
+    
+    [Fact, TestPriority(8)]
+    public void AddJobTypeAssignmentCapableUserShouldFailForWrongUserEmail()
+    {
+        // Arrange
+        var param = new JobTypeAssignmentCapabilityParams()
+        {
+            JobTypeName = TestJobType.JobTypeName,
+            UserEmail = ""
+        };
+
+        // Act
+        var result = _jobTypeAssignmentCapabilityService.AddJobTypeAssignmentCapableUser(
+            TestCampaign.CampaignGuid.Value, param).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.UserNotFound, result);
+    }
+
+    [Fact, TestPriority(8)]
+    public void GetJobTypeAssignmentCapableUsersShouldReturnOne()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobTypeAssignmentCapabilityService.GetJobTypeAssignmentCapableUsers(
+            TestCampaign.CampaignGuid.Value, TestJobType.JobTypeName).Result;
+        
+        // Assert
+        Assert.NotEmpty(result);
+        Assert.Contains(result, x => x.Email == TestUser.Email);
+    }
+    
+    [Fact, TestPriority(8)]
+    public void GetJobTypeAssignmentCapableUsersShouldReturnEmptyForWrongJobTypeName()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobTypeAssignmentCapabilityService.GetJobTypeAssignmentCapableUsers(
+            TestCampaign.CampaignGuid.Value, "").Result;
+        
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact, TestPriority(9)]
+    public void GetJobAssignmentCapableUsersWithJobTypeShouldReturnTwo()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobAssignmentCapabilityService.GetJobAssignmentCapableUsers(
+            TestCampaign.CampaignGuid.Value, TestJob.JobGuid, true).Result;
+        _helper.WriteLine(result.ToString());
+
+        var resultList = result.ToList();
+        
+        // Assert
+        Assert.NotEmpty(resultList);
+        Assert.Contains(resultList, x => x.Email == TestUser.Email);
+    }
+
+    [Fact, TestPriority(10)]
+    public void AddJobAssignmentShouldWork()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobsService.AddJobAssignment(TestCampaign.CampaignGuid.Value, TestJob.JobGuid.Value,
+            TestJobAssignmentParams, TestUser.UserId).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, result);
+    }
+    
+    [Fact, TestPriority(11)]
+    public void AddJobAssignmentShouldFailForDuplicateKey()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobsService.AddJobAssignment(TestCampaign.CampaignGuid.Value, TestJob.JobGuid.Value,
+            TestJobAssignmentParams, TestUser.UserId).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.DuplicateKey, result);
+    }
+    
+    [Fact, TestPriority(11)]
+    public void AddJobAssignmentShouldFailForWrongJobGuid()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobsService.AddJobAssignment(TestCampaign.CampaignGuid.Value, Guid.Empty,
+            TestJobAssignmentParams, TestUser.UserId).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.JobNotFound, result);
+    }
+    
+    [Fact, TestPriority(11)]
+    public void AddJobAssignmentShouldFailForWrongUserEmail()
+    {
+        // Arrange
+        var param = new JobAssignmentParams()
+        {
+            UserEmail = "",
+        };
+
+        // Act
+        var result = _jobsService.AddJobAssignment(TestCampaign.CampaignGuid.Value, TestJob.JobGuid.Value,
+            param, TestUser.UserId).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.UserNotFound, result);
+    }
+    
+    [Fact, TestPriority(11)]
+    public void GetJobAssignmentShouldReturnOne()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobsService.GetJobAssignments(TestCampaign.CampaignGuid.Value, TestJob.JobGuid.Value).Result;
+        
+        // Assert
+        Assert.NotEmpty(result);
+        Assert.Contains(result, x => x.Email == TestUser.Email && x.Salary == TestJob.JobDefaultSalary);
+    }
+    
+    [Fact, TestPriority(11)]
+    public void GetJobAssignmentShouldReturnEmptyForWrongJobGuid()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobsService.GetJobAssignments(TestCampaign.CampaignGuid.Value, Guid.Empty).Result;
+        
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact, TestPriority(12)]
+    public void UpdateJobAssignmentShouldWork()
+    {
+        // Arrange
+        TestJobAssignmentParams.Salary = 1000000;
+        
+        // Act
+        var result = _jobsService.UpdateJobAssignment(TestCampaign.CampaignGuid.Value, TestJob.JobGuid.Value,
+            TestJobAssignmentParams).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, result);
+    }
+    
+    [Fact, TestPriority(13)]
+    public void UpdateJobAssignmentShouldFailForWrongJobGuid()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobsService.UpdateJobAssignment(TestCampaign.CampaignGuid.Value, Guid.Empty,
+            TestJobAssignmentParams).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.JobNotFound, result);
+    }
+    
+    [Fact, TestPriority(13)]
+    public void UpdateJobAssignmentShouldFailForWrongUserEmail()
+    {
+        // Arrange
+        var param = new JobAssignmentParams()
+        {
+            UserEmail = "",
+        };
+        
+        // Act
+        var result = _jobsService.UpdateJobAssignment(TestCampaign.CampaignGuid.Value, TestJob.JobGuid.Value,
+            param).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.UserNotFound, result);
+    }
+
+    [Fact, TestPriority(14)]
+    public void GetUpdatedJobAssignmentShouldWork()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobsService.GetJobAssignments(TestCampaign.CampaignGuid.Value, TestJob.JobGuid.Value).Result;
+        
+        // Assert
+        Assert.NotEmpty(result);
+        Assert.Contains(result, x => x.Email == TestUser.Email && x.Salary == TestJobAssignmentParams.Salary);
+    }
+    
+    [Fact, TestPriority(15)]
+    public void DeleteJobAssignmentShouldFailForWrongJobGuid()
+    {
+        // Arrange
+        
+        // Act
+        var res = _jobsService.RemoveJobAssignment(TestCampaign.CampaignGuid.Value, Guid.Empty, TestUser.Email).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.JobNotFound, res);
+    }
+    
+    [Fact, TestPriority(15)]
+    public void DeleteJobAssignmentShouldFailForWrongUserEmail()
+    {
+        // Arrange
+        
+        // Act
+        var res = _jobsService.RemoveJobAssignment(TestCampaign.CampaignGuid.Value, TestJob.JobGuid.Value, "").Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.UserNotFound, res);
+    }
+
+    [Fact, TestPriority(15)]
+    public void GetUserJobsShouldWork()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobsService.GetUserJobs(TestUser.UserId).Result;
+        
+        // Assert
+        Assert.NotEmpty(result);
+        Assert.Contains(result, x => x.JobGuid == TestJob.JobGuid.Value);
+    }
+    
+    [Fact, TestPriority(15)]
+    public void GetUserJobsShouldReturnEmptyForWrongUserId()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobsService.GetUserJobs(-1).Result;
+        
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact, TestPriority(15)]
+    public void GetUserJobsForSpecificCampaignShouldWork()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobsService.GetUserJobs(TestUser.UserId, TestCampaign.CampaignGuid.Value).Result;
+        
+        // Assert
+        Assert.NotEmpty(result);
+        Assert.Contains(result, x => x.JobGuid == TestJob.JobGuid.Value);
+    }
+    
+    [Fact, TestPriority(15)]
+    public void GetUserJobsForSpecificCampaignShouldReturnEmptyForWrongUserId()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobsService.GetUserJobs(-1, TestCampaign.CampaignGuid.Value).Result;
+        
+        // Assert
+        Assert.Empty(result);
+    }
+    
+    [Fact, TestPriority(15)]
+    public void GetUserJobsForSpecificCampaignShouldReturnEmptyForWrongCampaignGuid()
+    {
+        // Arrange
+        
+        // Act
+        var result = _jobsService.GetUserJobs(TestUser.UserId, Guid.Empty).Result;
+        
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact, TestPriority(100)]
+    public void DeleteJobAssignmentShouldWork()
+    {
+        // Arrange
+        
+        // Act
+        var res = _jobsService.RemoveJobAssignment(TestCampaign.CampaignGuid.Value, TestJob.JobGuid.Value, TestUser.Email).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, res);
+    }
+    
+
+    [Fact, TestPriority(100)]
+    public void DeleteJobTypeAssignmentCapableUserShouldWork2()
+    {
+        // Arrange
+        
+        // Act
+        _jobTypeAssignmentCapabilityService.RemoveJobTypeAssignmentCapableUser(TestCampaign.CampaignGuid.Value, TestJobTypeAssignmentParams).Wait();
+        var result = _jobTypeAssignmentCapabilityService.GetJobTypeAssignmentCapableUsers(
+            TestCampaign.CampaignGuid.Value, TestJobType.JobTypeName).Result;
+        
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact, TestPriority(100)]
+    public void DeleteJobAssignmentCapabilityShouldWork2()
+    {
+        // Arrange
+        
+        // Act
+        _jobAssignmentCapabilityService.RemoveJobAssignmentCapableUser(TestCampaign.CampaignGuid.Value, testJobAssignmentCapabilityParams).Wait();
+        var result = _jobAssignmentCapabilityService.GetJobAssignmentCapableUsers(
+            TestCampaign.CampaignGuid.Value, TestJob.JobGuid, false).Result;
+        
+        // Assert
+        Assert.Empty(result);
+    }
+
+
+
     [Fact, TestPriority(100)]
     public void DeleteJobTypeShouldWork()
     {
@@ -928,7 +1447,7 @@ public class JobRelatedServicesTestsTests
         Assert.DoesNotContain(result, x => x.JobTypeName == "Test Job Type updated");
     }
 
-    [Fact, TestPriority(101)]
+    [Fact, TestPriority(100)]
     public void DeleteJobShouldWork()
     {
         // Arrange
