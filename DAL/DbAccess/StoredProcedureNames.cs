@@ -454,4 +454,13 @@ public static class StoredProcedureNames
     /// Params: userId (int)<br/>
     /// </summary>
     public const string RemoveUserPhoneNumber = "usp_UserPhoneNumberRemove";
+    
+    /// <summary>
+    /// Gets a list of users for a campaign, based on various filters.<br/>
+    /// Params: campaignGuid (Guid), firstName (string) - optional, lastName (string) - optional, email (string) - optional,
+    /// idNum (int) - optional, phoneNum (string) - optional, city (string) - optional, street (string) - optional,
+    /// jobStartTime (DateTime) - optional, jobEndTime (DateTime) - optional<br/>
+    /// jobStartTime and jobEndTime are used to get the list of users who are available to work during that time.<br/>
+    /// </summary>
+    public const string FilterUsersList = "usp_UsersListFilter";
 }

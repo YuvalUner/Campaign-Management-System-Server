@@ -33,9 +33,9 @@ public class JobTypesService: IJobTypesService
     {
         var param = new DynamicParameters(new
         {
-            jobTypeName,
             campaignGuid
         });
+        param.Add("jobTypeName", jobTypeName, DbType.String, ParameterDirection.Input);
         await _dbAccess.ModifyData(StoredProcedureNames.DeleteJobType, param);
     }
     
@@ -46,8 +46,9 @@ public class JobTypesService: IJobTypesService
             newJobTypeName = jobType.JobTypeName,
             newJobTypeDescription = jobType.JobTypeDescription,
             campaignGuid,
-            jobTypeName
         });
+        // Adding this later, as the name may be in hebrew and specifying it this way guarantees handling as nvarchar
+        param.Add("jobTypeName", jobTypeName, DbType.String, ParameterDirection.Input);
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.UpdateJobType, param);
         return (CustomStatusCode) param.Get<int>("returnVal");
