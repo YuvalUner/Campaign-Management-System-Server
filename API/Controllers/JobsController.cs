@@ -438,4 +438,36 @@ public class JobsController : Controller
         }
     }
     
+    [HttpGet("get-available-users/{campaignGuid:guid}")]
+    public async Task<IActionResult> GetAvailableUsers(Guid campaignGuid, [FromQuery] UsersFilterForJobsParams filterParams)
+    {
+        try
+        {
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.Jobs,
+                        PermissionType = PermissionTypes.View
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            if (filterParams.JobStartTime == null && filterParams.JobEndTime == null)
+            {
+                return BadRequest(FormatErrorMessage(TimeframeMustBeProvided, CustomStatusCode.ValueNullOrEmpty));
+            }
+            
+            filterParams.CampaignGuid = campaignGuid;
+            
+            var users = await _jobsService.GetUsersAvaialbleForJob(filterParams);
+            return Ok(users);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while getting available users");
+            return StatusCode(500, "Error while getting available users");
+        }
+    }
+    
 }

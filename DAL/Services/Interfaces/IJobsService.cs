@@ -103,4 +103,12 @@ public interface IJobsService
     /// along with their campaign name and Guid.</param>
     /// <returns></returns>
     Task<IEnumerable<UserJob>> GetUserJobs(int? userId, Guid? campaignGuid = null);
+
+    /// <summary>
+    /// Gets a list of users that are available for a job.
+    /// Filtering can also be done, according to the parameters in the filterParams object.
+    /// </summary>
+    /// <param name="filterParams"></param>
+    /// <returns></returns>
+    Task<IEnumerable<UsersFilterResults>> GetUsersAvaialbleForJob(UsersFilterForJobsParams filterParams);
 }
