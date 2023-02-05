@@ -49,6 +49,7 @@ public static class ErrorMessages
     public const string EmailNullOrEmpty = "Email can not be null or empty";
     public const string SalaryNullOrEmpty = "Salary can not be null or empty";
     public const string PreferencesNullOrEmpty = "Preferences can not be null or empty";
+    public const string TimeframeMustBeProvided = "Timeframe must be provided";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {

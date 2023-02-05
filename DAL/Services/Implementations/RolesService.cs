@@ -58,8 +58,9 @@ public class RolesService : IRolesService
         var param = new DynamicParameters(new
         {
             campaignGuid,
-            roleName
         });
+        // This parameter is added this way as it may be in Hebrew, and doing it this way guarantees treatment as nvarchar
+        param.Add("roleName", dbType: DbType.String, direction: ParameterDirection.Input, value: roleName);
         await _dbAccess.ModifyData(StoredProcedureNames.DeleteRole, param);
     }
 
@@ -69,8 +70,8 @@ public class RolesService : IRolesService
         {
             campaignGuid,
             userEmail,
-            roleName
         });
+        param.Add("roleName", dbType: DbType.String, direction: ParameterDirection.Input, value: roleName);
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AssignUserToRole, param);
         return (CustomStatusCode) param.Get<int>("returnVal");
@@ -82,8 +83,8 @@ public class RolesService : IRolesService
         {
             campaignGuid,
             userEmail,
-            roleName
         });
+        param.Add("roleName", dbType: DbType.String, direction: ParameterDirection.Input, value: roleName);
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AssignUserToAdministrativeRole, param);
         return (CustomStatusCode) param.Get<int>("returnVal");
@@ -94,9 +95,9 @@ public class RolesService : IRolesService
         var param = new DynamicParameters(new
         {
             campaignGuid,
-            roleName,
             roleDescription
         });
+        param.Add("roleName", dbType: DbType.String, direction: ParameterDirection.Input, value: roleName);
         await _dbAccess.ModifyData(StoredProcedureNames.UpdateRole, param);
     }
     
@@ -124,9 +125,9 @@ public class RolesService : IRolesService
     {
         var param = new DynamicParameters(new
         {
-            roleName,
             campaignGuid
         });
+        param.Add("roleName", dbType: DbType.String, direction: ParameterDirection.Input, value: roleName);
         var res = await _dbAccess.GetData<Role, DynamicParameters>(StoredProcedureNames.GetRole, param);
         return res.FirstOrDefault();
     }
