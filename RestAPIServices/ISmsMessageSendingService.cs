@@ -54,4 +54,14 @@ public interface ISmsMessageSendingService
     /// <param name="countryCode"></param>
     /// <returns></returns>
     Task SendJobUnAssignedSmsAsync(string? jobName, string? location, string phoneNumber, CountryCodes countryCode);
+
+    /// <summary>
+    /// Allows to send a free text message to a phone number.
+    /// To be used when none of the other templates apply, such as when the user wants to send a custom message.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="phoneNumber"></param>
+    /// <param name="countryCode"></param>
+    /// <returns></returns>
+    Task<CallStatus> SendFreeTextSmsAsync(string? message, string phoneNumber, CountryCodes countryCode);
 }
