@@ -38,7 +38,7 @@ public class UsersController : Controller
         {
             int? userId = HttpContext.Session.GetInt32(Constants.UserId);
             List<CampaignUser> campaigns = await _usersService.GetUserCampaigns(userId);
-            // The CampaignUser model also holds fields that should not be getting out, such as UserId, CampaignId, RoleId.
+            // The CampaignUser model also holds fields that should not be getting out, such as SenderId, CampaignId, RoleId.
             // Hence, it needs to be cleaned up first.
             var campaignsCensored = campaigns.Select(x => new
             {
@@ -134,7 +134,7 @@ public class UsersController : Controller
             // An authenticated user should never access this method through the client.
             if (userIsAuthenticated)
             {
-                _logger.LogInformation("User with id {UserId} tried to re-authenticate", userId);
+                _logger.LogInformation("User with id {SenderId} tried to re-authenticate", userId);
                 return Unauthorized(FormatErrorMessage(DuplicateVerification, CustomStatusCode.AlreadyVerified));
             }
 
@@ -145,9 +145,9 @@ public class UsersController : Controller
             if (!await VerifyNonDuplicatePrivateInfo(userId))
             {
                 // If this error never gets logged, this part of the code can be removed.
-                _logger.LogError("First check in UserPrivateInfo passed but 2nd failed for user with id {UserId}",
+                _logger.LogError("First check in UserPrivateInfo passed but 2nd failed for user with id {SenderId}",
                     userId);
-                _logger.LogInformation("User with id {UserId} tried to enter private info twice", userId);
+                _logger.LogInformation("User with id {SenderId} tried to enter private info twice", userId);
                 return Unauthorized();
             }
 
@@ -165,14 +165,14 @@ public class UsersController : Controller
             if (res == CustomStatusCode.IdAlreadyExistsWhenVerifyingInfo)
             {
                 _logger.LogInformation(
-                    "Error No. {ErrorNum}: User with id {UserId} And IP Address {IpAddress} tried to enter" +
+                    "Error No. {ErrorNum}: User with id {SenderId} And IP Address {IpAddress} tried to enter" +
                     "an ID number that is already in the database",
                     CustomStatusCode.IdAlreadyExistsWhenVerifyingInfo, userId, HttpContext.Connection.RemoteIpAddress);
                 return BadRequest(FormatErrorMessage(DuplicateVerification, CustomStatusCode.IdAlreadyExistsWhenVerifyingInfo));
             }
 
             HttpContext.Session.SetInt32(Constants.UserAuthenticationStatus, 1);
-            _logger.LogInformation("User with {UserId} verified their private info", userId);
+            _logger.LogInformation("User with {SenderId} verified their private info", userId);
             return Ok();
         }
         catch (Exception e)

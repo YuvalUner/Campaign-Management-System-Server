@@ -101,7 +101,7 @@ public class CampaignsController : Controller
                 return BadRequest(FormatErrorMessage(CityNotFound, CustomStatusCode.CityNotFound));
             }
 
-            _logger.LogInformation("Created campaign called {CampaignName} for user {UserId}", campaign.CampaignName,
+            _logger.LogInformation("Created campaign called {CampaignName} for user {SenderId}", campaign.CampaignName,
                 userId);
             // After creating the new campaign, add the newly created campaign to the list of campaigns the user can access.
             Guid? campaignGuid = await _campaignService.GetCampaignGuid(campaign.CampaignId);
