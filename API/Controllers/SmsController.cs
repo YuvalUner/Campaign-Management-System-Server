@@ -40,6 +40,16 @@ public class SmsController: Controller
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
             
+            if (smsSendingParams.PhoneNumbers.Count == 0)
+            {
+                return BadRequest(FormatErrorMessage(PhoneNumbersRequired, CustomStatusCode.ValueNullOrEmpty));
+            }
+            
+            if (string.IsNullOrEmpty(smsSendingParams.MessageContents))
+            {
+                return BadRequest(FormatErrorMessage(MessageContentRequired, CustomStatusCode.ValueNullOrEmpty));
+            }
+            
             smsSendingParams.CampaignGuid = campaignGuid;
             smsSendingParams.SenderId = HttpContext.Session.GetInt32(Constants.UserId);
             // Remove any empty strings
@@ -60,6 +70,60 @@ public class SmsController: Controller
         {
             _logger.LogError(e, "Error sending SMS messages");
             return StatusCode(500, "Error sending SMS messages");
+        }
+    }
+    
+    [HttpGet("/logs/{campaignGuid:guid}")]
+    public async Task<IActionResult> GetSmsLogs(Guid campaignGuid)
+    {
+        try
+        {
+            // Check that the user has access to the campaign
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.Sms,
+                        PermissionType = PermissionTypes.View
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            var smsLogs = await _smsMessageService.GetBaseSmsLogs(campaignGuid);
+            return Ok(smsLogs);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting SMS logs");
+            return StatusCode(500, "Error getting SMS logs");
+        }
+    }
+    
+    [HttpGet("/logs/details/{campaignGuid:guid}/{messageGuid:guid}")]
+    public async Task<IActionResult> GetSmsDetailsLog(Guid campaignGuid, Guid messageGuid)
+    {
+        try
+        {
+            // Check that the user has access to the campaign
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.Sms,
+                        PermissionType = PermissionTypes.View
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            var smsDetailsLogs = await _smsMessageService.GetSmsDetailsLog(messageGuid);
+            return Ok(smsDetailsLogs);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting SMS details logs");
+            return StatusCode(500, "Error getting SMS details logs");
         }
     }
 }
