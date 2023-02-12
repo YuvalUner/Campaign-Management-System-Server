@@ -55,4 +55,13 @@ public class SmsMessageService: ISmsMessageService
             await _dbAccess.ModifyData(StoredProcedureNames.AddSmsMessageSent, smsSendingParamsDb);
         }
     }
+
+    public async Task<IEnumerable<SmsLogResult>> GetBaseSmsLogs(Guid campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid
+        });
+        return await _dbAccess.GetData<SmsLogResult, DynamicParameters>(StoredProcedureNames.GetBaseSmsLogs, param);
+    }
 }

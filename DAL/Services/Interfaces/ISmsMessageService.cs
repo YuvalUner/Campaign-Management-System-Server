@@ -24,4 +24,14 @@ public interface ISmsMessageService
     /// <param name="countryCode"></param>
     /// <returns></returns>
     Task SendSmsMessageToMultiplePhones(SmsSendingParams smsSendingParams, int newMessageId, CountryCodes countryCode);
+
+    /// <summary>
+    /// Gets the base SMS logs for a campaign.<br/>
+    /// Base SMS logs contain the message's content, the message's date, the number of times the message was sent,
+    /// and who sent the message.<br/>
+    /// They do not contain the message's recipients or whether the message was sent successfully or not to each of them.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <returns></returns>
+    Task<IEnumerable<SmsLogResult>> GetBaseSmsLogs(Guid campaignGuid);
 }

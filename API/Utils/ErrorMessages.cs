@@ -50,6 +50,8 @@ public static class ErrorMessages
     public const string SalaryNullOrEmpty = "Salary can not be null or empty";
     public const string PreferencesNullOrEmpty = "Preferences can not be null or empty";
     public const string TimeframeMustBeProvided = "Timeframe must be provided";
+    public const string PhoneNumbersRequired = "List of phone numbers must not be empty";
+    public const string MessageContentRequired = "Message content must not be empty";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {
