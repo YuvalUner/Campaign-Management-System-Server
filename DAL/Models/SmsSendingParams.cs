@@ -2,8 +2,8 @@
 
 public class SmsSendingParams
 {
-    public int? UserId { get; set; }
+    public int? SenderId { get; set; }
     public Guid? CampaignGuid { get; set; }
-    public IEnumerable<string?> PhoneNumbers { get; set; }
+    public List<string?> PhoneNumbers { get; set; }
     public string? MessageContents { get; set; }
 }
