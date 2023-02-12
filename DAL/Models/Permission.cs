@@ -23,6 +23,7 @@ public static class PermissionTargets
     public const string CampaignRoles = "Campaign Roles";
     public const string Jobs = "Jobs";
     public const string JobTypes = "Job Types";
+    public const string Sms = "SMS";
 
     private static readonly string[] All =  { 
         CampaignSettings, 
@@ -32,7 +33,8 @@ public static class PermissionTargets
         CampaignRolesList, 
         CampaignRoles,
         Jobs,
-        JobTypes
+        JobTypes,
+        Sms
     };
 
     public static bool IsValid(string screen)

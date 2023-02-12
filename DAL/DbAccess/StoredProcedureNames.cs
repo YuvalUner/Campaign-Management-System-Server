@@ -463,4 +463,17 @@ public static class StoredProcedureNames
     /// jobStartTime and jobEndTime are used to get the list of users who are available to work during that time.<br/>
     /// </summary>
     public const string FilterUsersList = "usp_UsersListFilter";
+
+    /// <summary>
+    /// Adds a new sms message to the database.<br/>
+    /// Params: campaignGuid (Guid), messageContent (string), senderId (int)., newMessageGuid (Guid) - output,
+    /// newMessageId (int) - output.<br/>
+    /// </summary>
+    public const string AddSmsMessage = "usp_SmsMessageAdd";
+    
+    /// <summary>
+    /// Records the sending of a message to a phone number.<br/>
+    /// Params: messageId (int), phoneNumber (string), isSuccess (bool) <br/>
+    /// </summary>
+    public const string AddSmsMessageSent = "usp_SmsMessageSentToPhoneNumberAdd";
 }

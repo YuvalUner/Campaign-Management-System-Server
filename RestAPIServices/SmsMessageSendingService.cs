@@ -13,6 +13,13 @@ public enum CountryCodes
     Israel = 972
 }
 
+public enum CallStatus
+{
+    Success = 1,
+    Failed = 0
+}
+
+
 /// <summary>
 /// A class that transforms a phone number to a specific format.
 /// Uses the builder pattern to allow for easy chaining of transformations.
@@ -72,6 +79,8 @@ public class SmsMessageSendingService : ISmsMessageSendingService
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<SmsMessageSendingService> _logger;
+
+    private static List<int> TelesignNotFailedStatusCodes = new() { 290, 291, 292, 295, 251, 250, 200, 201, 203 };
     
     public SmsMessageSendingService(IConfiguration configuration, ILogger<SmsMessageSendingService> logger)
     {
@@ -79,17 +88,19 @@ public class SmsMessageSendingService : ISmsMessageSendingService
         _logger = logger;
     }
 
-    public async Task SendSmsMessageAsync(string phoneNumber, string message)
+    public async Task<int> SendSmsMessageAsync(string phoneNumber, string message)
     {
         try
         {
             MessagingClient messagingClient = new MessagingClient(_configuration["SmsConfiguration:Telesign:CustomerId"],
                 _configuration["SmsConfiguration:Telesign:ApiKey"]);
             RestClient.TelesignResponse telesignResponse = await messagingClient.MessageAsync(phoneNumber, message, "ARN");
+            return telesignResponse.StatusCode;
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Error while sending sms message");
+            return -1;
         }
     }
 
@@ -132,5 +143,13 @@ public class SmsMessageSendingService : ISmsMessageSendingService
         phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
             .Transform(phoneNumber);
         await SendSmsMessageAsync(phoneNumber, message);
+    }
+    
+    public async Task<CallStatus> SendFreeTextSmsAsync(string? message, string phoneNumber, CountryCodes countryCode)
+    {
+        phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
+            .Transform(phoneNumber);
+        var res =  await SendSmsMessageAsync(phoneNumber, message);
+        return TelesignNotFailedStatusCodes.Contains(res) ? CallStatus.Success : CallStatus.Failed;
     }
 }
