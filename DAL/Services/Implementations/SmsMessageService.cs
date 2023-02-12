@@ -64,4 +64,13 @@ public class SmsMessageService: ISmsMessageService
         });
         return await _dbAccess.GetData<SmsLogResult, DynamicParameters>(StoredProcedureNames.GetBaseSmsLogs, param);
     }
+
+    public async Task<IEnumerable<SmsDetailsLogResult>> GetSmsDetailsLog(Guid messageGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            messageGuid
+        });
+        return await _dbAccess.GetData<SmsDetailsLogResult, DynamicParameters>(StoredProcedureNames.GetSmsDetailsLog, param);
+    }
 }
