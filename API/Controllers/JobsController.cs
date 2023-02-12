@@ -438,8 +438,8 @@ public class JobsController : Controller
         }
     }
     
-    [HttpGet("get-available-users/{campaignGuid:guid}")]
-    public async Task<IActionResult> GetAvailableUsers(Guid campaignGuid, [FromQuery] UsersFilterForJobsParams filterParams)
+    [HttpPost("get-available-users/{campaignGuid:guid}")]
+    public async Task<IActionResult> GetAvailableUsers(Guid campaignGuid, [FromBody] UsersFilterForJobsParams filterParams)
     {
         try
         {

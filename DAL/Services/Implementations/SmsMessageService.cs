@@ -24,7 +24,7 @@ public class SmsMessageService: ISmsMessageService
         var smsAddingParams = new DynamicParameters(new
         {
             smsSendingParams.CampaignGuid,
-            smsSendingParams.UserId,
+            smsSendingParams.SenderId,
             smsSendingParams.MessageContents
         });
         smsAddingParams.Add("newMessageGuid", dbType: DbType.Guid, direction: ParameterDirection.Output);
@@ -48,9 +48,9 @@ public class SmsMessageService: ISmsMessageService
             // This is done for both logging purposes and for potential billing purposes
             var smsSendingParamsDb = new DynamicParameters(new
             {
-                newMessageId,
+                messageId = newMessageId,
                 phoneNumber,
-                res
+                isSuccess = res
             });
             await _dbAccess.ModifyData(StoredProcedureNames.AddSmsMessageSent, smsSendingParamsDb);
         }

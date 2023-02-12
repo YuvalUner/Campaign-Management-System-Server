@@ -26,8 +26,8 @@ public class VotersLedgerController : Controller
         _campaignsService = campaignsService;
     }
     
-    [HttpGet("/filter/{campaignGuid:guid}")]
-    public async Task<IActionResult> FilterVotersLedger(Guid campaignGuid, [FromQuery] VotersLedgerFilter filter)
+    [HttpPost("/filter/{campaignGuid:guid}")]
+    public async Task<IActionResult> FilterVotersLedger(Guid campaignGuid, [FromBody] VotersLedgerFilter filter)
     {
         try
         {
