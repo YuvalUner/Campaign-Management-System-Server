@@ -34,4 +34,12 @@ public interface ISmsMessageService
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
     Task<IEnumerable<SmsLogResult>> GetBaseSmsLogs(Guid campaignGuid);
+
+    /// <summary>
+    /// Gets the SMS details logs for a message.<br/>
+    /// Returns message's recipients and whether the message was sent successfully or not to each of them.
+    /// </summary>
+    /// <param name="messageGuid"></param>
+    /// <returns></returns>
+    Task<IEnumerable<SmsDetailsLogResult>> GetSmsDetailsLog(Guid messageGuid);
 }

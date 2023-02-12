@@ -99,4 +99,31 @@ public class SmsController: Controller
             return StatusCode(500, "Error getting SMS logs");
         }
     }
+    
+    [HttpGet("/logs/details/{campaignGuid:guid}/{messageGuid:guid}")]
+    public async Task<IActionResult> GetSmsDetailsLog(Guid campaignGuid, Guid messageGuid)
+    {
+        try
+        {
+            // Check that the user has access to the campaign
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.Sms,
+                        PermissionType = PermissionTypes.View
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            var smsDetailsLogs = await _smsMessageService.GetSmsDetailsLog(messageGuid);
+            return Ok(smsDetailsLogs);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting SMS details logs");
+            return StatusCode(500, "Error getting SMS details logs");
+        }
+    }
 }

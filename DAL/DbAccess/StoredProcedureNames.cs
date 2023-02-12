@@ -483,4 +483,11 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid)<br/>
     /// </summary>
     public const string GetBaseSmsLogs = "usp_SmsMessageGeneralLogsGet";
+    
+    /// <summary>
+    /// Gets the log for a specific sms message.<br/>
+    /// Returns the phone numbers it was sent to, and whether it was successfully sent to each phone number.<br/>
+    /// In addition, if the phone number can be associated with someone, their name and address will be returned.<br/>
+    /// </summary>
+    public const string GetSmsDetailsLog = "usp_SmsInDepthLogDetailsGet";
 }
