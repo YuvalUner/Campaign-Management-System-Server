@@ -476,4 +476,18 @@ public static class StoredProcedureNames
     /// Params: messageId (int), phoneNumber (string), isSuccess (bool) <br/>
     /// </summary>
     public const string AddSmsMessageSent = "usp_SmsMessageSentToPhoneNumberAdd";
+
+    /// <summary>
+    /// Gets the sms logs of a specific campaign.<br/>
+    /// Only gets the basic info, without going into the details of each message - those are in a different SP.<br/>
+    /// Params: campaignGuid (Guid)<br/>
+    /// </summary>
+    public const string GetBaseSmsLogs = "usp_SmsMessageGeneralLogsGet";
+    
+    /// <summary>
+    /// Gets the log for a specific sms message.<br/>
+    /// Returns the phone numbers it was sent to, and whether it was successfully sent to each phone number.<br/>
+    /// In addition, if the phone number can be associated with someone, their name and address will be returned.<br/>
+    /// </summary>
+    public const string GetSmsDetailsLog = "usp_SmsInDepthLogDetailsGet";
 }
