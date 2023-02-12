@@ -34,7 +34,7 @@ public class RolesAndPermissionsServicesTests
     
     private static Role testRole = new Role()
     {
-        RoleName = "TestRole",
+        RoleName = "בדיקה",
         RoleDescription = "TestRoleDescription",
         RoleLevel = 0
     };
