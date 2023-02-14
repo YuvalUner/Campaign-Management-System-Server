@@ -25,6 +25,7 @@ public interface IVotersLedgerService
     /// </summary>
     /// <param name="updateParams">An object containing the voter's id number and support status</param>
     /// <param name="campaignGuid"></param>
-    /// <returns>The success or error code from the database</returns>
+    /// <returns>Ok on success, CityNotFound error code if it could not find a connection between the given ID
+    /// number and the city the campaign is in.</returns>
     Task<CustomStatusCode> UpdateVoterSupportStatus(UpdateSupportStatusParams updateParams, Guid campaignGuid);
 }
