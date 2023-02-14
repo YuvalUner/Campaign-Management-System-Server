@@ -46,4 +46,5 @@ public enum CustomStatusCode
     JobTypeNotFound = 50013,
     JobFullyManned = 50014,
     UserNotInCampaign = 50015,
+    ParameterMustNotBeNullOrEmpty = 50016,
 }
