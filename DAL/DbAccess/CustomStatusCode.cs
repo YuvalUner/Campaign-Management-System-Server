@@ -50,4 +50,5 @@ public enum CustomStatusCode
     CampaignNotFound = 50017,
     EventNotFound = 50018,
     TooManyValuesProvided = 50019,
+    EventAlreadyFull = 50020,
 }
