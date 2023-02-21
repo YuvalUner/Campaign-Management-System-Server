@@ -49,4 +49,5 @@ public enum CustomStatusCode
     ParameterMustNotBeNullOrEmpty = 50016,
     CampaignNotFound = 50017,
     EventNotFound = 50018,
+    TooManyValuesProvided = 50019,
 }

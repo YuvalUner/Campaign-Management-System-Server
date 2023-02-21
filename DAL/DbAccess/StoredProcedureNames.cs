@@ -490,4 +490,45 @@ public static class StoredProcedureNames
     /// In addition, if the phone number can be associated with someone, their name and address will be returned.<br/>
     /// </summary>
     public const string GetSmsDetailsLog = "usp_SmsInDepthLogDetailsGet";
+    
+    /// <summary>
+    /// Adds a new event to the database.<br/>
+    /// Params: eventName (string), eventDescription (string) - optional, eventStartTime (DateTime) - optional,
+    /// eventEndTime (DateTime) - optional, maxAttendees (int) - optional, eventLocation (string) - optional,
+    /// userId (int), campaignGuid (Guid) - optional, newEventGuid (Guid) - output, newEventId (int) - output.<br/>
+    /// Returns: Status code CampaignNotFound if campaign was provided but not found.<br/>
+    /// </summary>
+    public const string AddEvent = "usp_EventAdd";
+    
+    /// <summary>
+    /// Updates an existing event in the database.<br/>
+    /// Params: eventGuid (Guid), eventName (string) - optional, eventDescription (string) - optional,
+    /// eventLocation (string) - optional, eventStartTime (DateTime) - optional, eventEndTime (DateTime) - optional,
+    /// maxAttendees (int) - optional, campaignGuid (Guid) - optional.<br/>
+    /// Returns: Status code EventNotFound if the event does not exist, Status code CampaignNotFound if campaign was
+    /// provided but not found.<br/>
+    /// </summary>
+    public const string UpdateEvent = "usp_EventUpdate";
+    
+    /// <summary>
+    /// Deletes an existing event from the database.<br/>
+    /// Params: eventGuid (Guid)<br/>
+    /// Returns: Status code EventNotFound if the event does not exist.<br/>
+    /// </summary>
+    public const string DeleteEvent = "usp_EventDelete";
+
+    /// <summary>
+    /// Assigns a user to an event.<br/>
+    /// Params: eventGuid (Guid), userId (int) - optional, userEmail (string) - optional.<br/>
+    /// Returns: EventNotFound if the event does not exist, UserNotFound if the user does not exist,
+    /// ParameterMustNotBeNullOrEmpty if both userId and userEmail are empty, TooManyValuesProvided if both
+    /// userId and userEmail are provided, DuplicateKey if user is already assigned to the event.<br/>
+    /// </summary>
+    public const string AssignToEvent = "usp_EventAssignTo";
+    
+    /// <summary>
+    /// Gets all events a user is assigned to.<br/>
+    /// Params: userId (int).<br/>
+    /// </summary>
+    public const string GetUserEvents = "usp_EventsGetForUser";
 }
