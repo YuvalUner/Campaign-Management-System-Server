@@ -106,7 +106,7 @@ public class EventsService
         return param.Get<CustomStatusCode>("returnVal");
     }
 
-    public async Task<CustomStatusCode> AssignToEvent(Guid eventGuid, int? userId, string? userEmail)
+    public async Task<CustomStatusCode> AddEventParticipant(Guid eventGuid, int? userId, string? userEmail)
     {
         var param = new DynamicParameters(new
         {
@@ -140,5 +140,56 @@ public class EventsService
         
         var result = await _dbAccess.GetData<GetUserEventsResult, DynamicParameters>(StoredProcedureNames.GetUserEvents, param);
         return result;
+    }
+
+    public async Task<CustomStatusCode> AddEventWatcher(int userId, Guid eventId)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId,
+            eventId
+        });
+        
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        await _dbAccess.ModifyData(StoredProcedureNames.AddWatcherToEvent, param);
+        
+        return param.Get<CustomStatusCode>("returnVal");
+    }
+    
+    public async Task<CustomStatusCode> RemoveEventWatcher(int userId, Guid eventId)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId,
+            eventId
+        });
+        
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        await _dbAccess.ModifyData(StoredProcedureNames.RemoveEventWatcher, param);
+        
+        return param.Get<CustomStatusCode>("returnVal");
+    }
+
+    public async Task<CustomStatusCode> RemoveEventParticipant(Guid eventGuid, int? userId, string? userEmail)
+    {
+        var param = new DynamicParameters(new
+        {
+            eventGuid
+        });
+        
+        if (userId != null)
+        {
+            param.Add("userId", userId);
+        }
+        
+        if (userEmail != null)
+        {
+            param.Add("userEmail", userEmail);
+        }
+        
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        
+        await _dbAccess.ModifyData(StoredProcedureNames.RemoveEventParticipant, param);
+        return param.Get<CustomStatusCode>("returnVal");
     }
 }

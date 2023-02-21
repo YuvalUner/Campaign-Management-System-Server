@@ -518,7 +518,7 @@ public static class StoredProcedureNames
     public const string DeleteEvent = "usp_EventDelete";
 
     /// <summary>
-    /// Assigns a user to an event.<br/>
+    /// Assigns a user to an event as a participant. Removes the user from being a watcher if they already are one.<br/>
     /// Params: eventGuid (Guid), userId (int) - optional, userEmail (string) - optional.<br/>
     /// Returns: EventNotFound if the event does not exist, UserNotFound if the user does not exist,
     /// ParameterMustNotBeNullOrEmpty if both userId and userEmail are empty, TooManyValuesProvided if both
@@ -531,4 +531,28 @@ public static class StoredProcedureNames
     /// Params: userId (int).<br/>
     /// </summary>
     public const string GetUserEvents = "usp_EventsGetForUser";
+    
+    /// <summary>
+    /// Adds a watcher to an event. Unlike participants, watchers do not count towards the event attendance. 
+    /// Removes the user's participation in the event if they are already participants.<br/>
+    /// Params: eventGuid (Guid), userId (int).<br/>
+    /// Returns: EventNotFound if the event does not exist, DuplicateKey if user is already a watcher of that event.<br/>
+    /// </summary>
+    public const string AddWatcherToEvent = "usp_EventAddWatcher";
+    
+    /// <summary>
+    /// Removes a participant from an event, and updates the event's attendance count.<br/>
+    /// Params: eventGuid (Guid), userId (int) - optional, userEmail (string) - optional.<br/>
+    /// Returns: EventNotFound if the event does not exist, UserNotFound if the user does not exist,
+    /// ParameterMustNotBeNullOrEmpty if both userId and userEmail are empty, TooManyValuesProvided if both
+    /// userId and userEmail are provided.<br/>
+    /// </summary>
+    public const string RemoveEventParticipant = "usp_EventParticipationDelete";
+    
+    /// <summary>
+    /// Removes a watcher from an event.<br/>
+    /// Params: eventGuid (Guid), userId (int).<br/>
+    /// Returns: EventNotFound if the event does not exist.<br/>
+    /// </summary>
+    public const string RemoveEventWatcher = "usp_EventWatcherDelete";
 }

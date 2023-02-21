@@ -12,4 +12,5 @@ public class GetUserEventsResult
     public Guid? CampaignGuid { get; set; }
     public string? CampaignName { get; set; }
     public string? CampaignLogoUrl { get; set; }
+    public bool Participating { get; set; }
 }
