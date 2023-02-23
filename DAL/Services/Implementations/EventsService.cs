@@ -112,7 +112,7 @@ public class EventsService: IEventsService
         return param.Get<CustomStatusCode>("returnVal");
     }
 
-    public async Task<CustomStatusCode> AddEventParticipant(Guid eventGuid, int? userId, string? userEmail)
+    public async Task<CustomStatusCode> AddEventParticipant(Guid eventGuid, int? userId = null, string? userEmail = null)
     {
         var param = new DynamicParameters(new
         {
@@ -148,12 +148,12 @@ public class EventsService: IEventsService
         return result;
     }
 
-    public async Task<CustomStatusCode> AddEventWatcher(int userId, Guid eventId)
+    public async Task<CustomStatusCode> AddEventWatcher(int userId, Guid eventGuid)
     {
         var param = new DynamicParameters(new
         {
             userId,
-            eventId
+            eventGuid
         });
         
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
