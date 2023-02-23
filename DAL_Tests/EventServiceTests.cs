@@ -72,9 +72,8 @@ public class EventServiceTests
         var events = _eventsService.GetCampaignEvents(testCampaign.CampaignGuid).Result;
 
         // Assert
-        Assert.NotNull(events.Item2);
-        Assert.Empty(events.Item2);
-        Assert.Equal(CustomStatusCode.Ok, events.Item1);
+        Assert.NotNull(events);
+        Assert.Empty(events);
     }
 
     [Fact, TestPriority(1)]
@@ -230,10 +229,9 @@ public class EventServiceTests
         var events = _eventsService.GetCampaignEvents(testCampaign.CampaignGuid).Result;
 
         // Assert
-        Assert.NotNull(events.Item2);
-        Assert.Single(events.Item2);
-        Assert.Equal(CustomStatusCode.Ok, events.Item1);
-        Assert.Contains(events.Item2, x => x.EventGuid == testCustomEvent.EventGuid);
+        Assert.NotNull(events);
+        Assert.Single(events);
+        Assert.Contains(events, x => x.EventGuid == testCustomEvent.EventGuid);
     }
 
     [Fact, TestPriority(3)]
@@ -488,12 +486,11 @@ public class EventServiceTests
         
         // Act
         var events = _eventsService.GetCampaignEvents(testCampaign.CampaignGuid.Value).Result;
-        var eventsList = events.Item2.ToList();
+        var eventsList = events.ToList();
         
         // Assert
-        Assert.NotNull(events.Item2);
-        Assert.Single(events.Item2);
-        Assert.Equal(CustomStatusCode.Ok, events.Item1);
+        Assert.NotNull(events);
+        Assert.Single(events);
         Assert.Equal(1, eventsList[0].NumAttending);
     }
     
@@ -591,12 +588,11 @@ public class EventServiceTests
         
         // Act
         var events = _eventsService.GetCampaignEvents(testCampaign.CampaignGuid.Value).Result;
-        var eventsList = events.Item2.ToList();
+        var eventsList = events.ToList();
         
         // Assert
-        Assert.NotNull(events.Item2);
-        Assert.Single(events.Item2);
-        Assert.Equal(CustomStatusCode.Ok, events.Item1);
+        Assert.NotNull(events);
+        Assert.Single(events);
         Assert.Equal(0, eventsList[0].NumAttending);
     }
 

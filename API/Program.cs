@@ -32,6 +32,7 @@ builder.Services.AddScoped<IJobTypeAssignmentCapabilityService, JobTypeAssignmen
 builder.Services.AddScoped<IJobAssignmentCapabilityService, JobAssignmentCapabilityService>();
 builder.Services.AddScoped<IJobPreferencesService, JobPreferencesService>();
 builder.Services.AddScoped<ISmsMessageService, SmsMessageService>();
+builder.Services.AddScoped<IEventsService, EventsService>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", optionsBuilder => {

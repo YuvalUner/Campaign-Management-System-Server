@@ -574,4 +574,10 @@ public static class StoredProcedureNames
     /// Params: eventGuid (Guid).<br/>
     /// </summary>
     public const string GetEvent = "usp_EventGet";
+    
+    /// <summary>
+    /// Gets the user id of the creator of a specific event.<br/>
+    /// Params: eventGuid (Guid).<br/>
+    /// </summary>
+    public const string GetEventCreatorUserId = "usp_EventsGetCreatorUserId";
 }
