@@ -76,10 +76,20 @@ public class EventsController : Controller
             {
                 return BadRequest(FormatErrorMessage(EventNameIsRequired, CustomStatusCode.ValueNullOrEmpty));
             }
+            if (newEvent.MaxAttendees == null || newEvent.MaxAttendees <= 0)
+            {
+                return BadRequest(FormatErrorMessage(MaxAttendeesNotNullOrZero, CustomStatusCode.ValueNullOrEmpty));
+            }
 
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
             newEvent.EventCreatorId = userId.Value;
             newEvent.CampaignGuid = null;
+            
+            // If the user did not specify whether the event is open join, then it is not.
+            if (newEvent.IsOpenJoin == null)
+            {
+                newEvent.IsOpenJoin = false;
+            }
 
             var createdEvent = await _eventsService.AddEvent(newEvent);
             // The event is always created successfully, so long as the event name is not empty and campaignGuid is null.
@@ -108,6 +118,10 @@ public class EventsController : Controller
             {
                 return BadRequest(FormatErrorMessage(EventNameIsRequired, CustomStatusCode.ValueNullOrEmpty));
             }
+            if (newEvent.MaxAttendees == null || newEvent.MaxAttendees <= 0)
+            {
+                return BadRequest(FormatErrorMessage(MaxAttendeesNotNullOrZero, CustomStatusCode.ValueNullOrEmpty));
+            }
 
             if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext,
                     campaignGuid, new Permission()
@@ -123,6 +137,11 @@ public class EventsController : Controller
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
             newEvent.EventCreatorId = userId.Value;
             newEvent.CampaignGuid = campaignGuid;
+            
+            if (newEvent.IsOpenJoin == null)
+            {
+                newEvent.IsOpenJoin = false;
+            }
 
             var createdEvent = await _eventsService.AddEvent(newEvent);
             if (createdEvent.Item1 == CustomStatusCode.CampaignNotFound)
@@ -158,6 +177,12 @@ public class EventsController : Controller
                         PermissionTarget = PermissionTargets.Events,
                         PermissionType = PermissionTypes.Edit
                     }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            if (!await EventsUtils.IsEventInCampaign(_eventsService, eventGuid, campaignGuid))
             {
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
                     CustomStatusCode.PermissionOrAuthorizationError));
@@ -232,6 +257,12 @@ public class EventsController : Controller
                         PermissionTarget = PermissionTargets.Events,
                         PermissionType = PermissionTypes.Edit
                     }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            if (!await EventsUtils.IsEventInCampaign(_eventsService, eventGuid, campaignGuid))
             {
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
                     CustomStatusCode.PermissionOrAuthorizationError));
@@ -417,6 +448,12 @@ public class EventsController : Controller
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
+            
+            if (!await EventsUtils.IsEventInCampaign(_eventsService, eventGuid, campaignGuid))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
 
             var addParticipantResult = await _eventsService.AddEventParticipant(eventGuid, userEmail: userEmail);
 
@@ -530,6 +567,12 @@ public class EventsController : Controller
                 }
             }
             
+            if (!await EventsUtils.IsEventInCampaign(_eventsService, eventGuid, campaignGuid))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
 
             // If all the above checks pass, then the user is authorized to remove the participant.
             var removeParticipantResult = await _eventsService.RemoveEventParticipant(eventGuid, userEmail: userEmail);
@@ -574,7 +617,7 @@ public class EventsController : Controller
             // If all the above checks pass, then the user is authorized to get the participants.
             var participants = await _eventsService.GetEventParticipants(eventGuid);
 
-            return Ok(participants);
+            return Ok(participants.Item2);
         }
         catch (Exception e)
         {
@@ -598,11 +641,18 @@ public class EventsController : Controller
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
+            
+            // If the user has permission to edit the campaign's events, verify that the event is actually in the campaign.
+            if (!await EventsUtils.IsEventInCampaign(_eventsService, eventGuid, campaignGuid))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
 
             // If all the above checks pass, then the user is authorized to get the participants.
             var participants = await _eventsService.GetEventParticipants(eventGuid);
 
-            return Ok(participants);
+            return Ok(participants.Item2);
         }
         catch (Exception e)
         {

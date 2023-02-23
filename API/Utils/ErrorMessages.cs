@@ -58,6 +58,7 @@ public static class ErrorMessages
     public const string AlreadyParticipating = "You are already participating in this event";
     public const string AlreadyWatcher = "You are already watching this event";
     public const string EmailRequired = "Email is required";
+    public const string MaxAttendeesNotNullOrZero = "Max attendees must be greater than 0";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {

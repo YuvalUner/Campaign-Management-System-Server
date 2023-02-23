@@ -48,6 +48,10 @@ public class EventsService: IEventsService
         {
             param.Add("MaxAttendees", customEvent.MaxAttendees);
         }
+        if (customEvent.IsOpenJoin != null)
+        {
+            param.Add("IsOpenJoin", customEvent.IsOpenJoin);
+        }
         
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         param.Add("newEventGuid", dbType: DbType.Guid, direction: ParameterDirection.Output);
@@ -91,6 +95,10 @@ public class EventsService: IEventsService
         if (customEvent.EventName != null)
         {
             param.Add("EventName", customEvent.EventName);
+        }
+        if (customEvent.IsOpenJoin != null)
+        {
+            param.Add("IsOpenJoin", customEvent.IsOpenJoin);
         }
         
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
@@ -212,7 +220,7 @@ public class EventsService: IEventsService
         return  res;
     }
     
-    public async Task<(CustomStatusCode, IEnumerable<User>)> GetEventParticipants(Guid eventGuid)
+    public async Task<(CustomStatusCode, IEnumerable<UserPublicInfo>)> GetEventParticipants(Guid eventGuid)
     {
         var param = new DynamicParameters(new
         {
@@ -221,7 +229,7 @@ public class EventsService: IEventsService
         
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         
-        var res =  await _dbAccess.GetData<User,
+        var res =  await _dbAccess.GetData<UserPublicInfo,
             DynamicParameters>(StoredProcedureNames.GetEventParticipants, param);
         
         return (param.Get<CustomStatusCode>("returnVal") ,res);
