@@ -305,6 +305,30 @@ public class EventServiceTests
     }
 
     [Fact, TestPriority(5)]
+    public void RemoveEventWatcherShouldWork()
+    {
+        // Arrange
+        
+        // Act
+        var res = _eventsService.RemoveEventWatcher(testUser.UserId, testCustomEvent.EventGuid.Value).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, res);
+    }
+    
+    [Fact, TestPriority(5)]
+    public void RemoveEventWatcherShouldFailForWrongEventGuid()
+    {
+        // Arrange
+        
+        // Act
+        var res = _eventsService.RemoveEventWatcher(testUser.UserId, Guid.Empty).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.EventNotFound, res);
+    }
+
+    [Fact, TestPriority(5)]
     public void GetEventParticipantsShouldReturnEmpty()
     {
         // Arrange
@@ -455,6 +479,125 @@ public class EventServiceTests
         Assert.Equal(testCustomEvent.EventLocation, events[0].EventLocation);
         Assert.Equal(testCustomEvent.EventGuid, events[0].EventGuid);
         Assert.True(events[0].Participating);
+    }
+
+    [Fact, TestPriority(9)]
+    public void GetCampaignEventsShouldReturnOneWithNumAttendingEqualOne()
+    {
+        // Arrange
+        
+        // Act
+        var events = _eventsService.GetCampaignEvents(testCampaign.CampaignGuid.Value).Result;
+        var eventsList = events.Item2.ToList();
+        
+        // Assert
+        Assert.NotNull(events.Item2);
+        Assert.Single(events.Item2);
+        Assert.Equal(CustomStatusCode.Ok, events.Item1);
+        Assert.Equal(1, eventsList[0].NumAttending);
+    }
+    
+    [Fact, TestPriority(9)]
+    public void RemoveEventParticipantShouldWork()
+    {
+        // Arrange
+        
+        // Act
+        var res = _eventsService.RemoveEventParticipant(testCustomEvent.EventGuid.Value, testUser.UserId).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, res);
+    }
+
+    [Fact, TestPriority(10)]
+    public void GetEventsForUserShouldReturnEmptyAfterDelete()
+    {
+        // Arrange
+        
+        // Act
+        var events = _eventsService.GetUserEvents(testUser.UserId).Result.ToList();
+        
+        // Assert
+        Assert.NotNull(events);
+        Assert.Empty(events);
+    }
+    
+    [Fact, TestPriority(10)]
+    public void RemoveEventParticipantShouldFailForWrongEventGuid()
+    {
+        // Arrange
+        
+        // Act
+        var res = _eventsService.RemoveEventParticipant(Guid.Empty, testUser.UserId).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.EventNotFound, res);
+    }
+
+    [Fact, TestPriority(10)]
+    public void RemoveEventParticipantShouldFailForEmptyUserIdAndEmail()
+    {
+        // Arrange
+        
+        // Act
+        var res = _eventsService.RemoveEventParticipant(testCustomEvent.EventGuid.Value).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.ParameterMustNotBeNullOrEmpty, res);
+    }
+    
+    [Fact, TestPriority(10)]
+    public void RemoveEventParticipantShouldFailForProvidingBothUserIdAndEmail()
+    {
+        // Arrange
+        
+        // Act
+        var res = _eventsService.RemoveEventParticipant(testCustomEvent.EventGuid.Value,
+            userId: 0, userEmail: "wrongEmail").Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.TooManyValuesProvided, res);
+    }
+    
+    [Fact, TestPriority(10)]
+    public void RemoveEventParticipantShouldFailForWrongEmail()
+    {
+        // Arrange
+        
+        // Act
+        var res = _eventsService.RemoveEventParticipant(testCustomEvent.EventGuid.Value,
+            userEmail: "Wrong email").Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.UserNotFound, res);
+    }
+    
+    [Fact, TestPriority(10)]
+    public void RemoveEventParticipantShouldFailForWrongUserId()
+    {
+        // Arrange
+        
+        // Act
+
+        // Assert
+        Assert.Throws<System.AggregateException>(() => _eventsService.AddEventParticipant(testCustomEvent.EventGuid.Value,
+            userId: 0).Result);
+    }
+    
+    [Fact, TestPriority(10)]
+    public void GetCampaignEventsShouldReturnOneWithNumAttendingEqualZero()
+    {
+        // Arrange
+        
+        // Act
+        var events = _eventsService.GetCampaignEvents(testCampaign.CampaignGuid.Value).Result;
+        var eventsList = events.Item2.ToList();
+        
+        // Assert
+        Assert.NotNull(events.Item2);
+        Assert.Single(events.Item2);
+        Assert.Equal(CustomStatusCode.Ok, events.Item1);
+        Assert.Equal(0, eventsList[0].NumAttending);
     }
 
 

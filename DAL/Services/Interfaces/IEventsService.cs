@@ -52,17 +52,17 @@ public interface IEventsService
     /// a participant.
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="eventId"></param>
+    /// <param name="eventGuid"></param>
     /// <returns>EventNotFound if the event does not exist, DuplicateKey if user is already a watcher of that event.</returns>
-    Task<CustomStatusCode> AddEventWatcher(int userId, Guid eventId);
+    Task<CustomStatusCode> AddEventWatcher(int userId, Guid eventGuid);
 
     /// <summary>
     /// Removes a user from the list of watchers of an event.
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="eventId"></param>
+    /// <param name="eventGuid"></param>
     /// <returns>EventNotFound if the event does not exist.</returns>
-    Task<CustomStatusCode> RemoveEventWatcher(int userId, Guid eventId);
+    Task<CustomStatusCode> RemoveEventWatcher(int userId, Guid eventGuid);
 
     /// <summary>
     /// Removes a user from the list of participants of an event.
@@ -73,7 +73,7 @@ public interface IEventsService
     /// <returns>EventNotFound if the event does not exist, UserNotFound if the user does not exist,
     /// ParameterMustNotBeNullOrEmpty if both userId and userEmail are empty, TooManyValuesProvided if both
     /// userId and userEmail are provided.</returns>
-    Task<CustomStatusCode> RemoveEventParticipant(Guid eventGuid, int? userId, string? userEmail);
+    Task<CustomStatusCode> RemoveEventParticipant(Guid eventGuid, int? userId = null, string? userEmail = null);
 
     /// <summary>
     /// Gets the list of events for a campaign.
