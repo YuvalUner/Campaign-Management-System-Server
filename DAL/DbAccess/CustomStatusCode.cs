@@ -47,4 +47,8 @@ public enum CustomStatusCode
     JobFullyManned = 50014,
     UserNotInCampaign = 50015,
     ParameterMustNotBeNullOrEmpty = 50016,
+    CampaignNotFound = 50017,
+    EventNotFound = 50018,
+    TooManyValuesProvided = 50019,
+    EventAlreadyFull = 50020,
 }
