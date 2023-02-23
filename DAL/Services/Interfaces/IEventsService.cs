@@ -27,7 +27,7 @@ public interface IEventsService
     /// <param name="eventGuid"></param>
     /// <returns>Status code EventNotFound if the event does not exist.</returns>
     Task<CustomStatusCode> DeleteEvent(Guid eventGuid);
-    
+
     /// <summary>
     /// Adds a user to an event as a participant. Removes the user from the list of watchers if they are already
     /// a watcher.
@@ -38,7 +38,7 @@ public interface IEventsService
     /// <returns>EventNotFound if the event does not exist, UserNotFound if the user does not exist,
     /// ParameterMustNotBeNullOrEmpty if both userId and userEmail are empty, TooManyValuesProvided if both
     /// userId and userEmail are provided, DuplicateKey if user is already assigned to the event.</returns>
-    Task<CustomStatusCode> AddEventParticipant(Guid eventGuid, int? userId, string? userEmail);
+    Task<CustomStatusCode> AddEventParticipant(Guid eventGuid, int? userId = null, string? userEmail = null);
 
     /// <summary>
     /// Gets all events for a user, where they are either a participant or a watcher.
