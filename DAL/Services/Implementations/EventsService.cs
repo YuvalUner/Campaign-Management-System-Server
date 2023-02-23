@@ -1,11 +1,13 @@
 ﻿using System.Data;
 using DAL.DbAccess;
 using DAL.Models;
+using DAL.Services.Interfaces;
 using Dapper;
 
 namespace DAL.Services.Implementations;
 
-public class EventsService
+
+public class EventsService: IEventsService
 {
     private readonly IGenericDbAccess  _dbAccess;
     
@@ -14,7 +16,7 @@ public class EventsService
         _dbAccess = dbAccess;
     }
 
-    public async Task<(CustomStatusCode, int, Guid)> AddEvent(CustomEvent customEvent)
+    public async Task<(CustomStatusCode, int?, Guid?)> AddEvent(CustomEvent customEvent)
     {
         var param = new DynamicParameters(new
         {
@@ -40,7 +42,7 @@ public class EventsService
         }
         if (customEvent.CampaignGuid != null)
         {
-            param.Add("CampaignGuid", customEvent.CampaignId);
+            param.Add("CampaignGuid", customEvent.CampaignGuid);
         }
         if (customEvent.MaxAttendees != null)
         {
@@ -80,11 +82,15 @@ public class EventsService
         }
         if (customEvent.CampaignGuid != null)
         {
-            param.Add("CampaignGuid", customEvent.CampaignId);
+            param.Add("CampaignGuid", customEvent.CampaignGuid);
         }
         if (customEvent.MaxAttendees != null)
         {
             param.Add("MaxAttendees", customEvent.MaxAttendees);
+        }
+        if (customEvent.EventName != null)
+        {
+            param.Add("EventName", customEvent.EventName);
         }
         
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
@@ -191,5 +197,49 @@ public class EventsService
         
         await _dbAccess.ModifyData(StoredProcedureNames.RemoveEventParticipant, param);
         return param.Get<CustomStatusCode>("returnVal");
+    }
+
+    public async Task<(CustomStatusCode,IEnumerable<EventWithCreatorDetails>)> GetCampaignEvents(Guid? campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid
+        });
+        
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        
+        var res =  await _dbAccess.GetData<EventWithCreatorDetails,
+            DynamicParameters>(StoredProcedureNames.GetCampaignEvents, param);
+        
+        return (param.Get<CustomStatusCode>("returnVal"), res);
+    }
+    
+    public async Task<(CustomStatusCode, IEnumerable<User>)> GetEventParticipants(Guid eventGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            eventGuid
+        });
+        
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        
+        var res =  await _dbAccess.GetData<User,
+            DynamicParameters>(StoredProcedureNames.GetEventParticipants, param);
+        
+        return (param.Get<CustomStatusCode>("returnVal") ,res);
+    }
+    
+    public async Task<EventWithCreatorDetails?> GetEvent(Guid eventGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            eventGuid
+        });
+        
+        
+        var res =  await _dbAccess.GetData<EventWithCreatorDetails,
+            DynamicParameters>(StoredProcedureNames.GetEvent, param);
+        
+        return res.FirstOrDefault();
     }
 }
