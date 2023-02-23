@@ -490,4 +490,94 @@ public static class StoredProcedureNames
     /// In addition, if the phone number can be associated with someone, their name and address will be returned.<br/>
     /// </summary>
     public const string GetSmsDetailsLog = "usp_SmsInDepthLogDetailsGet";
+    
+    /// <summary>
+    /// Adds a new event to the database.<br/>
+    /// Params: eventName (string), eventDescription (string) - optional, eventStartTime (DateTime) - optional,
+    /// eventEndTime (DateTime) - optional, maxAttendees (int) - optional, eventLocation (string) - optional,
+    /// userId (int), campaignGuid (Guid) - optional, newEventGuid (Guid) - output, newEventId (int) - output.<br/>
+    /// Returns: Status code CampaignNotFound if campaign was provided but not found.<br/>
+    /// </summary>
+    public const string AddEvent = "usp_EventAdd";
+    
+    /// <summary>
+    /// Updates an existing event in the database.<br/>
+    /// Params: eventGuid (Guid), eventName (string) - optional, eventDescription (string) - optional,
+    /// eventLocation (string) - optional, eventStartTime (DateTime) - optional, eventEndTime (DateTime) - optional,
+    /// maxAttendees (int) - optional, campaignGuid (Guid) - optional.<br/>
+    /// Returns: Status code EventNotFound if the event does not exist, Status code CampaignNotFound if campaign was
+    /// provided but not found.<br/>
+    /// </summary>
+    public const string UpdateEvent = "usp_EventUpdate";
+    
+    /// <summary>
+    /// Deletes an existing event from the database.<br/>
+    /// Params: eventGuid (Guid)<br/>
+    /// Returns: Status code EventNotFound if the event does not exist.<br/>
+    /// </summary>
+    public const string DeleteEvent = "usp_EventDelete";
+
+    /// <summary>
+    /// Assigns a user to an event as a participant. Removes the user from being a watcher if they already are one.<br/>
+    /// Params: eventGuid (Guid), userId (int) - optional, userEmail (string) - optional.<br/>
+    /// Returns: EventNotFound if the event does not exist, UserNotFound if the user does not exist,
+    /// ParameterMustNotBeNullOrEmpty if both userId and userEmail are empty, TooManyValuesProvided if both
+    /// userId and userEmail are provided, DuplicateKey if user is already assigned to the event.<br/>
+    /// </summary>
+    public const string AssignToEvent = "usp_EventAssignTo";
+    
+    /// <summary>
+    /// Gets all events a user is assigned to.<br/>
+    /// Params: userId (int).<br/>
+    /// </summary>
+    public const string GetUserEvents = "usp_EventsGetForUser";
+    
+    /// <summary>
+    /// Adds a watcher to an event. Unlike participants, watchers do not count towards the event attendance. 
+    /// Removes the user's participation in the event if they are already participants.<br/>
+    /// Params: eventGuid (Guid), userId (int).<br/>
+    /// Returns: EventNotFound if the event does not exist, DuplicateKey if user is already a watcher of that event.<br/>
+    /// </summary>
+    public const string AddWatcherToEvent = "usp_EventAddWatcher";
+    
+    /// <summary>
+    /// Removes a participant from an event, and updates the event's attendance count.<br/>
+    /// Params: eventGuid (Guid), userId (int) - optional, userEmail (string) - optional.<br/>
+    /// Returns: EventNotFound if the event does not exist, UserNotFound if the user does not exist,
+    /// ParameterMustNotBeNullOrEmpty if both userId and userEmail are empty, TooManyValuesProvided if both
+    /// userId and userEmail are provided.<br/>
+    /// </summary>
+    public const string RemoveEventParticipant = "usp_EventParticipationDelete";
+    
+    /// <summary>
+    /// Removes a watcher from an event.<br/>
+    /// Params: eventGuid (Guid), userId (int).<br/>
+    /// Returns: EventNotFound if the event does not exist.<br/>
+    /// </summary>
+    public const string RemoveEventWatcher = "usp_EventWatcherDelete";
+    
+    /// <summary>
+    /// Gets all events related to a campaign.<br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// </summary>
+    public const string GetCampaignEvents = "usp_EventsGetForCampaign";
+    
+    /// <summary>
+    /// Gets all participants of a specific event.<br/>
+    /// Params: eventGuid (Guid).<br/>
+    /// Returns: EventNotFound if the event does not exist.<br/>
+    /// </summary>
+    public const string GetEventParticipants = "usp_EventGetParticipants";
+    
+    /// <summary>
+    /// Gets the details of a specific event.<br/>
+    /// Params: eventGuid (Guid).<br/>
+    /// </summary>
+    public const string GetEvent = "usp_EventGet";
+    
+    /// <summary>
+    /// Gets the user id of the creator of a specific event.<br/>
+    /// Params: eventGuid (Guid).<br/>
+    /// </summary>
+    public const string GetEventCreatorUserId = "usp_EventsGetCreatorUserId";
 }

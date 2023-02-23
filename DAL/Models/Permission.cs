@@ -24,6 +24,7 @@ public static class PermissionTargets
     public const string Jobs = "Jobs";
     public const string JobTypes = "Job Types";
     public const string Sms = "SMS";
+    public const string Events = "Events";
 
     private static readonly string[] All =  { 
         CampaignSettings, 
@@ -34,7 +35,8 @@ public static class PermissionTargets
         CampaignRoles,
         Jobs,
         JobTypes,
-        Sms
+        Sms,
+        Events
     };
 
     public static bool IsValid(string screen)
