@@ -162,12 +162,12 @@ public class EventsService: IEventsService
         return param.Get<CustomStatusCode>("returnVal");
     }
     
-    public async Task<CustomStatusCode> RemoveEventWatcher(int userId, Guid eventId)
+    public async Task<CustomStatusCode> RemoveEventWatcher(int userId, Guid eventGuid)
     {
         var param = new DynamicParameters(new
         {
             userId,
-            eventId
+            eventGuid
         });
         
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
@@ -176,7 +176,7 @@ public class EventsService: IEventsService
         return param.Get<CustomStatusCode>("returnVal");
     }
 
-    public async Task<CustomStatusCode> RemoveEventParticipant(Guid eventGuid, int? userId, string? userEmail)
+    public async Task<CustomStatusCode> RemoveEventParticipant(Guid eventGuid, int? userId = null, string? userEmail = null)
     {
         var param = new DynamicParameters(new
         {
