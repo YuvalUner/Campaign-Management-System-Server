@@ -15,4 +15,6 @@ public class GetUserEventsResult
     public bool Participating { get; set; }
     
     public bool IsOpenJoin { get; set; } = false;
+    
+    public int? NumAttending { get; set; }
 }

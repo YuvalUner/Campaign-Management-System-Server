@@ -16,5 +16,5 @@ public class CustomEvent
     
     public Guid? CampaignGuid { get; set; }
 
-    public bool IsOpenJoin { get; set; } = false;
+    public bool? IsOpenJoin { get; set; }
 }

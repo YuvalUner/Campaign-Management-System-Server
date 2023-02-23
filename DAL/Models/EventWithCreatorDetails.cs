@@ -18,4 +18,6 @@ public class EventWithCreatorDetails
     public string? PhoneNumber { get; set; }
     
     public bool IsOpenJoin { get; set; } = false;
+    
+    public Guid? CampaignGuid { get; set; }
 }

@@ -87,7 +87,7 @@ public interface IEventsService
     /// </summary>
     /// <param name="eventGuid"></param>
     /// <returns>EventNotFound if the event does not exist.</returns>
-    Task<(CustomStatusCode, IEnumerable<User>)> GetEventParticipants(Guid eventGuid);
+    Task<(CustomStatusCode, IEnumerable<UserPublicInfo>)> GetEventParticipants(Guid eventGuid);
 
     /// <summary>
     /// Gets the details of a single event, along with its creator's details.
