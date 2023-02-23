@@ -555,4 +555,23 @@ public static class StoredProcedureNames
     /// Returns: EventNotFound if the event does not exist.<br/>
     /// </summary>
     public const string RemoveEventWatcher = "usp_EventWatcherDelete";
+    
+    /// <summary>
+    /// Gets all events related to a campaign.<br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// </summary>
+    public const string GetCampaignEvents = "usp_EventsGetForCampaign";
+    
+    /// <summary>
+    /// Gets all participants of a specific event.<br/>
+    /// Params: eventGuid (Guid).<br/>
+    /// Returns: EventNotFound if the event does not exist.<br/>
+    /// </summary>
+    public const string GetEventParticipants = "usp_EventGetParticipants";
+    
+    /// <summary>
+    /// Gets the details of a specific event.<br/>
+    /// Params: eventGuid (Guid).<br/>
+    /// </summary>
+    public const string GetEvent = "usp_EventGet";
 }
