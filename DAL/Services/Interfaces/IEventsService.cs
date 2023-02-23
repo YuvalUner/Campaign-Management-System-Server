@@ -80,7 +80,7 @@ public interface IEventsService
     /// </summary>
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
-    Task<(CustomStatusCode, IEnumerable<EventWithCreatorDetails>)> GetCampaignEvents(Guid? campaignGuid);
+    Task<IEnumerable<EventWithCreatorDetails?>> GetCampaignEvents(Guid? campaignGuid);
 
     /// <summary>
     /// Gets the list of participants for a specific event.
@@ -95,5 +95,12 @@ public interface IEventsService
     /// <param name="eventGuid"></param>
     /// <returns></returns>
     Task<EventWithCreatorDetails?> GetEvent(Guid eventGuid);
+
+    /// <summary>
+    /// Returns the id of the user who created the event.
+    /// </summary>
+    /// <param name="eventGuid"></param>
+    /// <returns></returns>
+    Task<User?> GetEventCreatorUserId(Guid eventGuid);
 
 }

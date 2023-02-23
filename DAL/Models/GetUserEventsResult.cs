@@ -13,4 +13,6 @@ public class GetUserEventsResult
     public string? CampaignName { get; set; }
     public string? CampaignLogoUrl { get; set; }
     public bool Participating { get; set; }
+    
+    public bool IsOpenJoin { get; set; } = false;
 }

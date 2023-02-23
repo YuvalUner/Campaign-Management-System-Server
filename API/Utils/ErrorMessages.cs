@@ -52,6 +52,12 @@ public static class ErrorMessages
     public const string TimeframeMustBeProvided = "Timeframe must be provided";
     public const string PhoneNumbersRequired = "List of phone numbers must not be empty";
     public const string MessageContentRequired = "Message content must not be empty";
+    public const string EventNameIsRequired = "Event name is required";
+    public const string EventNotFound = "Event not found. Please check the event ID and try again";
+    public const string EventAlreadyFull = "Event is already full, can not add more people";
+    public const string AlreadyParticipating = "You are already participating in this event";
+    public const string AlreadyWatcher = "You are already watching this event";
+    public const string EmailRequired = "Email is required";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {

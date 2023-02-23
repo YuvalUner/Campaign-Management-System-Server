@@ -199,19 +199,17 @@ public class EventsService: IEventsService
         return param.Get<CustomStatusCode>("returnVal");
     }
 
-    public async Task<(CustomStatusCode,IEnumerable<EventWithCreatorDetails>)> GetCampaignEvents(Guid? campaignGuid)
+    public async Task<IEnumerable<EventWithCreatorDetails?>> GetCampaignEvents(Guid? campaignGuid)
     {
         var param = new DynamicParameters(new
         {
             campaignGuid
         });
-        
-        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
-        
+
         var res =  await _dbAccess.GetData<EventWithCreatorDetails,
             DynamicParameters>(StoredProcedureNames.GetCampaignEvents, param);
         
-        return (param.Get<CustomStatusCode>("returnVal"), res);
+        return  res;
     }
     
     public async Task<(CustomStatusCode, IEnumerable<User>)> GetEventParticipants(Guid eventGuid)
@@ -239,6 +237,19 @@ public class EventsService: IEventsService
         
         var res =  await _dbAccess.GetData<EventWithCreatorDetails,
             DynamicParameters>(StoredProcedureNames.GetEvent, param);
+        
+        return res.FirstOrDefault();
+    }
+
+    public async Task<User?> GetEventCreatorUserId(Guid eventGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            eventGuid
+        });
+        
+        var res =  await _dbAccess.GetData<User,
+            DynamicParameters>(StoredProcedureNames.GetEventCreatorUserId, param);
         
         return res.FirstOrDefault();
     }
