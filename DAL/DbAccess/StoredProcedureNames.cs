@@ -580,4 +580,22 @@ public static class StoredProcedureNames
     /// Params: eventGuid (Guid).<br/>
     /// </summary>
     public const string GetEventCreatorUserId = "usp_EventsGetCreatorUserId";
+    
+    /// <summary>
+    /// Gets all users who can manage another specific user's schedule.<br/>
+    /// Params: userEmail (string).<br/>
+    /// </summary>
+    public const string GetScheduleManagers = "usp_EventScheduleManagersGet";
+
+    /// <summary>
+    /// Adds a new schedule manager to a user.<br/>
+    /// Params: giverUserId (int), receiverEmail (string).<br/>
+    /// </summary>
+    public const string AddScheduleManager = "usp_EventScheduleManagerAdd";
+
+    /// <summary>
+    /// Removes a schedule manager from a user.<br/>
+    /// Params: giverUserId (int), receiverEmail (string).<br/>
+    /// </summary>
+    public const string RemoveScheduleManager = "usp_EventScheduleManagerRemove";
 }
