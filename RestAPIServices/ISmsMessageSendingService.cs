@@ -92,4 +92,33 @@ public interface ISmsMessageSendingService
     Task SendEventCreatedForUserSmsAsync(string? eventName,
         string? eventLocation, DateTime? startTime, DateTime? endTime, string creatorName,
         string? phoneNumber, CountryCodes countryCode);
+
+    /// <summary>
+    /// Sends a standard event deleted message to the phone number.
+    /// </summary>
+    /// <param name="eventName"></param>
+    /// <param name="eventLocation"></param>
+    /// <param name="startTime"></param>
+    /// <param name="endTime"></param>
+    /// <param name="phoneNumber"></param>
+    /// <param name="senderName"></param>
+    /// <param name="countryCode"></param>
+    /// <returns></returns>
+    Task SendEventDeletedMessageAsync(string? eventName, string? eventLocation,
+        DateTime? startTime, DateTime? endTime, string? phoneNumber, string? senderName, CountryCodes countryCode);
+
+    /// <summary>
+    /// Sends a standard event updated message to the phone number.
+    /// If location, start time or end time are null, they will not be included in the message.
+    /// </summary>
+    /// <param name="eventName"></param>
+    /// <param name="eventLocation"></param>
+    /// <param name="startTime"></param>
+    /// <param name="endTime"></param>
+    /// <param name="phoneNumber"></param>
+    /// <param name="senderName"></param>
+    /// <param name="countryCode"></param>
+    /// <returns></returns>
+    Task SendEventUpdatedMessageAsync(string? eventName, string? eventLocation,
+        DateTime? startTime, DateTime? endTime, string? phoneNumber, string? senderName, CountryCodes countryCode);
 }

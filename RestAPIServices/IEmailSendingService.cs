@@ -68,4 +68,30 @@ public interface IEmailSendingService
     Task SendEventCreatedForUserEmailAsync(string? eventName,
         string? eventLocation, DateTime? startTime, DateTime? endTime, string creatorName, string? emailTo,
         string? senderName);
+
+    /// <summary>
+    /// Sends a standard event deleted notification to the email address.
+    /// </summary>
+    /// <param name="eventName"></param>
+    /// <param name="eventLocation"></param>
+    /// <param name="startTime"></param>
+    /// <param name="endTime"></param>
+    /// <param name="emailTo"></param>
+    /// <param name="senderName"></param>
+    /// <returns></returns>
+    Task SendEventDeletedEmailAsync(string? eventName, string? eventLocation,
+        DateTime? startTime, DateTime? endTime, string? emailTo, string? senderName);
+
+    /// <summary>
+    /// Sends a standard event updated notification to the email address.
+    /// </summary>
+    /// <param name="eventName"></param>
+    /// <param name="eventLocation"></param>
+    /// <param name="startTime"></param>
+    /// <param name="endTime"></param>
+    /// <param name="emailTo"></param>
+    /// <param name="senderName"></param>
+    /// <returns></returns>
+    Task SendEventUpdatedEmailAsync(string? eventName, string? eventLocation,
+        DateTime? startTime, DateTime? endTime, string? emailTo, string? senderName);
 }
