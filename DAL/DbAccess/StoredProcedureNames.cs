@@ -580,4 +580,38 @@ public static class StoredProcedureNames
     /// Params: eventGuid (Guid).<br/>
     /// </summary>
     public const string GetEventCreatorUserId = "usp_EventsGetCreatorUserId";
+    
+    /// <summary>
+    /// Gets all users who can manage another specific user's schedule.<br/>
+    /// Params: userEmail (string) - optional, userId (int) - optional.<br/>
+    /// Returns: ParameterMustNotBeNullOrEmpty if both userId and userEmail are empty, TooManyValuesProvided if both
+    /// userId and userEmail are provided.<br/>
+    /// </summary>
+    public const string GetScheduleManagers = "usp_EventScheduleManagersGet";
+
+    /// <summary>
+    /// Adds a new schedule manager to a user.<br/>
+    /// Params: giverUserId (int), receiverEmail (string).<br/>
+    /// Returns: Status code UserNotFound if the permission receiver does not exist,
+    /// DuplicateKey if user is already a schedule manage of the requesting user.<br/>
+    /// </summary>
+    public const string AddScheduleManager = "usp_EventScheduleManagerAdd";
+
+    /// <summary>
+    /// Removes a schedule manager from a user.<br/>
+    /// Params: giverUserId (int), receiverEmail (string).<br/>
+    /// Returns: Status code UserNotFound if the permission receiver does not exist.<br/>
+    /// </summary>
+    public const string RemoveScheduleManager = "usp_EventScheduleManagerRemove";
+    
+    /// <summary>
+    /// Gets all users who can be managed by a specific user.<br/>
+    /// Params: userId (int).<br/>
+    /// </summary>
+    public const string GetManagedUsers = "usp_EventScheduleManagedUsersGet";
+    
+    /// <summary>
+    /// Gets a list of all the user's personal events, those created by them or for them.<br/>
+    /// </summary>
+    public const string GetPersonalEvents = "usp_EventsGetPersonal";
 }

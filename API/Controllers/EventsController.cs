@@ -17,12 +17,15 @@ public class EventsController : Controller
     private readonly IEventsService _eventsService;
     private readonly ILogger<EventsController> _logger;
     private readonly IUsersService _usersService;
+    private readonly IScheduleManagersService _scheduleManagersService;
 
-    public EventsController(IEventsService eventsService, ILogger<EventsController> logger, IUsersService usersService)
+    public EventsController(IEventsService eventsService, ILogger<EventsController> logger, IUsersService usersService,
+        IScheduleManagersService scheduleManagersService)
     {
         _eventsService = eventsService;
         _logger = logger;
         _usersService = usersService;
+        _scheduleManagersService = scheduleManagersService;
     }
 
     [HttpGet("get-self-events")]
@@ -84,6 +87,7 @@ public class EventsController : Controller
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
             newEvent.EventCreatorId = userId.Value;
             newEvent.CampaignGuid = null;
+            newEvent.EventOf = userId.Value;
             
             // If the user did not specify whether the event is open join, then it is not.
             if (newEvent.IsOpenJoin == null)
@@ -91,14 +95,13 @@ public class EventsController : Controller
                 newEvent.IsOpenJoin = false;
             }
 
-            var createdEvent = await _eventsService.AddEvent(newEvent);
             // The event is always created successfully, so long as the event name is not empty and campaignGuid is null.
-            var eventGuid = createdEvent.Item3.Value;
-
+            var (statusCode, eventId, eventGuid) = await _eventsService.AddEvent(newEvent);
+            
             // No need to await this - all of its fail conditions can not happen, since the event was just created
             // and its Guid is 100% correct.
             // User is always added as a participant to their own event.
-            _eventsService.AddEventParticipant(eventGuid, userId.Value);
+            _eventsService.AddEventParticipant(eventGuid.Value, userId.Value);
 
             return Ok(eventGuid);
         }
@@ -137,6 +140,7 @@ public class EventsController : Controller
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
             newEvent.EventCreatorId = userId.Value;
             newEvent.CampaignGuid = campaignGuid;
+            newEvent.EventOf = null;
             
             if (newEvent.IsOpenJoin == null)
             {
@@ -660,4 +664,60 @@ public class EventsController : Controller
             return BadRequest("Error while getting event participants from campaign event");
         }
     }
+
+    [HttpPost("add-event-for-managed-user/{userEmail}")]
+    public async Task<IActionResult> AddEventForManagedUser(string userEmail, [FromBody] CustomEvent newEvent)
+    {
+        try
+        {
+            var userId = HttpContext.Session.GetInt32(Constants.UserId);
+            
+            // Check to make sure the user is authorized to add an event for the managed user.
+            var managedUsers = await _scheduleManagersService.GetManagedUsers(userId.Value);
+            
+            // If the user is not managing the user they are trying to add an event for, then they are not authorized.
+            var managedUser = managedUsers.FirstOrDefault(u => u.Email == userEmail);
+            if (managedUser == null)
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            // Get the user id of the managed user.
+            var managedUserWithId = await _usersService.GetUserByEmail(userEmail);
+
+            newEvent.EventOf = managedUserWithId.UserId;
+            newEvent.EventCreatorId = userId.Value;
+            newEvent.CampaignId = null;
+
+            // Else, the user is authorized to add an event for the managed user.
+            var (statusCode, eventId, eventGuid) = await _eventsService.AddEvent(newEvent);
+
+            return Ok(eventGuid);
+
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while adding event for managed user");
+            return BadRequest("Error while adding event for managed user");
+        }
+    }
+
+    [HttpGet("get-personal-events")]
+    public async Task<IActionResult> GetPersonalEvents()
+    {
+        try
+        {
+            var userId = HttpContext.Session.GetInt32(Constants.UserId);
+            var events = await _eventsService.GetPersonalEvents(userId.Value);
+
+            return Ok(events);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while getting personal events");
+            return BadRequest("Error while getting personal events");
+        }
+    }
+    
 }
