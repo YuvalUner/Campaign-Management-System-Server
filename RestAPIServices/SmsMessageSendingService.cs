@@ -213,4 +213,51 @@ public class SmsMessageSendingService : ISmsMessageSendingService
         await SendSmsMessageAsync(phoneNumber, message);
     }
 
+    public async Task SendEventDeletedMessageAsync(string? eventName, string? eventLocation,
+        DateTime? startTime, DateTime? endTime, string? phoneNumber, string? senderName, CountryCodes countryCode)
+    {
+        phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
+            .Transform(phoneNumber);
+        
+        string message;
+        if (startTime != null && endTime != null)
+        {
+            message = $"{senderName}: \n The event {eventName} at {eventLocation} from {startTime} to {endTime} was deleted";
+        }
+        else if (startTime != null)
+        {
+            message = $"{senderName}: \n The event {eventName} at {eventLocation} from {startTime} was deleted";
+        }
+        else if (endTime != null)
+        {
+            message = $"{senderName}: \n The event {eventName} at {eventLocation} until {endTime} was deleted";
+        }
+        else
+        {
+            message = $"{senderName}: \n The event {eventName} at {eventLocation} was deleted";
+        }
+        await SendSmsMessageAsync(phoneNumber, message);
+    }
+
+    public async Task SendEventUpdatedMessageAsync(string? eventName, string? eventLocation,
+        DateTime? startTime, DateTime? endTime, string? phoneNumber, string? senderName, CountryCodes countryCode)
+    {
+        phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
+            .Transform(phoneNumber);
+        
+        string message = $"{senderName}'s event {eventName} updated \n";
+        if (eventLocation != null)
+        {
+            message += $"Location moved to: {eventLocation} \n";
+        }
+        if (startTime != null)
+        {
+            message += $"Start time changed to: {startTime} \n";
+        }
+        if (endTime != null)
+        {
+            message += $"End time changed to: {endTime} \n";
+        }
+        await SendSmsMessageAsync(phoneNumber, message);
+    }
 }
