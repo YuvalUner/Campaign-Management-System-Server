@@ -64,4 +64,32 @@ public interface ISmsMessageSendingService
     /// <param name="countryCode"></param>
     /// <returns></returns>
     Task<CallStatus> SendFreeTextSmsAsync(string? message, string phoneNumber, CountryCodes countryCode);
+
+    /// <summary>
+    /// Sends a standard event participation message to the phone number.
+    /// </summary>
+    /// <param name="eventName"></param>
+    /// <param name="eventLocation"></param>
+    /// <param name="startTime"></param>
+    /// <param name="endTime"></param>
+    /// <param name="phoneNumber"></param>
+    /// <param name="countryCode"></param>
+    /// <returns></returns>
+    Task SendAddedEventParticipationSmsAsync(string? eventName,
+        string? eventLocation, DateTime? startTime, DateTime? endTime, string? phoneNumber, CountryCodes countryCode);
+
+    /// <summary>
+    /// Sends a standard event created message to the phone number.
+    /// </summary>
+    /// <param name="eventName"></param>
+    /// <param name="eventLocation"></param>
+    /// <param name="startTime"></param>
+    /// <param name="endTime"></param>
+    /// <param name="creatorName"></param>
+    /// <param name="phoneNumber"></param>
+    /// <param name="countryCode"></param>
+    /// <returns></returns>
+    Task SendEventCreatedForUserSmsAsync(string? eventName,
+        string? eventLocation, DateTime? startTime, DateTime? endTime, string creatorName,
+        string? phoneNumber, CountryCodes countryCode);
 }
