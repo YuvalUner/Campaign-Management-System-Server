@@ -19,4 +19,20 @@ public class CustomEvent
     public bool? IsOpenJoin { get; set; }
     
     public int? EventOf { get; set; }
+
+    public static CustomEvent FromEventWithCreatorDetails(EventWithCreatorDetails e)
+    {
+        return new CustomEvent()
+        {
+            EventName = e.EventName,
+            EventDescription = e.EventDescription,
+            EventLocation = e.EventLocation,
+            EventStartTime = e.EventStartTime,
+            EventEndTime = e.EventEndTime,
+            MaxAttendees = e.MaxAttendees,
+            NumAttending = e.NumAttending,
+            EventGuid = e.EventGuid,
+            CampaignGuid = e.CampaignGuid,
+        };
+    }
 }
