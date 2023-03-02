@@ -81,7 +81,7 @@ public class SmsMessageSendingService : ISmsMessageSendingService
     private readonly ILogger<SmsMessageSendingService> _logger;
 
     private static List<int> TelesignNotFailedStatusCodes = new() { 290, 291, 292, 295, 251, 250, 200, 201, 203 };
-    
+
     public SmsMessageSendingService(IConfiguration configuration, ILogger<SmsMessageSendingService> logger)
     {
         _configuration = configuration;
@@ -92,9 +92,11 @@ public class SmsMessageSendingService : ISmsMessageSendingService
     {
         try
         {
-            MessagingClient messagingClient = new MessagingClient(_configuration["SmsConfiguration:Telesign:CustomerId"],
+            MessagingClient messagingClient = new MessagingClient(
+                _configuration["SmsConfiguration:Telesign:CustomerId"],
                 _configuration["SmsConfiguration:Telesign:ApiKey"]);
-            RestClient.TelesignResponse telesignResponse = await messagingClient.MessageAsync(phoneNumber, message, "ARN");
+            RestClient.TelesignResponse telesignResponse =
+                await messagingClient.MessageAsync(phoneNumber, message, "ARN");
             return telesignResponse.StatusCode;
         }
         catch (Exception e)
@@ -104,15 +106,16 @@ public class SmsMessageSendingService : ISmsMessageSendingService
         }
     }
 
-    public async Task SendUserJoinedSmsAsync(string? userName, string? campaignName, string phoneNumber, CountryCodes countryCode)
+    public async Task SendUserJoinedSmsAsync(string? userName, string? campaignName, string phoneNumber,
+        CountryCodes countryCode)
     {
         string message = $"User {userName} joined campaign {campaignName}";
         phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
             .Transform(phoneNumber);
         await SendSmsMessageAsync(phoneNumber, message);
-        
+
     }
-    
+
     public async Task SendPhoneVerificationCodeAsync(string? phoneNumber, string code, CountryCodes countryCode)
     {
         string message = $"Your verification code is {code}";
@@ -120,36 +123,94 @@ public class SmsMessageSendingService : ISmsMessageSendingService
             .Transform(phoneNumber);
         await SendSmsMessageAsync(phoneNumber, message);
     }
-    
-    public async Task SendRoleAssignedSmsAsync(string? roleName, string? campaignName, string phoneNumber, CountryCodes countryCode)
+
+    public async Task SendRoleAssignedSmsAsync(string? roleName, string? campaignName, string phoneNumber,
+        CountryCodes countryCode)
     {
         string message = $"You were assigned the role {roleName} in campaign {campaignName}";
         phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
             .Transform(phoneNumber);
         await SendSmsMessageAsync(phoneNumber, message);
     }
-    
-    public async Task SendJobAssignedSmsAsync(string? jobName, DateTime? jobStartTime, DateTime? jobEndTime, string? location, string phoneNumber, CountryCodes countryCode)
+
+    public async Task SendJobAssignedSmsAsync(string? jobName, DateTime? jobStartTime, DateTime? jobEndTime,
+        string? location, string phoneNumber, CountryCodes countryCode)
     {
         string message = $"You were assigned the job {jobName} from {jobStartTime} to {jobEndTime} at {location}";
         phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
             .Transform(phoneNumber);
         await SendSmsMessageAsync(phoneNumber, message);
     }
-    
-    public async Task SendJobUnAssignedSmsAsync(string? jobName, string? location, string phoneNumber, CountryCodes countryCode)
+
+    public async Task SendJobUnAssignedSmsAsync(string? jobName, string? location, string phoneNumber,
+        CountryCodes countryCode)
     {
         string message = $"You were unassigned from the job {jobName} at {location}";
         phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
             .Transform(phoneNumber);
         await SendSmsMessageAsync(phoneNumber, message);
     }
-    
+
     public async Task<CallStatus> SendFreeTextSmsAsync(string? message, string phoneNumber, CountryCodes countryCode)
     {
         phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
             .Transform(phoneNumber);
-        var res =  await SendSmsMessageAsync(phoneNumber, message);
+        var res = await SendSmsMessageAsync(phoneNumber, message);
         return TelesignNotFailedStatusCodes.Contains(res) ? CallStatus.Success : CallStatus.Failed;
     }
+
+    public async Task SendAddedEventParticipationSmsAsync(string? eventName,
+        string? eventLocation, DateTime? startTime, DateTime? endTime, string? phoneNumber, CountryCodes countryCode)
+    {
+        phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
+            .Transform(phoneNumber);
+        string message;
+        if (startTime != null && endTime != null)
+        {
+            message = $"You were added to the event {eventName} at {eventLocation} from {startTime} to {endTime}";
+        }
+        else if (startTime != null)
+        {
+            message = $"You were added to the event {eventName} at {eventLocation} from {startTime}";
+        }
+        else if (endTime != null)
+        {
+            message = $"You were added to the event {eventName} at {eventLocation} until {endTime}";
+        }
+        else
+        {
+            message = $"You were added to the event {eventName} at {eventLocation}";
+        }
+        await SendSmsMessageAsync(phoneNumber, message);
+    }
+
+    public async Task SendEventCreatedForUserSmsAsync(string? eventName,
+        string? eventLocation, DateTime? startTime, DateTime? endTime, string creatorName,
+        string? phoneNumber, CountryCodes countryCode)
+    {
+        phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
+            .Transform(phoneNumber);
+        string message;
+        if (startTime != null && endTime != null)
+        {
+            message = $"The event {eventName} at {eventLocation} from {startTime} to {endTime} was created by" +
+                      $" {creatorName} and added to your schedule";
+        }
+        else if (startTime != null)
+        {
+            message = $"The event {eventName} at {eventLocation} from {startTime} was created by {creatorName} and added" +
+                      $" to your schedule";
+        }
+        else if (endTime != null)
+        {
+            message = $"The event {eventName} at {eventLocation} until {endTime} was created by {creatorName} and added" +
+                      $" to your schedule";
+        }
+        else
+        {
+            message = $"The event {eventName} at {eventLocation} was created by {creatorName} and added to your schedule";
+        }
+        await SendSmsMessageAsync(phoneNumber, message);
+    }
+
 }
