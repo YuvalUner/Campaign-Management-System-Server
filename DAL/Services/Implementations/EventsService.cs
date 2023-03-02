@@ -52,6 +52,10 @@ public class EventsService: IEventsService
         {
             param.Add("IsOpenJoin", customEvent.IsOpenJoin);
         }
+        if (customEvent.EventOf != null)
+        {
+            param.Add("EventOf", customEvent.EventOf);
+        }
         
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         param.Add("newEventGuid", dbType: DbType.Guid, direction: ParameterDirection.Output);
@@ -260,5 +264,15 @@ public class EventsService: IEventsService
             DynamicParameters>(StoredProcedureNames.GetEventCreatorUserId, param);
         
         return res.FirstOrDefault();
+    }
+
+    public async Task<IEnumerable<EventWithCreatorDetails>> GetPersonalEvents(int userId)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId
+        });
+        
+        return await _dbAccess.GetData<EventWithCreatorDetails, DynamicParameters>(StoredProcedureNames.GetPersonalEvents, param);
     }
 }

@@ -609,4 +609,9 @@ public static class StoredProcedureNames
     /// Params: userId (int).<br/>
     /// </summary>
     public const string GetManagedUsers = "usp_EventScheduleManagedUsersGet";
+    
+    /// <summary>
+    /// Gets a list of all the user's personal events, those created by them or for them.<br/>
+    /// </summary>
+    public const string GetPersonalEvents = "usp_EventsGetPersonal";
 }
