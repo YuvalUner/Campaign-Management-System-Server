@@ -103,21 +103,127 @@ public class ScheduleManagersServiceTests
         // Arrange
         
         // Act
-        var statusCode = _scheduleManagersService.AddScheduleManager(_managerUser.UserId, _managedUser.Email).Result;
+        var statusCode = _scheduleManagersService.AddScheduleManager(_managedUser.UserId, _managerUser.Email).Result;
         
         // Assert
         Assert.Equal(CustomStatusCode.Ok, statusCode);
     }
     
-    [Fact, TestPriority(100)]
-    public void RemoveScheduleManagerShouldWork()
+    [Fact, TestPriority(3)]
+    public void AddScheduleManager_ShouldReturnDuplicateKey_WhenScheduleManagerAlreadyAdded()
     {
         // Arrange
         
         // Act
-        var statusCode = _scheduleManagersService.RemoveScheduleManager(_managerUser.UserId, _managedUser.Email).Result;
+        var statusCode = _scheduleManagersService.AddScheduleManager(_managedUser.UserId, _managerUser.Email).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.DuplicateKey, statusCode);
+    }
+    
+    [Fact, TestPriority(3)]
+    public void GetScheduleManagersById_ShouldReturnListWithOneScheduleManager_WhenScheduleManagerAdded()
+    {
+        // Arrange
+        
+        // Act
+        var (statusCode, scheduleManagers) = _scheduleManagersService.GetScheduleManagers(userId: _managedUser.UserId).Result;
         
         // Assert
         Assert.Equal(CustomStatusCode.Ok, statusCode);
+        Assert.Single(scheduleManagers);
+        Assert.Equal(_managerUser.UserId, scheduleManagers.First().UserId);
+        Assert.Equal(_managerUser.Email, scheduleManagers.First().Email);
+    }
+    
+    [Fact, TestPriority(3)]
+    public void GetScheduleManagersByEmail_ShouldReturnListWithOneScheduleManager_WhenScheduleManagerAdded()
+    {
+        // Arrange
+        
+        // Act
+        var (statusCode, scheduleManagers) = _scheduleManagersService.GetScheduleManagers(userEmail: _managedUser.Email).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, statusCode);
+        Assert.Single(scheduleManagers);
+        Assert.Equal(_managerUser.UserId, scheduleManagers.First().UserId);
+        Assert.Equal(_managerUser.Email, scheduleManagers.First().Email);
+    }
+    
+    [Fact, TestPriority(3)]
+    public void GetManagedUsers_ShouldReturnListWithOneManagedUser_WhenScheduleManagerAdded()
+    {
+        // Arrange
+        
+        // Act
+        var managedUsers = _scheduleManagersService.GetManagedUsers(_managerUser.UserId).Result;
+        
+        // Assert
+        Assert.Single(managedUsers);
+        Assert.Equal(_managedUser.Email, managedUsers.First().Email);
+    }
+    
+    [Fact, TestPriority(3)]
+    public void RemoveScheduleManager_ShouldReturnUserNotFound_WhenManagerEmailIsWrong()
+    {
+        // Arrange
+        
+        // Act
+        var statusCode = _scheduleManagersService.RemoveScheduleManager(_managedUser.UserId, "notFound").Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.UserNotFound, statusCode);
+    }
+    
+    
+    [Fact, TestPriority(100)]
+    public void RemoveScheduleManager_ShouldReturnOk()
+    {
+        // Arrange
+        
+        // Act
+        var statusCode = _scheduleManagersService.RemoveScheduleManager(_managedUser.UserId, _managerUser.Email).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, statusCode);
+    }
+    
+    [Fact, TestPriority(101)]
+    public void GetScheduleManagersById_ShouldReturnEmptyList_WhenScheduleManagerRemoved()
+    {
+        // Arrange
+        
+        // Act
+        var (statusCode, scheduleManagers) = _scheduleManagersService.GetScheduleManagers(userId: _managerUser.UserId).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, statusCode);
+        Assert.Empty(scheduleManagers);
+    }
+    
+    [Fact, TestPriority(101)]
+    public void GetScheduleManagersByEmail_ShouldReturnEmptyList_WhenScheduleManagerRemoved()
+    {
+        // Arrange
+        
+        // Act
+        var (statusCode, scheduleManagers) = _scheduleManagersService.GetScheduleManagers(userEmail: _managerUser.Email).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, statusCode);
+        Assert.Empty(scheduleManagers);
+    }
+    
+    [Fact, TestPriority(101)]
+    public void GetManagedUsers_ShouldReturnEmptyList_WhenScheduleManagerRemoved()
+    {
+        // Arrange
+        
+        // Act
+        var managedUsers = _scheduleManagersService.GetManagedUsers(_managedUser.UserId).Result;
+        
+        // Assert
+        Assert.Empty(managedUsers);
     }
 }

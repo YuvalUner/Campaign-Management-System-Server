@@ -10,7 +10,9 @@ public interface IScheduleManagersService
     /// </summary>
     /// <param name="userEmail">Email of the user to get schedule managers for. This or userId must be provided.</param>
     /// <param name="userId">User Id of the user to get schedule managers for. This or userEmail must be provided.</param>
-    /// <returns>Stored procedure's status code as item 1, list of schedule managers as item 2.</returns>
+    /// <returns>Stored procedure's status code as item 1, list of schedule managers as item 2.<br/>
+    /// Stored procedure's status code can be Ok, ParameterMustNotBeNullOrEmpty if both userId and userEmail are empty,
+    /// TooManyValuesProvided if both userId and userEmail are provided</returns>
     Task<(CustomStatusCode, IEnumerable<User>)> GetScheduleManagers(string? userEmail = null, int? userId = null);
     
     /// <summary>
