@@ -103,6 +103,64 @@ public class EventsController : Controller
         }
     }
 
+    private async Task SendEventDeletedMessage(bool viaEmail, bool viaSms, string email, string? phoneNumber,
+        EventWithCreatorDetails customEvent, string? senderName = null)
+    {
+        if (viaEmail)
+        {
+            _emailSendingService.SendEventDeletedEmailAsync(
+                customEvent.EventName,
+                customEvent.EventLocation,
+                customEvent.EventStartTime,
+                customEvent.EventEndTime,
+                email,
+                senderName
+            );
+        }
+
+        if (viaSms && !string.IsNullOrEmpty(phoneNumber))
+        {
+            _smsMessageSendingService.SendEventDeletedMessageAsync(
+                customEvent.EventName,
+                customEvent.EventLocation,
+                customEvent.EventStartTime,
+                customEvent.EventEndTime,
+                phoneNumber,
+                senderName,
+                CountryCodes.Israel
+            );
+        }
+    }
+
+    private async Task SendEventUpdatedMessage(bool viaEmail, bool viaSms, string email, string? phoneNumber,
+        CustomEvent customEvent, string? senderName = null)
+    {
+        if (viaEmail)
+        {
+            _emailSendingService.SendEventUpdatedEmailAsync(
+                customEvent.EventName,
+                customEvent.EventLocation,
+                customEvent.EventStartTime,
+                customEvent.EventEndTime,
+                email,
+                senderName
+            );
+        }
+
+        if (viaSms && !string.IsNullOrEmpty(phoneNumber))
+        {
+            _smsMessageSendingService.SendEventUpdatedMessageAsync(
+                customEvent.EventName,
+                customEvent.EventLocation,
+                customEvent.EventStartTime,
+                customEvent.EventEndTime,
+                phoneNumber,
+                senderName,
+                CountryCodes.Israel
+            );
+        }
+    }
+
     [HttpGet("get-self-events")]
     public async Task<IActionResult> GetSelf()
     {
@@ -246,7 +304,8 @@ public class EventsController : Controller
     }
 
     [HttpPut("update-campaign-event/{campaignGuid:guid}/{eventGuid:guid}")]
-    public async Task<IActionResult> UpdateEvent(Guid eventGuid, Guid campaignGuid, [FromBody] CustomEvent updatedEvent)
+    public async Task<IActionResult> UpdateEvent(Guid eventGuid, Guid campaignGuid, [FromBody] CustomEvent updatedEvent,
+        [FromQuery] bool sendSms = false, [FromQuery] bool sendEmail = false)
     {
         try
         {
@@ -268,17 +327,44 @@ public class EventsController : Controller
             }
 
             updatedEvent.EventGuid = eventGuid;
+            updatedEvent.CampaignGuid = campaignGuid;
 
             var updatedEventResult = await _eventsService.UpdateEvent(updatedEvent);
 
-            return updatedEventResult switch
+            switch (updatedEventResult)
             {
-                CustomStatusCode.EventNotFound => BadRequest(FormatErrorMessage(EventNotFound,
-                    CustomStatusCode.EventNotFound)),
-                CustomStatusCode.CampaignNotFound => BadRequest(FormatErrorMessage(CampaignNotFound,
-                    CustomStatusCode.CampaignNotFound)),
-                _ => Ok()
+                case CustomStatusCode.EventNotFound:
+                    return BadRequest(FormatErrorMessage(EventNotFound, CustomStatusCode.EventNotFound));
+                case CustomStatusCode.CampaignNotFound:
+                    return BadRequest(FormatErrorMessage(CampaignNotFound, CustomStatusCode.CampaignNotFound));
             };
+
+            if (sendSms || sendEmail)
+            {
+                var (statusCode, eventParticipants) = await _eventsService.GetEventParticipants(eventGuid);
+                var campaign = await _campaignsService.GetCampaignBasicInfo(campaignGuid);
+                
+                // If the event name was not updated, we need to get it from the DB.
+                if (updatedEvent.EventName == null)
+                {
+                    var eventAfterUpdate = await _eventsService.GetEvent(eventGuid);
+                    updatedEvent.EventName = eventAfterUpdate.EventName;
+                }
+
+                foreach (var participant in eventParticipants)
+                {
+                    SendEventUpdatedMessage(
+                        sendEmail,
+                        sendSms,
+                        participant.Email,
+                        participant.PhoneNumber,
+                        updatedEvent,
+                        campaign.CampaignName
+                    );
+                }
+            }
+
+            return Ok();
         }
         catch (Exception e)
         {
@@ -288,7 +374,8 @@ public class EventsController : Controller
     }
 
     [HttpPut("update-personal-event/{eventGuid:guid}")]
-    public async Task<IActionResult> UpdatePersonalEvent(Guid eventGuid, [FromBody] CustomEvent updatedEvent)
+    public async Task<IActionResult> UpdatePersonalEvent(Guid eventGuid, [FromBody] CustomEvent updatedEvent,
+        [FromQuery] bool sendSms = false, [FromQuery] bool sendEmail = false)
     {
         try
         {
@@ -310,13 +397,41 @@ public class EventsController : Controller
             updatedEvent.CampaignGuid = null;
 
             var updatedEventResult = await _eventsService.UpdateEvent(updatedEvent);
-
-            return updatedEventResult switch
+            
+            if (updatedEventResult == CustomStatusCode.EventNotFound)
             {
-                CustomStatusCode.EventNotFound => BadRequest(FormatErrorMessage(EventNotFound,
-                    CustomStatusCode.EventNotFound)),
-                _ => Ok()
-            };
+                return BadRequest(FormatErrorMessage(EventNotFound, CustomStatusCode.EventNotFound));
+            }
+            if (sendSms || sendEmail)
+            {
+                var (statusCode, eventParticipants) = await _eventsService.GetEventParticipants(eventGuid);
+                
+                var sendingUser = await _usersService.GetUserPublicInfo(userId);
+                string name = sendingUser.FirstNameHeb != null
+                    ? sendingUser.FirstNameHeb + " " +  sendingUser.LastNameHeb
+                    : sendingUser.DisplayNameEng;
+                
+                // If the event name was not updated, we need to get it from the DB.
+                if (updatedEvent.EventName == null)
+                {
+                    var eventAfterUpdate = await _eventsService.GetEvent(eventGuid);
+                    updatedEvent.EventName = eventAfterUpdate.EventName;
+                }
+
+                foreach (var participant in eventParticipants)
+                {
+                    SendEventUpdatedMessage(
+                        sendEmail,
+                        sendSms,
+                        participant.Email,
+                        participant.PhoneNumber,
+                        updatedEvent,
+                        name
+                    );
+                }
+            }
+            
+            return Ok();
         }
         catch (Exception e)
         {
@@ -326,7 +441,8 @@ public class EventsController : Controller
     }
 
     [HttpDelete("delete-campaign-event/{campaignGuid:guid}/{eventGuid:guid}")]
-    public async Task<IActionResult> DeleteEvent(Guid eventGuid, Guid campaignGuid)
+    public async Task<IActionResult> DeleteEvent(Guid eventGuid, Guid campaignGuid,
+        [FromQuery] bool sendSms = false, [FromQuery] bool sendEmail = false)
     {
         try
         {
@@ -347,16 +463,46 @@ public class EventsController : Controller
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
 
+            // If we need to send emails or sms, we need to get the event participants and event info
+            // before deleting the event.
+            var eventParticipants = new List<UserPublicInfo>();
+            var eventBackup = new EventWithCreatorDetails();
+            if (sendEmail || sendSms)
+            {
+                CustomStatusCode statusCode = CustomStatusCode.Ok;
+                eventBackup = await _eventsService.GetEvent(eventGuid);
+                var res  = await _eventsService.GetEventParticipants(eventGuid);
+                eventParticipants = res.Item2.ToList();
+            }
+            
             var deletedEventResult = await _eventsService.DeleteEvent(eventGuid);
 
-            return deletedEventResult switch
+            switch (deletedEventResult)
             {
-                CustomStatusCode.EventNotFound => BadRequest(FormatErrorMessage(EventNotFound,
-                    CustomStatusCode.EventNotFound)),
-                CustomStatusCode.CampaignNotFound => BadRequest(FormatErrorMessage(CampaignNotFound,
-                    CustomStatusCode.CampaignNotFound)),
-                _ => Ok()
+                case CustomStatusCode.EventNotFound:
+                    return BadRequest(FormatErrorMessage(EventNotFound, CustomStatusCode.EventNotFound));
+                case CustomStatusCode.CampaignNotFound:
+                    return BadRequest(FormatErrorMessage(CampaignNotFound, CustomStatusCode.CampaignNotFound));
             };
+
+            if (sendSms || sendEmail)
+            {
+                var campaign = await _campaignsService.GetCampaignBasicInfo(campaignGuid);
+
+                foreach (var participant in eventParticipants)
+                {
+                    SendEventDeletedMessage(
+                        sendEmail,
+                        sendSms,
+                        participant.Email,
+                        participant.PhoneNumber,
+                        eventBackup,
+                        campaign.CampaignName
+                    );
+                }
+            }
+
+            return Ok();
         }
         catch (Exception e)
         {
@@ -366,7 +512,8 @@ public class EventsController : Controller
     }
 
     [HttpDelete("delete-personal-event/{eventGuid:guid}")]
-    public async Task<IActionResult> DeletePersonalEvent(Guid eventGuid)
+    public async Task<IActionResult> DeletePersonalEvent(Guid eventGuid, 
+        [FromQuery] bool sendSms = false, [FromQuery] bool sendEmail = false)
     {
         try
         {
@@ -384,14 +531,45 @@ public class EventsController : Controller
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
 
-            var deletedEventResult = await _eventsService.DeleteEvent(eventGuid);
-
-            return deletedEventResult switch
+            // If we need to send emails or sms, we need to get the event participants and event info
+            // before deleting the event.
+            var eventParticipants = new List<UserPublicInfo>();
+            var eventBackup = new EventWithCreatorDetails();
+            if (sendEmail || sendSms)
             {
-                CustomStatusCode.EventNotFound => BadRequest(FormatErrorMessage(EventNotFound,
-                    CustomStatusCode.EventNotFound)),
-                _ => Ok()
-            };
+                CustomStatusCode statusCode = CustomStatusCode.Ok;
+                eventBackup = await _eventsService.GetEvent(eventGuid);
+                var res  = await _eventsService.GetEventParticipants(eventGuid);
+                eventParticipants = res.Item2.ToList();
+            }
+            var deletedEventResult = await _eventsService.DeleteEvent(eventGuid);
+            
+            if (deletedEventResult == CustomStatusCode.EventNotFound)
+            {
+                return BadRequest(FormatErrorMessage(EventNotFound, CustomStatusCode.EventNotFound));
+            }
+            
+            if (sendSms || sendEmail)
+            {
+                var sendingUser = await _usersService.GetUserPublicInfo(userId);
+                string name = sendingUser.FirstNameHeb != null
+                    ? sendingUser.FirstNameHeb + " " +  sendingUser.LastNameHeb
+                    : sendingUser.DisplayNameEng;
+
+                foreach (var participant in eventParticipants)
+                {
+                    SendEventDeletedMessage(
+                        sendEmail,
+                        sendSms,
+                        participant.Email,
+                        participant.PhoneNumber,
+                        eventBackup,
+                        name
+                    );
+                }
+            }
+
+            return Ok();
         }
         catch (Exception e)
         {
@@ -807,9 +985,12 @@ public class EventsController : Controller
             if (sendSms || sendEmail)
             {
                 var eventCreator = await _usersService.GetUserPublicInfo(userId.Value);
+                string senderName = eventCreator.FirstNameHeb != null
+                    ? eventCreator.FirstNameHeb + " " + eventCreator.LastNameHeb
+                    : eventCreator.DisplayNameEng;
+
                 SendEventCreatedForUserMessage(sendSms, sendEmail, userEmail, newEvent,
-                    eventCreator.FirstNameHeb + eventCreator.LastNameHeb,
-                    eventCreator.FirstNameHeb + eventCreator.LastNameHeb);
+                    senderName, senderName);
             }
 
 
