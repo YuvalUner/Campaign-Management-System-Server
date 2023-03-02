@@ -77,4 +77,53 @@ public class EmailSendingService : IEmailSendingService
         string message = $"You were unassigned from the job {jobName} at {location}";
         await SendEmailAsync(emailTo, subject, message, jobName);
     }
+    
+    public async Task SendAddedEventParticipationEmailAsync(string? eventName,
+        string? eventLocation, DateTime? startTime, DateTime? endTime,  string? emailTo, string? senderName)
+    {
+        string subject = $"Event participation added";
+        string message;
+        if (startTime != null && endTime != null)
+        {
+            message = $"You were added to the event {eventName} at {eventLocation} from {startTime} to {endTime}";
+        }
+        else if (startTime != null)
+        {
+            message = $"You were added to the event {eventName} at {eventLocation} starting at {startTime}";
+        }
+        else if (endTime != null)
+        {
+            message = $"You were added to the event {eventName} at {eventLocation} ending at {endTime}";
+        }
+        else
+        {
+            message = $"You were added to the event {eventName} at {eventLocation}";
+        }
+        await SendEmailAsync(emailTo, subject, message, senderName);
+    }
+
+    public async Task SendEventCreatedForUserEmailAsync(string? eventName,
+        string? eventLocation, DateTime? startTime, DateTime? endTime, string creatorName, string? emailTo,
+        string? senderName)
+    {
+        string subject = $"Event created and added to your schedule";
+        string message;
+        if (startTime != null && endTime != null)
+        {
+            message = $"Event {eventName} at {eventLocation} from {startTime} to {endTime} was created by {creatorName} and added to your schedule";
+        }
+        else if (startTime != null)
+        {
+            message = $"Event {eventName} at {eventLocation} starting at {startTime} was created by {creatorName} and added to your schedule";
+        }
+        else if (endTime != null)
+        {
+            message = $"Event {eventName} at {eventLocation} ending at {endTime} was created by {creatorName} and added to your schedule";
+        }
+        else
+        {
+            message = $"Event {eventName} at {eventLocation} was created by {creatorName} and added to your schedule";
+        }
+        await SendEmailAsync(emailTo, subject, message, senderName);
+    }
 }

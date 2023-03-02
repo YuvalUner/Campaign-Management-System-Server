@@ -5,6 +5,7 @@ using DAL.Models;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestAPIServices;
 using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
@@ -18,14 +19,88 @@ public class EventsController : Controller
     private readonly ILogger<EventsController> _logger;
     private readonly IUsersService _usersService;
     private readonly IScheduleManagersService _scheduleManagersService;
+    private readonly IEmailSendingService _emailSendingService;
+    private readonly ISmsMessageSendingService _smsMessageSendingService;
+    private readonly ICampaignsService _campaignsService;
 
     public EventsController(IEventsService eventsService, ILogger<EventsController> logger, IUsersService usersService,
-        IScheduleManagersService scheduleManagersService)
+        IScheduleManagersService scheduleManagersService, IEmailSendingService emailSendingService,
+        ISmsMessageSendingService smsMessageSendingService, ICampaignsService campaignsService)
     {
         _eventsService = eventsService;
         _logger = logger;
         _usersService = usersService;
         _scheduleManagersService = scheduleManagersService;
+        _emailSendingService = emailSendingService;
+        _smsMessageSendingService = smsMessageSendingService;
+        _campaignsService = campaignsService;
+    }
+
+    private async Task SendEventAssignedMessage(bool viaEmail, bool viaSms, string email, CustomEvent customEvent,
+        string? senderName = null)
+    {
+        if (viaEmail)
+        {
+            _emailSendingService.SendAddedEventParticipationEmailAsync(
+                customEvent.EventName,
+                customEvent.EventLocation,
+                customEvent.EventStartTime,
+                customEvent.EventEndTime,
+                email,
+                senderName
+            );
+        }
+
+        if (viaSms)
+        {
+            var user = await _usersService.GetUserContactInfoByEmail(email);
+            if (user != null && !string.IsNullOrEmpty(user.PhoneNumber))
+            {
+                _smsMessageSendingService.SendAddedEventParticipationSmsAsync(
+                    customEvent.EventName,
+                    customEvent.EventLocation,
+                    customEvent.EventStartTime,
+                    customEvent.EventEndTime,
+                    user.PhoneNumber,
+                    CountryCodes.Israel
+                );
+            }
+        }
+    }
+
+    private async Task SendEventCreatedForUserMessage(bool viaEmail, bool viaSms, string email, CustomEvent customEvent,
+        string creatorName = null, string senderName = null)
+    {
+        if (viaEmail)
+        {
+            _emailSendingService.SendEventCreatedForUserEmailAsync(
+                customEvent.EventName,
+                customEvent.EventLocation,
+                customEvent.EventStartTime,
+                customEvent.EventEndTime,
+                creatorName,
+                email,
+                senderName
+            );
+        }
+
+        if (viaSms)
+        {
+            var user = await _usersService.GetUserContactInfoByEmail(email);
+
+            if (user != null && !string.IsNullOrEmpty(user.PhoneNumber))
+            {
+                _smsMessageSendingService.SendEventCreatedForUserSmsAsync(
+                    customEvent.EventName,
+                    customEvent.EventLocation,
+                    customEvent.EventStartTime,
+                    customEvent.EventEndTime,
+                    creatorName,
+                    user.PhoneNumber,
+                    CountryCodes.Israel
+                );
+            }
+        }
     }
 
     [HttpGet("get-self-events")]
@@ -378,7 +453,8 @@ public class EventsController : Controller
     }
 
     [HttpPost("add-personal-or-open-event-participant/{eventGuid:guid}/{userEmail}")]
-    public async Task<IActionResult> AddPersonalEventParticipant(Guid eventGuid, string userEmail)
+    public async Task<IActionResult> AddPersonalEventParticipant(Guid eventGuid, string userEmail, 
+        [FromQuery] bool sendSms = false, [FromQuery] bool sendEmail = false)
     {
         try
         {
@@ -414,16 +490,30 @@ public class EventsController : Controller
 
             var addParticipantResult = await _eventsService.AddEventParticipant(eventGuid, userEmail: userEmail);
 
-            return addParticipantResult switch
+            switch (addParticipantResult)
             {
-                CustomStatusCode.EventNotFound => BadRequest(FormatErrorMessage(EventNotFound,
-                    CustomStatusCode.EventNotFound)),
-                CustomStatusCode.EventAlreadyFull => BadRequest(FormatErrorMessage(EventAlreadyFull,
-                    CustomStatusCode.EventAlreadyFull)),
-                CustomStatusCode.DuplicateKey => BadRequest(FormatErrorMessage(AlreadyParticipating,
-                    CustomStatusCode.DuplicateKey)),
-                _ => Ok()
+                case CustomStatusCode.EventNotFound:
+                    return BadRequest(FormatErrorMessage(EventNotFound, CustomStatusCode.EventNotFound));
+                case CustomStatusCode.EventAlreadyFull:
+                    return BadRequest(FormatErrorMessage(EventAlreadyFull, CustomStatusCode.EventAlreadyFull));
+                case CustomStatusCode.DuplicateKey:
+                    return BadRequest(FormatErrorMessage(AlreadyParticipating, CustomStatusCode.DuplicateKey));
             };
+
+            if (sendSms || sendEmail)
+            {
+                var sender = await _usersService.GetUserPublicInfo(userId);
+
+                SendEventAssignedMessage(
+                    sendEmail,
+                    sendSms,
+                    userEmail,
+                    CustomEvent.FromEventWithCreatorDetails(requestedEvent),
+                    sender.FirstNameHeb + sender.LastNameHeb
+                );
+            }
+            
+            return Ok();
         }
         catch (Exception e)
         {
@@ -433,7 +523,8 @@ public class EventsController : Controller
     }
 
     [HttpPost("add-campaign-event-participant/{campaignGuid:guid}/{eventGuid:guid}/{userEmail}")]
-    public async Task<IActionResult> AddCampaignEventParticipant(Guid eventGuid, Guid campaignGuid, string userEmail)
+    public async Task<IActionResult> AddCampaignEventParticipant(Guid eventGuid, Guid campaignGuid, string userEmail,
+        [FromQuery] bool sendSms = false, [FromQuery] bool sendEmail = false)
     {
         try
         {
@@ -461,16 +552,31 @@ public class EventsController : Controller
 
             var addParticipantResult = await _eventsService.AddEventParticipant(eventGuid, userEmail: userEmail);
 
-            return addParticipantResult switch
+            switch (addParticipantResult)
             {
-                CustomStatusCode.EventNotFound => BadRequest(FormatErrorMessage(EventNotFound,
-                    CustomStatusCode.EventNotFound)),
-                CustomStatusCode.EventAlreadyFull => BadRequest(FormatErrorMessage(EventAlreadyFull,
-                    CustomStatusCode.EventAlreadyFull)),
-                CustomStatusCode.DuplicateKey => BadRequest(FormatErrorMessage(AlreadyParticipating,
-                    CustomStatusCode.DuplicateKey)),
-                _ => Ok()
+                case CustomStatusCode.EventNotFound:
+                    return BadRequest(FormatErrorMessage(EventNotFound, CustomStatusCode.EventNotFound));
+                case CustomStatusCode.EventAlreadyFull:
+                    return BadRequest(FormatErrorMessage(EventAlreadyFull, CustomStatusCode.EventAlreadyFull));
+                case CustomStatusCode.DuplicateKey:
+                    return BadRequest(FormatErrorMessage(AlreadyParticipating, CustomStatusCode.DuplicateKey));
             };
+
+            if (sendSms || sendEmail)
+            {
+                var requestedEvent = await _eventsService.GetEvent(eventGuid);
+                var sendingCampaign = await _campaignsService.GetCampaignBasicInfo(campaignGuid);
+                
+                SendEventAssignedMessage(
+                    sendEmail,
+                    sendSms,
+                    userEmail,
+                    CustomEvent.FromEventWithCreatorDetails(requestedEvent),
+                    sendingCampaign.CampaignName
+                );
+            }
+            
+            return Ok();
         }
         catch (Exception e)
         {
@@ -665,8 +771,9 @@ public class EventsController : Controller
         }
     }
 
-    [HttpPost("add-event-for-managed-user/{userEmail}")]
-    public async Task<IActionResult> AddEventForManagedUser(string userEmail, [FromBody] CustomEvent newEvent)
+    [HttpPost("add-event-for-managed-user/{userEmail}/{sendSms:bool}/{sendEmail:bool}")]
+    public async Task<IActionResult> AddEventForManagedUser(string userEmail,
+        [FromBody] CustomEvent newEvent, [FromQuery] bool sendSms = false, [FromQuery] bool sendEmail = false)
     {
         try
         {
@@ -693,6 +800,19 @@ public class EventsController : Controller
             // Else, the user is authorized to add an event for the managed user.
             var (statusCode, eventId, eventGuid) = await _eventsService.AddEvent(newEvent);
 
+            _eventsService.AddEventParticipant(eventGuid.Value, userId: userId.Value);
+            _eventsService.AddEventWatcher(userId.Value, eventGuid.Value);
+            
+            // If the user wants to send an email or sms, then send it.
+            if (sendSms || sendEmail)
+            {
+                var eventCreator = await _usersService.GetUserPublicInfo(userId.Value);
+                SendEventCreatedForUserMessage(sendSms, sendEmail, userEmail, newEvent,
+                    eventCreator.FirstNameHeb + eventCreator.LastNameHeb,
+                    eventCreator.FirstNameHeb + eventCreator.LastNameHeb);
+            }
+
+
             return Ok(eventGuid);
 
         }
@@ -717,6 +837,37 @@ public class EventsController : Controller
         {
             _logger.LogError(e, "Error while getting personal events");
             return BadRequest("Error while getting personal events");
+        }
+    }
+
+    [HttpGet("get-managed-user-events/{userEmail}")]
+    public async Task<IActionResult> GetManagedUserEvents(string userEmail)
+    {
+        try
+        {
+            var userId = HttpContext.Session.GetInt32(Constants.UserId);
+            
+            var managedUsers = await _scheduleManagersService.GetManagedUsers(userId.Value);
+            
+            // If the user is not managing the user they are trying to add an event for, then they are not authorized.
+            var managedUser = managedUsers.FirstOrDefault(u => u.Email == userEmail);
+            if (managedUser == null)
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            // Get the user id of the managed user.
+            var managedUserWithId = await _usersService.GetUserByEmail(userEmail);
+            
+            var events = await _eventsService.GetUserEvents(managedUserWithId.UserId);
+            
+            return Ok(events);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while getting managed user events");
+            return BadRequest("Error while getting managed user events");
         }
     }
     
