@@ -103,4 +103,11 @@ public interface IEventsService
     /// <returns></returns>
     Task<User?> GetEventCreatorUserId(Guid eventGuid);
 
+    /// <summary>
+    /// Gets a list of all the user's personal events.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<IEnumerable<EventWithCreatorDetails>> GetPersonalEvents(int userId);
+
 }
