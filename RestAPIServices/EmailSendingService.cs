@@ -126,4 +126,48 @@ public class EmailSendingService : IEmailSendingService
         }
         await SendEmailAsync(emailTo, subject, message, senderName);
     }
+
+    public async Task SendEventDeletedEmailAsync(string? eventName, string? eventLocation,
+        DateTime? startTime, DateTime? endTime, string? emailTo, string? senderName)
+    {
+        string subject = $"Event deleted";
+        string message;
+        if (startTime != null && endTime != null)
+        {
+            message = $"Event {eventName} at {eventLocation} from {startTime} to {endTime} was deleted";
+        }
+        else if (startTime != null)
+        {
+            message = $"Event {eventName} at {eventLocation} starting at {startTime} was deleted";
+        }
+        else if (endTime != null)
+        {
+            message = $"Event {eventName} at {eventLocation} ending at {endTime} was deleted";
+        }
+        else
+        {
+            message = $"Event {eventName} at {eventLocation} was deleted";
+        }
+        await SendEmailAsync(emailTo, subject, message, senderName);
+    }
+
+    public async Task SendEventUpdatedEmailAsync(string? eventName, string? eventLocation,
+        DateTime? startTime, DateTime? endTime, string? emailTo, string? senderName)
+    {
+        string subject = $"Event updated";
+        string message = $"Event name: {eventName} \n";
+        if (eventLocation != null)
+        {
+            message += $"Location moved to: {eventLocation} \n";
+        }
+        if (startTime != null)
+        {
+            message += $"Start time changed to: {startTime} \n";
+        }
+        if (endTime != null)
+        {
+            message += $"End time changed to: {endTime} \n";
+        }
+        await SendEmailAsync(emailTo, subject, message, senderName);
+    }
 }
