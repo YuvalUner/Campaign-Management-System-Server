@@ -327,6 +327,7 @@ public class EventsController : Controller
             }
 
             updatedEvent.EventGuid = eventGuid;
+            updatedEvent.CampaignGuid = campaignGuid;
 
             var updatedEventResult = await _eventsService.UpdateEvent(updatedEvent);
 
@@ -407,7 +408,7 @@ public class EventsController : Controller
                 
                 var sendingUser = await _usersService.GetUserPublicInfo(userId);
                 string name = sendingUser.FirstNameHeb != null
-                    ? sendingUser.FirstNameHeb + sendingUser.LastNameHeb
+                    ? sendingUser.FirstNameHeb + " " +  sendingUser.LastNameHeb
                     : sendingUser.DisplayNameEng;
                 
                 // If the event name was not updated, we need to get it from the DB.
@@ -462,7 +463,18 @@ public class EventsController : Controller
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
 
-            var eventBackup = await _eventsService.GetEvent(eventGuid);
+            // If we need to send emails or sms, we need to get the event participants and event info
+            // before deleting the event.
+            var eventParticipants = new List<UserPublicInfo>();
+            var eventBackup = new EventWithCreatorDetails();
+            if (sendEmail || sendSms)
+            {
+                CustomStatusCode statusCode = CustomStatusCode.Ok;
+                eventBackup = await _eventsService.GetEvent(eventGuid);
+                var res  = await _eventsService.GetEventParticipants(eventGuid);
+                eventParticipants = res.Item2.ToList();
+            }
+            
             var deletedEventResult = await _eventsService.DeleteEvent(eventGuid);
 
             switch (deletedEventResult)
@@ -475,7 +487,6 @@ public class EventsController : Controller
 
             if (sendSms || sendEmail)
             {
-                var (statusCode, eventParticipants) = await _eventsService.GetEventParticipants(eventGuid);
                 var campaign = await _campaignsService.GetCampaignBasicInfo(campaignGuid);
 
                 foreach (var participant in eventParticipants)
@@ -520,7 +531,17 @@ public class EventsController : Controller
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
 
-            var eventBackup = await _eventsService.GetEvent(eventGuid);
+            // If we need to send emails or sms, we need to get the event participants and event info
+            // before deleting the event.
+            var eventParticipants = new List<UserPublicInfo>();
+            var eventBackup = new EventWithCreatorDetails();
+            if (sendEmail || sendSms)
+            {
+                CustomStatusCode statusCode = CustomStatusCode.Ok;
+                eventBackup = await _eventsService.GetEvent(eventGuid);
+                var res  = await _eventsService.GetEventParticipants(eventGuid);
+                eventParticipants = res.Item2.ToList();
+            }
             var deletedEventResult = await _eventsService.DeleteEvent(eventGuid);
             
             if (deletedEventResult == CustomStatusCode.EventNotFound)
@@ -530,10 +551,9 @@ public class EventsController : Controller
             
             if (sendSms || sendEmail)
             {
-                var (statusCode, eventParticipants) = await _eventsService.GetEventParticipants(eventGuid);
                 var sendingUser = await _usersService.GetUserPublicInfo(userId);
                 string name = sendingUser.FirstNameHeb != null
-                    ? sendingUser.FirstNameHeb + sendingUser.LastNameHeb
+                    ? sendingUser.FirstNameHeb + " " +  sendingUser.LastNameHeb
                     : sendingUser.DisplayNameEng;
 
                 foreach (var participant in eventParticipants)
@@ -965,9 +985,12 @@ public class EventsController : Controller
             if (sendSms || sendEmail)
             {
                 var eventCreator = await _usersService.GetUserPublicInfo(userId.Value);
+                string senderName = eventCreator.FirstNameHeb != null
+                    ? eventCreator.FirstNameHeb + " " + eventCreator.LastNameHeb
+                    : eventCreator.DisplayNameEng;
+
                 SendEventCreatedForUserMessage(sendSms, sendEmail, userEmail, newEvent,
-                    eventCreator.FirstNameHeb + eventCreator.LastNameHeb,
-                    eventCreator.FirstNameHeb + eventCreator.LastNameHeb);
+                    senderName, senderName);
             }
 
 
