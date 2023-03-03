@@ -626,7 +626,8 @@ public static class StoredProcedureNames
     /// <summary>
     /// Publishes an event to the public board by adding it to the relevant table.<br/>
     /// Params: eventGuid (Guid), publisherId (int).<br/>
-    /// Returns: Status code EventNotFound if the event does not exist, DuplicateKey if the event is already published.<br/>
+    /// Returns: Status code EventNotFound if the event does not exist, DuplicateKey if the event is already published,
+    /// IncorrectEventType if event is not associated to any campaign, UserNotFound if publisher id is not a valid user.<br/>
     /// </summary>
     public const string PublishEvent = "usp_PublicBoardEventAdd";
     
@@ -636,4 +637,11 @@ public static class StoredProcedureNames
     /// Returns: Status code EventNotFound if the event does not exist.<br/>
     /// </summary>
     public const string UnpublishEvent = "usp_PublicBoardEventDelete";
+
+    /// <summary>
+    /// Gets all published events for a specific campaign. Also gets details about the publisher of the events.<br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// Returns: Status code CampaignNotFound if the campaign does not exist.<br/>
+    /// </summary>
+    public const string GetCampaignPublishedEvents = "usp_PublicBoardEventsGetForCampaign";
 }

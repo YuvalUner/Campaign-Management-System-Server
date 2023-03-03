@@ -29,6 +29,11 @@ public class PublishingServiceTests
         EventGuid = Guid.Parse("21B6E907-CDE2-4E33-B425-733C027D201B")
     };
     
+    static CustomEvent _nonCampaignEvent = new CustomEvent()
+    {
+        EventGuid = Guid.Parse("736019CC-5125-4DA4-8E6B-A07E79464993")
+    };
+    
     public PublishingServiceTests()
     {
         _configuration = new ConfigurationBuilder().
@@ -37,6 +42,19 @@ public class PublishingServiceTests
             .Build(); 
         
         _publishingService = new PublishingService(new GenericDbAccess(_configuration));
+    }
+
+    [Fact, TestPriority(1)]
+    public void GetCampaignPublishedEvents_ShouldReturnEmptyList_ForNoEventsYet()
+    {
+        // Arrange
+        
+        // Act
+        var (statusCode, res) = _publishingService.GetCampaignPublishedEvents(_testCampaign.CampaignGuid).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, statusCode);
+        Assert.Empty(res);
     }
     
     [Fact, TestPriority(2)]
@@ -97,6 +115,47 @@ public class PublishingServiceTests
         
         // Assert
         Assert.Equal(CustomStatusCode.EventNotFound, result);
+    }
+
+    [Fact, TestPriority(3)]
+    public void PublishEventShouldFail_ForWrongEventType()
+    {
+        // Arrange
+        
+        // Act
+        var result = _publishingService.PublishEvent(_nonCampaignEvent.EventGuid, _testUser.UserId).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.IncorrectEventType, result);
+    }
+    
+    [Fact, TestPriority(3)]
+    public void GetCampaignPublishedEventsShouldWork()
+    {
+        // Arrange
+
+        // Act
+        var (statusCode, res) = _publishingService.GetCampaignPublishedEvents(_testCampaign.CampaignGuid).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, statusCode);
+        Assert.Single(res);
+        Assert.Equal(_testEvent.EventGuid, res.First().EventGuid);
+        Assert.Equal(_testUser.Email, res.First().Email);
+        Assert.Equal(_testCampaign.CampaignGuid, res.First().CampaignGuid);
+    }
+    
+    [Fact, TestPriority(3)]
+    public void GetCampaignPublishedEventsShouldFail_ForInvalidCampaignGuid()
+    {
+        // Arrange
+
+        // Act
+        var (statusCode, res) = _publishingService.GetCampaignPublishedEvents(Guid.Empty).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.CampaignNotFound, statusCode);
+        Assert.Empty(res);
     }
     
     [Fact, TestPriority(100)]
