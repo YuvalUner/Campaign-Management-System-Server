@@ -110,4 +110,11 @@ public interface IEventsService
     /// <returns></returns>
     Task<IEnumerable<EventWithCreatorDetails>> GetPersonalEvents(int userId);
 
+    /// <summary>
+    /// Gets the list of watchers for a specific event.
+    /// </summary>
+    /// <param name="eventGuid"></param>
+    /// <returns></returns>
+    Task<(CustomStatusCode, IEnumerable<UserPublicInfo>)> GetEventWatchers(Guid eventGuid);
+
 }
