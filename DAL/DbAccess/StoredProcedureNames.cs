@@ -612,6 +612,13 @@ public static class StoredProcedureNames
     
     /// <summary>
     /// Gets a list of all the user's personal events, those created by them or for them.<br/>
+    /// Params: userId (int).<br/>
     /// </summary>
     public const string GetPersonalEvents = "usp_EventsGetPersonal";
+
+    /// <summary>
+    /// Gets all watchers of a specific event.<br/>
+    /// Params: eventGuid (Guid).<br/>
+    /// </summary>
+    public const string GetEventWatchers = "usp_EventGetWatchers";
 }

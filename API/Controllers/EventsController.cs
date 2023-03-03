@@ -342,6 +342,9 @@ public class EventsController : Controller
             if (sendSms || sendEmail)
             {
                 var (statusCode, eventParticipants) = await _eventsService.GetEventParticipants(eventGuid);
+                var (statusCode2, eventWatchers) = await _eventsService.GetEventWatchers(eventGuid);
+                eventParticipants = eventParticipants.Concat(eventWatchers);
+                
                 var campaign = await _campaignsService.GetCampaignBasicInfo(campaignGuid);
                 
                 // If the event name was not updated, we need to get it from the DB.
@@ -405,6 +408,8 @@ public class EventsController : Controller
             if (sendSms || sendEmail)
             {
                 var (statusCode, eventParticipants) = await _eventsService.GetEventParticipants(eventGuid);
+                var (statusCode2, eventWatchers) = await _eventsService.GetEventWatchers(eventGuid);
+                eventParticipants = eventParticipants.Concat(eventWatchers);
                 
                 var sendingUser = await _usersService.GetUserPublicInfo(userId);
                 string name = sendingUser.FirstNameHeb != null
@@ -473,6 +478,8 @@ public class EventsController : Controller
                 eventBackup = await _eventsService.GetEvent(eventGuid);
                 var res  = await _eventsService.GetEventParticipants(eventGuid);
                 eventParticipants = res.Item2.ToList();
+                res = await _eventsService.GetEventWatchers(eventGuid);
+                eventParticipants = eventParticipants.Concat(res.Item2).ToList();
             }
             
             var deletedEventResult = await _eventsService.DeleteEvent(eventGuid);
@@ -541,6 +548,8 @@ public class EventsController : Controller
                 eventBackup = await _eventsService.GetEvent(eventGuid);
                 var res  = await _eventsService.GetEventParticipants(eventGuid);
                 eventParticipants = res.Item2.ToList();
+                res = await _eventsService.GetEventWatchers(eventGuid);
+                eventParticipants = eventParticipants.Concat(res.Item2).ToList();
             }
             var deletedEventResult = await _eventsService.DeleteEvent(eventGuid);
             
