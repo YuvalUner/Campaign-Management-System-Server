@@ -60,6 +60,8 @@ public static class ErrorMessages
     public const string EmailRequired = "Email is required";
     public const string MaxAttendeesNotNullOrZero = "Max attendees must be greater than 0";
     public const string ManagerAlreadyExists = "User is already your manager";
+    public const string EventAlreadyPublished = "Event is already published";
+    public const string EventNotAssociatedToCampaign = "Event is not associated to any campaign and can not be published";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {

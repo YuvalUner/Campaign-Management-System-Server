@@ -1,8 +1,9 @@
 ﻿namespace DAL.DbAccess;
 
 /// <summary>
-/// A collection of all the stored procedure names used in the app.
-/// For the values of the status codes returned by the stored procedures, see <see cref="CustomStatusCode"/>.
+/// A collection of all the stored procedure names used in the app.<br/>
+/// For the values of the status codes returned by the stored procedures, see <see cref="CustomStatusCode"/>.<br/>
+/// Stored procedures that return a status code return it as the return value of the stored procedure.
 /// </summary>
 public static class StoredProcedureNames
 {
@@ -621,4 +622,26 @@ public static class StoredProcedureNames
     /// Params: eventGuid (Guid).<br/>
     /// </summary>
     public const string GetEventWatchers = "usp_EventGetWatchers";
+
+    /// <summary>
+    /// Publishes an event to the public board by adding it to the relevant table.<br/>
+    /// Params: eventGuid (Guid), publisherId (int).<br/>
+    /// Returns: Status code EventNotFound if the event does not exist, DuplicateKey if the event is already published,
+    /// IncorrectEventType if event is not associated to any campaign, UserNotFound if publisher id is not a valid user.<br/>
+    /// </summary>
+    public const string PublishEvent = "usp_PublicBoardEventAdd";
+    
+    /// <summary>
+    /// Depublishes an event from the public board by removing it from the relevant table.<br/>
+    /// Params: eventGuid (Guid).<br/>
+    /// Returns: Status code EventNotFound if the event does not exist.<br/>
+    /// </summary>
+    public const string UnpublishEvent = "usp_PublicBoardEventDelete";
+
+    /// <summary>
+    /// Gets all published events for a specific campaign. Also gets details about the publisher of the events.<br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// Returns: Status code CampaignNotFound if the campaign does not exist.<br/>
+    /// </summary>
+    public const string GetCampaignPublishedEvents = "usp_PublicBoardEventsGetForCampaign";
 }
