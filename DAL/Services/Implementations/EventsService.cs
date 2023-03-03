@@ -275,4 +275,18 @@ public class EventsService: IEventsService
         
         return await _dbAccess.GetData<EventWithCreatorDetails, DynamicParameters>(StoredProcedureNames.GetPersonalEvents, param);
     }
+    
+    public async Task<(CustomStatusCode,IEnumerable<UserPublicInfo>)> GetEventWatchers(Guid eventGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            eventGuid
+        });
+        
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        
+        var res =  await _dbAccess.GetData<UserPublicInfo, DynamicParameters>(StoredProcedureNames.GetEventWatchers, param);
+        
+        return (param.Get<CustomStatusCode>("returnVal"), res);
+    }
 }
