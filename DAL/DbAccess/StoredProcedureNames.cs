@@ -632,7 +632,7 @@ public static class StoredProcedureNames
     public const string PublishEvent = "usp_PublicBoardEventAdd";
     
     /// <summary>
-    /// Depublishes an event from the public board by removing it from the relevant table.<br/>
+    /// Unpublishes an event from the public board by removing it from the relevant table.<br/>
     /// Params: eventGuid (Guid).<br/>
     /// Returns: Status code EventNotFound if the event does not exist.<br/>
     /// </summary>
@@ -644,4 +644,26 @@ public static class StoredProcedureNames
     /// Returns: Status code CampaignNotFound if the campaign does not exist.<br/>
     /// </summary>
     public const string GetCampaignPublishedEvents = "usp_PublicBoardEventsGetForCampaign";
+    
+    /// <summary>
+    /// Adds a new announcement to the public board by adding it to the relevant table.<br/>
+    /// Params: campaignGuid (Guid), publisherId (int), announcementTitle (string), announcementContent (string),
+    /// newAnnouncementGuid (Guid) - output.<br/>
+    /// Returns: Status code CampaignNotFound if the campaign does not exist, UserNotFound if publisher id is not a valid user.<br/>
+    /// </summary>
+    public const string PublishAnnouncement = "usp_PublicBoardAnnouncementAdd";
+    
+    /// <summary>
+    /// Unpublishes an announcement from the public board by removing it from the relevant table.<br/>
+    /// Params: announcementGuid (Guid).<br/>
+    /// Returns: Status code AnnouncementNotFound if the announcement does not exist.<br/>
+    /// </summary>
+    public const string UnpublishAnnouncement = "usp_PublicBoardAnnouncementDelete";
+    
+    /// <summary>
+    /// Gets all published announcements for a specific campaign. Also gets details about the publisher of the announcements.<br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// Returns: Status code CampaignNotFound if the campaign does not exist.<br/>
+    /// </summary>
+    public const string GetCampaignPublishedAnnouncements = "usp_PublicBoardAnnouncementsGetForCampaign";
 }
