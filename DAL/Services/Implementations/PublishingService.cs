@@ -61,7 +61,7 @@ public class PublishingService : IPublishingService
         return (param.Get<CustomStatusCode>("returnVal"), result);
     }
 
-    public async Task<CustomStatusCode> PublishAnnouncement(Announcement announcement, Guid campaignGuid)
+    public async Task<(CustomStatusCode, Guid)> PublishAnnouncement(Announcement announcement, Guid campaignGuid)
     {
         var param = new DynamicParameters(new
         {
@@ -72,10 +72,11 @@ public class PublishingService : IPublishingService
         });
 
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        param.Add("newAnnouncementGuid", dbType: DbType.Guid, direction: ParameterDirection.Output);
 
         await _dbAccess.ModifyData(StoredProcedureNames.PublishAnnouncement, param);
 
-        return param.Get<CustomStatusCode>("returnVal");
+        return (param.Get<CustomStatusCode>("returnVal"), param.Get<Guid>("newAnnouncementGuid"));
     }
     
     public async Task<CustomStatusCode> UnpublishAnnouncement(Guid? announcementGuid)
