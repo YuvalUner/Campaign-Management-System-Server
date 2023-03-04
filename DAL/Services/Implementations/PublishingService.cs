@@ -60,4 +60,52 @@ public class PublishingService : IPublishingService
 
         return (param.Get<CustomStatusCode>("returnVal"), result);
     }
+
+    public async Task<(CustomStatusCode, Guid)> PublishAnnouncement(Announcement announcement, Guid campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            announcement.AnnouncementTitle,
+            announcement.AnnouncementContent,
+            announcement.PublisherId,
+            campaignGuid
+        });
+
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        param.Add("newAnnouncementGuid", dbType: DbType.Guid, direction: ParameterDirection.Output);
+
+        await _dbAccess.ModifyData(StoredProcedureNames.PublishAnnouncement, param);
+
+        return (param.Get<CustomStatusCode>("returnVal"), param.Get<Guid>("newAnnouncementGuid"));
+    }
+    
+    public async Task<CustomStatusCode> UnpublishAnnouncement(Guid? announcementGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            announcementGuid
+        });
+
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+        await _dbAccess.ModifyData(StoredProcedureNames.UnpublishAnnouncement, param);
+
+        return param.Get<CustomStatusCode>("returnVal");
+    }
+    
+    public async Task<(CustomStatusCode, IEnumerable<AnnouncementWithPublisherDetails>)> GetCampaignAnnouncements(Guid? campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid
+        });
+
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+        var result =
+            await _dbAccess.GetData<AnnouncementWithPublisherDetails, DynamicParameters>(
+                StoredProcedureNames.GetCampaignPublishedAnnouncements, param);
+
+        return (param.Get<CustomStatusCode>("returnVal"), result);
+    }
 }

@@ -28,4 +28,28 @@ public interface IPublishingService
     /// <returns>Status code CampaignNotFound if the campaign does not exist.</returns>
     Task<(CustomStatusCode, IEnumerable<PublishedEventWithPublisher>)> GetCampaignPublishedEvents(
         Guid? campaignGuid);
+
+    /// <summary>
+    /// Publishes an announcement by adding it to the published announcements table.
+    /// </summary>
+    /// <param name="announcement">An Announcement object with at-least the content, title and publisher id fields filled.</param>
+    /// <param name="campaignGuid">Guid of the campaign the announcement is related to.</param>
+    /// <returns>In item 1: Status code CampaignNotFound if the campaign does not exist, UserNotFound if publisher id is not a valid user.<br/>
+    /// In item 2: Guid of new announcements. Empty Guid if stored procedure failed.</returns>
+    Task<(CustomStatusCode, Guid)> PublishAnnouncement(Announcement announcement, Guid campaignGuid);
+
+    /// <summary>
+    /// Unpublishes an announcement by removing it from the published announcements table.
+    /// </summary>
+    /// <param name="announcementGuid">The Guid of the announcement to remove.</param>
+    /// <returns>Status code AnnouncementNotFound if the announcement does not exist.</returns>
+    Task<CustomStatusCode> UnpublishAnnouncement(Guid? announcementGuid);
+
+    /// <summary>
+    /// Gets all published announcements for a campaign, along with the user who published them.
+    /// </summary>
+    /// <param name="campaignGuid">The Guid of the campaign to get announcements for.</param>
+    /// <returns>Status code CampaignNotFound if the campaign does not exist.</returns>
+    Task<(CustomStatusCode, IEnumerable<AnnouncementWithPublisherDetails>)>
+        GetCampaignAnnouncements(Guid? campaignGuid);
 }

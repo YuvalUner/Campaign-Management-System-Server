@@ -34,6 +34,13 @@ public class PublishingServiceTests
         EventGuid = Guid.Parse("736019CC-5125-4DA4-8E6B-A07E79464993")
     };
     
+    static Announcement _testAnnouncement = new Announcement()
+    {
+        AnnouncementTitle = "Test Announcement",
+        AnnouncementContent = "Test Announcement Content",
+        PublisherId = _testUser.UserId
+    };
+    
     public PublishingServiceTests()
     {
         _configuration = new ConfigurationBuilder().
@@ -51,6 +58,19 @@ public class PublishingServiceTests
         
         // Act
         var (statusCode, res) = _publishingService.GetCampaignPublishedEvents(_testCampaign.CampaignGuid).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, statusCode);
+        Assert.Empty(res);
+    }
+    
+    [Fact, TestPriority(1)]
+    public void GetCampaignPublishedAnnouncements_ShouldReturnEmptyList_ForNoEventsYet()
+    {
+        // Arrange
+        
+        // Act
+        var (statusCode, res) = _publishingService.GetCampaignAnnouncements(_testCampaign.CampaignGuid).Result;
         
         // Assert
         Assert.Equal(CustomStatusCode.Ok, statusCode);
@@ -158,6 +178,83 @@ public class PublishingServiceTests
         Assert.Empty(res);
     }
     
+    [Fact, TestPriority(4)]
+    public void PublishAnnouncementShouldWork()
+    {
+        // Arrange
+
+        // Act
+        var (statusCode, newGuid) = _publishingService.PublishAnnouncement(_testAnnouncement, _testCampaign.CampaignGuid.Value).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, statusCode);
+        Assert.NotEqual(Guid.Empty, newGuid);
+        _testAnnouncement.AnnouncementGuid = newGuid;
+    }
+    
+    [Fact, TestPriority(4)]
+    public void PublishAnnouncementShouldFail_ForInvalidCampaignGuid()
+    {
+        // Arrange
+
+        // Act
+        var (statusCode, newGuid) = _publishingService.PublishAnnouncement(_testAnnouncement, Guid.Empty).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.CampaignNotFound, statusCode);
+        Assert.Equal(Guid.Empty, newGuid);
+    }
+    
+    [Fact, TestPriority(4)]
+    public void PublishAnnouncementShouldFail_ForInvalidPublisherId()
+    {
+        // Arrange
+        var failedPublishingAnnouncement = new Announcement()
+        {
+            AnnouncementTitle = "Test Announcement",
+            AnnouncementContent = "Test Announcement Content",
+            PublisherId = 0
+        };
+
+        // Act
+        var (statusCode, newGuid) = _publishingService.PublishAnnouncement(failedPublishingAnnouncement, _testCampaign.CampaignGuid.Value).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.UserNotFound, statusCode);
+        Assert.Equal(Guid.Empty, newGuid);
+    }
+    
+    [Fact, TestPriority(5)]
+    public void GetCampaignPublishedAnnouncementsShouldWork()
+    {
+        // Arrange
+
+        // Act
+        var (statusCode, res) = _publishingService.GetCampaignAnnouncements(_testCampaign.CampaignGuid.Value).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, statusCode);
+        Assert.Single(res);
+        Assert.Equal(_testAnnouncement.AnnouncementGuid, res.First().AnnouncementGuid);
+        Assert.Equal(_testAnnouncement.AnnouncementTitle, res.First().AnnouncementTitle);
+        Assert.Equal(_testAnnouncement.AnnouncementContent, res.First().AnnouncementContent);
+        Assert.Equal(_testUser.Email, res.First().Email);
+        Assert.Equal(_testCampaign.CampaignGuid, res.First().CampaignGuid);
+    }
+    
+    [Fact, TestPriority(5)]
+    public void GetCampaignPublishedAnnouncementsShouldFail_ForInvalidCampaignGuid()
+    {
+        // Arrange
+
+        // Act
+        var (statusCode, res) = _publishingService.GetCampaignAnnouncements(Guid.Empty).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.CampaignNotFound, statusCode);
+        Assert.Empty(res);
+    }
+    
     [Fact, TestPriority(100)]
     public void UnpublishEventShouldWork()
     {
@@ -180,5 +277,55 @@ public class PublishingServiceTests
         
         // Assert
         Assert.Equal(CustomStatusCode.EventNotFound, result);
+    }
+    
+    [Fact, TestPriority(101)]
+    public void GetEventsForCampaign_ShouldReturnEmptyList_AfterUnpublishing()
+    {
+        // Arrange
+
+        // Act
+        var (statusCode, res) = _publishingService.GetCampaignPublishedEvents(_testCampaign.CampaignGuid).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, statusCode);
+        Assert.Empty(res);
+    }
+    
+    [Fact, TestPriority(100)]
+    public void UnpublishAnnouncementShouldWork()
+    {
+        // Arrange
+
+        // Act
+        var result = _publishingService.UnpublishAnnouncement(_testAnnouncement.AnnouncementGuid.Value).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, result);
+    }
+    
+    [Fact, TestPriority(101)]
+    public void UnpublishAnnouncementShouldFail_ForRemovingAlreadyUnpublishedAnnouncement()
+    {
+        // Arrange
+
+        // Act
+        var result = _publishingService.UnpublishAnnouncement(_testAnnouncement.AnnouncementGuid.Value).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.AnnouncementNotFound, result);
+    }
+
+    [Fact, TestPriority(101)]
+    public void GetCampaignPublishedAnnouncements_ShouldReturnEmptyList_AfterUnpublishing()
+    {
+        // Arrange
+
+        // Act
+        var (statusCode, res) = _publishingService.GetCampaignAnnouncements(_testCampaign.CampaignGuid).Result;
+
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, statusCode);
+        Assert.Empty(res);
     }
 }
