@@ -62,6 +62,11 @@ public static class ErrorMessages
     public const string ManagerAlreadyExists = "User is already your manager";
     public const string EventAlreadyPublished = "Event is already published";
     public const string EventNotAssociatedToCampaign = "Event is not associated to any campaign and can not be published";
+    public const string AnnouncementTitleRequired = "Announcement title is required";
+    public const string AnnouncementContentRequired = "Announcement content is required";
+    public const string AnnouncementTitleTooLong = "Announcement title must be 100 characters or less";
+    public const string AnnouncementContentTooLong = "Announcement content must be 4000 characters or less";
+    public const string AnnouncementNotFound = "Announcement not found";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {
