@@ -3,7 +3,8 @@
 /// <summary>
 /// A collection of all the stored procedure names used in the app.<br/>
 /// For the values of the status codes returned by the stored procedures, see <see cref="CustomStatusCode"/>.<br/>
-/// Stored procedures that return a status code return it as the return value of the stored procedure.
+/// Stored procedures that return a status code upon failure return it as the return value of the stored procedure.<br/>
+/// Successful stored procedures return 0, which is the Ok status code.
 /// </summary>
 public static class StoredProcedureNames
 {
