@@ -52,4 +52,5 @@ public enum CustomStatusCode
     TooManyValuesProvided = 50019,
     EventAlreadyFull = 50020,
     IncorrectEventType = 50021,
+    AnnouncementNotFound = 50022,
 }
