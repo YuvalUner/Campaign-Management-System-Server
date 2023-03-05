@@ -667,4 +667,37 @@ public static class StoredProcedureNames
     /// Returns: Status code CampaignNotFound if the campaign does not exist.<br/>
     /// </summary>
     public const string GetCampaignPublishedAnnouncements = "usp_PublicBoardAnnouncementsGetForCampaign";
+    
+    /// <summary>
+    /// Adds a new user preference to the database.<br/>
+    /// Params: userId (int), campaignGuid (Guid), isPreferred (bool) - set to true if the user wants to prioritize updates
+    /// from this campaign, and false if the user wants to avoid updates from this campaign.<br/>
+    /// Returns: Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist,
+    /// DuplicateKey if the user already has a preference for this campaign.<br/>
+    /// </summary>
+    public const string AddUserPreference = "usp_UserPreferenceAdd";
+    
+    /// <summary>
+    /// Removes a user preference from the database.<br/>
+    /// Params: userId (int), campaignGuid (Guid).<br/>
+    /// Returns: Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist,
+    /// PreferenceNotFound if the user does not have a preference for this campaign.<br/>
+    /// </summary>
+    public const string DeleteUserPreference = "usp_UserPreferenceDelete";
+    
+    /// <summary>
+    /// Updates a user preference in the database.<br/>
+    /// Params: userId (int), campaignGuid (Guid), isPreferred (bool) - set to true if the user wants to prioritize updates, 
+    /// and false if the user wants to avoid updates.<br/>
+    /// Returns: Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist,
+    /// PreferenceNotFound if the user does not have a preference for this campaign.<br/>
+    /// </summary>
+    public const string UpdateUserPreference = "usp_UserPreferenceUpdate";
+    
+    /// <summary>
+    /// Gets the list of user preferences from the database, including the campaign name, logo and campaign guid.<br/>
+    /// Params: userId (int).<br/>
+    /// Returns: Status code UserNotFound if the user does not exist.<br/>
+    /// </summary>
+    public const string GetUserPreferences = "usp_UserPreferenceGet";
 }
