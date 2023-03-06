@@ -50,9 +50,9 @@ public class PublicBoardService: IPublicBoardService
             (StoredProcedureNames.SearchPublishedEvents, searchParams);
     }
     
-    public async Task<IEnumerable<AnnouncementWithPublisherDetails>> SearchAnnouncements(AnnouncementSearchParams searchParams)
+    public async Task<IEnumerable<AnnouncementWithPublisherDetails>> SearchAnnouncements(AnnouncementsSearchParams searchParams)
     {
-        return await _dbAccess.GetData<AnnouncementWithPublisherDetails, AnnouncementSearchParams>
+        return await _dbAccess.GetData<AnnouncementWithPublisherDetails, AnnouncementsSearchParams>
             (StoredProcedureNames.SearchPublishedAnnouncements, searchParams);
     }
 }

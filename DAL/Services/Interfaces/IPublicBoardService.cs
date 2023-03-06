@@ -37,8 +37,8 @@ public interface IPublicBoardService
     /// <summary>
     /// Searches published announcements according to the given parameters.
     /// </summary>
-    /// <param name="searchParams">The search parameters to use. For specification, see <see cref="AnnouncementSearchParams"/>.
+    /// <param name="searchParams">The search parameters to use. For specification, see <see cref="AnnouncementsSearchParams"/>.
     /// All fields left null will be ignored.</param>
     /// <returns></returns>
-    Task<IEnumerable<AnnouncementWithPublisherDetails>> SearchAnnouncements(AnnouncementSearchParams searchParams);
+    Task<IEnumerable<AnnouncementWithPublisherDetails>> SearchAnnouncements(AnnouncementsSearchParams searchParams);
 }

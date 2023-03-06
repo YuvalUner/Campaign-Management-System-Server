@@ -1,6 +1,6 @@
 ﻿namespace DAL.Models;
 
-public class AnnouncementSearchParams
+public class AnnouncementsSearchParams
 {
     public Guid? CampaignGuid { get; set; }
     public string? CampaignName { get; set; }
