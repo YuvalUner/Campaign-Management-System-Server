@@ -718,4 +718,26 @@ public static class StoredProcedureNames
     /// Params: userId (int), limit (int) - optional, how many rows to return, defaults to 50.<br/>
     /// </summary>
     public const string GetPublishedAnnouncementsByUserPreferences = "usp_PublicBoardAnnouncementsGetForUserByPreferences";
+    
+    /// <summary>
+    /// Searches for published events by the given parameters.<br/>
+    /// Params: @campaignGuid uniqueidentifier, @campaignName nvarchar(200), @campaignCity nvarchar(100),
+    /// @publishingDate datetime, @eventName nvarchar(200), @publisherFirstName nvarchar(200), @publisherLastName nvarchar(200),
+    /// @eventLocation nvarchar(100), @eventStartTime datetime, @eventEndTime datetime <br/>
+    /// All parameters are optional, and if they are not provided, they are ignored.<br/>
+    /// The parameters are written like this because I could not be bothered to write them one by one, instead I just
+    /// copied the parameters from the stored procedure.<br/>
+    /// </summary>
+    public const string SearchPublishedEvents = "usp_PublicBoardEventsSearch";
+    
+    /// <summary>
+    /// Searches for published announcements by the given parameters.<br/>
+    /// Params: @campaignGuid uniqueidentifier, @campaignName nvarchar(200), @campaignCity nvarchar(100),
+    /// @publishingDate datetime, @announcementTitle nvarchar(100), @publisherFirstName nvarchar(200),
+    /// @publisherLastName nvarchar(200)<br/>
+    /// All parameters are optional, and if they are not provided, they are ignored.<br/>
+    /// The parameters are written like this because I could not be bothered to write them one by one, instead I just
+    /// copied the parameters from the stored procedure.<br/>
+    /// </summary>
+    public const string SearchPublishedAnnouncements = "usp_PublicBoardAnnouncementsSearch";
 }
