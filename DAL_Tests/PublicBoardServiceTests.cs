@@ -464,7 +464,7 @@ public class PublicBoardServiceTests
     public void SearchPublishedAnnouncements_ShouldReturnAnnouncements_ForCorrectCampaignGuid()
     {
         // Arrange
-        var AnnouncementsSearchParams = new AnnouncementSearchParams()
+        var AnnouncementsSearchParams = new AnnouncementsSearchParams()
         {
             CampaignGuid = _preferredCampaign.CampaignGuid
         };
@@ -481,7 +481,7 @@ public class PublicBoardServiceTests
     public void SearchPublishedAnnouncements_ShouldReturnAnnouncements_ForCorrectPublisherFirstName()
     {
         // Arrange
-        var AnnouncementsSearchParams = new AnnouncementSearchParams()
+        var AnnouncementsSearchParams = new AnnouncementsSearchParams()
         {
             PublisherFirstName = _testUser.FirstNameHeb
         };
@@ -498,7 +498,7 @@ public class PublicBoardServiceTests
     public void SearchPublishedAnnouncements_ShouldReturnEmpty_ForWrongPublisherFirstName()
     {
         // Arrange
-        var AnnouncementsSearchParams = new AnnouncementSearchParams()
+        var AnnouncementsSearchParams = new AnnouncementsSearchParams()
         {
             PublisherFirstName = "wrong search string"
         };
@@ -514,7 +514,7 @@ public class PublicBoardServiceTests
     public void SearchPublishedAnnouncements_ShouldReturnAnnouncements_ForCorrectPublisherLastName()
     {
         // Arrange
-        var AnnouncementsSearchParams = new AnnouncementSearchParams()
+        var AnnouncementsSearchParams = new AnnouncementsSearchParams()
         {
             PublisherLastName = _testUser.LastNameHeb
         };
@@ -531,7 +531,7 @@ public class PublicBoardServiceTests
     public void SearchPublishedAnnouncements_ShouldReturnEmpty_ForWrongPublisherLastName()
     {
         // Arrange
-        var AnnouncementsSearchParams = new AnnouncementSearchParams()
+        var AnnouncementsSearchParams = new AnnouncementsSearchParams()
         {
             PublisherLastName = "wrong search string"
         };
@@ -547,7 +547,7 @@ public class PublicBoardServiceTests
     public void SearchPublishedAnnouncements_ShouldReturnEmpty_ForWrongCampaignGuid()
     {
         // Arrange
-        var AnnouncementsSearchParams = new AnnouncementSearchParams()
+        var AnnouncementsSearchParams = new AnnouncementsSearchParams()
         {
             CampaignGuid = Guid.Empty
         };
@@ -563,7 +563,7 @@ public class PublicBoardServiceTests
     public void SearchPublishedAnnouncements_ShouldReturnAnnouncements_ForCorrectAnnouncementTitle()
     {
         // Arrange
-        var AnnouncementsSearchParams = new AnnouncementSearchParams()
+        var AnnouncementsSearchParams = new AnnouncementsSearchParams()
         {
             AnnouncementTitle = _testAnnouncement.AnnouncementTitle
         };
@@ -580,7 +580,7 @@ public class PublicBoardServiceTests
     public void SearchPublishedAnnouncements_ShouldReturnEmpty_ForWrongAnnouncementTitle()
     {
         // Arrange
-        var AnnouncementsSearchParams = new AnnouncementSearchParams()
+        var AnnouncementsSearchParams = new AnnouncementsSearchParams()
         {
             AnnouncementTitle = "wrong search string"
         };
@@ -596,7 +596,7 @@ public class PublicBoardServiceTests
     public void SearchPublishedAnnouncements_ShouldReturnAnnouncements_ForCorrectPublishingDate()
     {
         // Arrange
-        var AnnouncementsSearchParams = new AnnouncementSearchParams()
+        var AnnouncementsSearchParams = new AnnouncementsSearchParams()
         {
             PublishingDate = _testEventPublishingDate
         };
@@ -613,7 +613,7 @@ public class PublicBoardServiceTests
     public void SearchPublishedAnnouncements_ShouldReturnEmpty_ForWrongPublishingDate()
     {
         // Arrange
-        var AnnouncementsSearchParams = new AnnouncementSearchParams()
+        var AnnouncementsSearchParams = new AnnouncementsSearchParams()
         {
             PublishingDate = DateTime.Parse("01/01/1900")
         };
@@ -661,7 +661,7 @@ public class PublicBoardServiceTests
     public void SearchPublishedAnnouncements_ShouldReturnAnnouncements_ForCorrectCampaignCity()
     {
         // Arrange
-        var AnnouncementsSearchParams = new AnnouncementSearchParams()
+        var AnnouncementsSearchParams = new AnnouncementsSearchParams()
         {
             CampaignCity = _preferredCampaign.CityName
         };
@@ -677,7 +677,7 @@ public class PublicBoardServiceTests
     public void SearchPublishedAnnouncements_ShouldReturnEmpty_ForWrongCampaignCity()
     {
         // Arrange
-        var AnnouncementsSearchParams = new AnnouncementSearchParams()
+        var AnnouncementsSearchParams = new AnnouncementsSearchParams()
         {
             CampaignCity = "wrong search string"
         };
