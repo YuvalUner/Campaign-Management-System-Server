@@ -667,4 +667,77 @@ public static class StoredProcedureNames
     /// Returns: Status code CampaignNotFound if the campaign does not exist.<br/>
     /// </summary>
     public const string GetCampaignPublishedAnnouncements = "usp_PublicBoardAnnouncementsGetForCampaign";
+    
+    /// <summary>
+    /// Adds a new user preference to the database.<br/>
+    /// Params: userId (int), campaignGuid (Guid), isPreferred (bool) - set to true if the user wants to prioritize updates
+    /// from this campaign, and false if the user wants to avoid updates from this campaign.<br/>
+    /// Returns: Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist,
+    /// DuplicateKey if the user already has a preference for this campaign.<br/>
+    /// </summary>
+    public const string AddUserPreference = "usp_UserPreferenceAdd";
+    
+    /// <summary>
+    /// Removes a user preference from the database.<br/>
+    /// Params: userId (int), campaignGuid (Guid).<br/>
+    /// Returns: Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist,
+    /// PreferenceNotFound if the user does not have a preference for this campaign.<br/>
+    /// </summary>
+    public const string DeleteUserPreference = "usp_UserPreferenceDelete";
+    
+    /// <summary>
+    /// Updates a user preference in the database.<br/>
+    /// Params: userId (int), campaignGuid (Guid), isPreferred (bool) - set to true if the user wants to prioritize updates, 
+    /// and false if the user wants to avoid updates.<br/>
+    /// Returns: Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist,
+    /// PreferenceNotFound if the user does not have a preference for this campaign.<br/>
+    /// </summary>
+    public const string UpdateUserPreference = "usp_UserPreferenceUpdate";
+    
+    /// <summary>
+    /// Gets the list of user preferences from the database, including the campaign name, logo and campaign guid.<br/>
+    /// Params: userId (int).<br/>
+    /// Returns: Status code UserNotFound if the user does not exist.<br/>
+    /// </summary>
+    public const string GetUserPreferences = "usp_UserPreferenceGet";
+    
+    /// <summary>
+    /// Gets published events for a specific user, based on their preferences.<br/>
+    /// Events are ordered such that events from preferred campaigns are returned first, followed by events from
+    /// other campaigns, and all are ordered by publishing date.<br/>
+    /// Events from avoided campaigns are filtered out.<br/>
+    /// Params: userId (int), limit (int) - optional, how many rows to return, defaults to 50.<br/>
+    /// </summary>
+    public const string GetPublishedEventsByUserPreferences = "usp_PublicBoardEventsGetForUserByPreferences";
+    
+    /// <summary>
+    /// Gets published announcements for a specific user, based on their preferences.<br/>
+    /// Announcements are ordered such that announcements from preferred campaigns are returned first, followed by
+    /// other campaigns, and all are ordered by publishing date.<br/>
+    /// Announcements from avoided campaigns are filtered out.<br/>
+    /// Params: userId (int), limit (int) - optional, how many rows to return, defaults to 50.<br/>
+    /// </summary>
+    public const string GetPublishedAnnouncementsByUserPreferences = "usp_PublicBoardAnnouncementsGetForUserByPreferences";
+    
+    /// <summary>
+    /// Searches for published events by the given parameters.<br/>
+    /// Params: @campaignGuid uniqueidentifier, @campaignName nvarchar(200), @campaignCity nvarchar(100),
+    /// @publishingDate datetime, @eventName nvarchar(200), @publisherFirstName nvarchar(200), @publisherLastName nvarchar(200),
+    /// @eventLocation nvarchar(100), @eventStartTime datetime, @eventEndTime datetime <br/>
+    /// All parameters are optional, and if they are not provided, they are ignored.<br/>
+    /// The parameters are written like this because I could not be bothered to write them one by one, instead I just
+    /// copied the parameters from the stored procedure.<br/>
+    /// </summary>
+    public const string SearchPublishedEvents = "usp_PublicBoardEventsSearch";
+    
+    /// <summary>
+    /// Searches for published announcements by the given parameters.<br/>
+    /// Params: @campaignGuid uniqueidentifier, @campaignName nvarchar(200), @campaignCity nvarchar(100),
+    /// @publishingDate datetime, @announcementTitle nvarchar(100), @publisherFirstName nvarchar(200),
+    /// @publisherLastName nvarchar(200)<br/>
+    /// All parameters are optional, and if they are not provided, they are ignored.<br/>
+    /// The parameters are written like this because I could not be bothered to write them one by one, instead I just
+    /// copied the parameters from the stored procedure.<br/>
+    /// </summary>
+    public const string SearchPublishedAnnouncements = "usp_PublicBoardAnnouncementsSearch";
 }

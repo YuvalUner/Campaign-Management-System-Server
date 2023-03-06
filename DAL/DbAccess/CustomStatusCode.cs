@@ -53,4 +53,5 @@ public enum CustomStatusCode
     EventAlreadyFull = 50020,
     IncorrectEventType = 50021,
     AnnouncementNotFound = 50022,
+    PreferenceNotFound = 50023,
 }
