@@ -43,4 +43,16 @@ public class PublicBoardService: IPublicBoardService
         return await _dbAccess.GetData<AnnouncementWithPublisherDetails, DynamicParameters>
             (StoredProcedureNames.GetPublishedAnnouncementsByUserPreferences, param);
     }
+
+    public async Task<IEnumerable<PublishedEventWithPublisher>> SearchEvents(EventsSearchParams searchParams)
+    {
+        return await _dbAccess.GetData<PublishedEventWithPublisher, EventsSearchParams>
+            (StoredProcedureNames.SearchPublishedEvents, searchParams);
+    }
+    
+    public async Task<IEnumerable<AnnouncementWithPublisherDetails>> SearchAnnouncements(AnnouncementSearchParams searchParams)
+    {
+        return await _dbAccess.GetData<AnnouncementWithPublisherDetails, AnnouncementSearchParams>
+            (StoredProcedureNames.SearchPublishedAnnouncements, searchParams);
+    }
 }

@@ -25,4 +25,20 @@ public interface IPublicBoardService
     /// <param name="limit">How many rows to get. Keep null to get 50.</param>
     /// <returns></returns>
     Task<IEnumerable<AnnouncementWithPublisherDetails>> GetAnnouncementsForUser(int? userId, int? limit);
+
+    /// <summary>
+    /// Searches published events according to the given parameters.
+    /// </summary>
+    /// <param name="searchParams">The search parameters to use. For specification, see <see cref="EventsSearchParams"/>. 
+    /// All fields left null will be ignored.</param>
+    /// <returns></returns>
+    Task<IEnumerable<PublishedEventWithPublisher>> SearchEvents(EventsSearchParams searchParams);
+
+    /// <summary>
+    /// Searches published announcements according to the given parameters.
+    /// </summary>
+    /// <param name="searchParams">The search parameters to use. For specification, see <see cref="AnnouncementSearchParams"/>.
+    /// All fields left null will be ignored.</param>
+    /// <returns></returns>
+    Task<IEnumerable<AnnouncementWithPublisherDetails>> SearchAnnouncements(AnnouncementSearchParams searchParams);
 }
