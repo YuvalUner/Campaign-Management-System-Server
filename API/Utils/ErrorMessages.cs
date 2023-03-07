@@ -67,6 +67,7 @@ public static class ErrorMessages
     public const string AnnouncementTitleTooLong = "Announcement title must be 100 characters or less";
     public const string AnnouncementContentTooLong = "Announcement content must be 4000 characters or less";
     public const string AnnouncementNotFound = "Announcement not found";
+    public const string NotificationSettingsRequired = "Notification settings are required and can not both be false";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {

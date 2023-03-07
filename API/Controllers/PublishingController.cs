@@ -4,6 +4,7 @@ using DAL.Models;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RestAPIServices;
 using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
@@ -17,11 +18,76 @@ public class PublishingController : Controller
     private readonly ILogger<PublishingController> _logger;
     private readonly int _maxAnnouncementTitleLength = 100;
     private readonly int _maxAnnouncementContentLength = 4000;
-    
-    public PublishingController(IPublishingService publishingService, ILogger<PublishingController> logger)
+    private readonly ICampaignsService _campaignsService;
+    private readonly ISmsMessageSendingService _smsMessageSendingService;
+    private readonly IEmailSendingService _emailSendingService;
+    private readonly IPublicBoardService _publicBoardService;
+    private readonly IEventsService _eventsService;
+
+    public PublishingController(IPublishingService publishingService, ILogger<PublishingController> logger,
+        ICampaignsService campaignsService, ISmsMessageSendingService smsMessageSendingService,
+        IEmailSendingService emailSendingService, IPublicBoardService publicBoardService, IEventsService eventsService)
     {
         _publishingService = publishingService;
         _logger = logger;
+        _campaignsService = campaignsService;
+        _smsMessageSendingService = smsMessageSendingService;
+        _emailSendingService = emailSendingService;
+        _publicBoardService = publicBoardService;
+        _eventsService = eventsService;
+    }
+
+    private async Task SendEventPublishedNotification(NotificationUponPublishSettingsForCampaign settings,
+        EventWithCreatorDetails eventInfo, string? senderName)
+    {
+        if (settings.ViaEmail == true)
+        {
+            await _emailSendingService.SendEventPublishedEmailAsync(
+                eventInfo.EventName,
+                eventInfo.EventLocation,
+                eventInfo.EventStartTime,
+                eventInfo.EventEndTime,
+                settings.Email,
+                senderName
+            );
+        }
+        
+        if (settings.ViaSms == true)
+        {
+            await _smsMessageSendingService.SendEventPublishedMessageAsync(
+                eventInfo.EventName,
+                eventInfo.EventLocation,
+                eventInfo.EventStartTime,
+                eventInfo.EventEndTime,
+                settings.PhoneNumber,
+                senderName,
+                CountryCodes.Israel
+            );
+        }
+    }
+
+    private async Task SendAnnouncementPublishedNotification(NotificationUponPublishSettingsForCampaign settings,
+        Announcement announcement, string? senderName)
+    {
+        if (settings.ViaEmail == true)
+        {
+            await _emailSendingService.SendAnnouncementPublishedEmailAsync(
+                announcement.AnnouncementTitle,
+                announcement.AnnouncementContent,
+                settings.Email,
+                senderName
+            );
+        }
+
+        if (settings.ViaSms == true)
+        {
+            await _smsMessageSendingService.SendAnnouncementPublishedMessageAsync(
+                announcement.AnnouncementTitle,
+                settings.PhoneNumber,
+                senderName,
+                CountryCodes.Israel
+            );
+        }
     }
     
     [HttpPost("publish-event/{eventGuid:guid}/{campaignGuid:guid}")]
@@ -44,15 +110,27 @@ public class PublishingController : Controller
             
             var result = await _publishingService.PublishEvent(eventGuid, userId);
 
-            return result switch
+            switch (result)
             {
-                CustomStatusCode.EventNotFound => NotFound(FormatErrorMessage(EventNotFound, result)),
-                CustomStatusCode.DuplicateKey => BadRequest(FormatErrorMessage(EventAlreadyPublished, result)),
-                CustomStatusCode.IncorrectEventType => BadRequest(FormatErrorMessage(EventNotAssociatedToCampaign,
-                    result)),
-                CustomStatusCode.UserNotFound => NotFound(FormatErrorMessage(UserNotFound, result)),
-                _ => Ok()
+                case CustomStatusCode.EventNotFound:
+                    return NotFound(FormatErrorMessage(EventNotFound, result));
+                case CustomStatusCode.DuplicateKey:
+                    return BadRequest(FormatErrorMessage(EventAlreadyPublished, result));
+                case CustomStatusCode.IncorrectEventType:
+                    return BadRequest(FormatErrorMessage(EventNotAssociatedToCampaign, result));
             };
+
+            var campaignInfo = await _campaignsService.GetCampaignBasicInfo(campaignGuid);
+            var userSettings = await _publicBoardService.GetNotificationSettingsForCampaign(campaignGuid);
+            var eventInfo = await _eventsService.GetEvent(eventGuid);
+
+            // Send notifications to all users who have subscribed to notifications for this campaign
+            foreach (var settings in userSettings)
+            {
+                SendEventPublishedNotification(settings, eventInfo, campaignInfo.CampaignName);
+            }
+            
+            return Ok();
         }
         catch (Exception e)
         {
@@ -208,12 +286,24 @@ public class PublishingController : Controller
             
             var (statusCode, newAnnouncementGuid) = await _publishingService.PublishAnnouncement(announcement, campaignGuid);
 
-            return statusCode switch
+            switch (statusCode)
             {
-                CustomStatusCode.CampaignNotFound => NotFound(FormatErrorMessage(CampaignNotFound, statusCode)),
-                CustomStatusCode.UserNotFound => NotFound(FormatErrorMessage(UserNotFound, statusCode)),
-                _ => Ok(newAnnouncementGuid)
+                case CustomStatusCode.CampaignNotFound:
+                    return NotFound(FormatErrorMessage(CampaignNotFound, statusCode));
+                case CustomStatusCode.UserNotFound:
+                    return NotFound(FormatErrorMessage(UserNotFound, statusCode));
             };
+
+            var campaignInfo = await _campaignsService.GetCampaignBasicInfo(campaignGuid);
+            var userSettings = await _publicBoardService.GetNotificationSettingsForCampaign(campaignGuid);
+            
+            // Send a notification to all users who have the "Receive notifications for new announcements" setting enabled
+            foreach (var settings in userSettings)
+            {
+                SendAnnouncementPublishedNotification(settings, announcement, campaignInfo.CampaignName);
+            }
+            
+            return Ok(newAnnouncementGuid);
         }
         catch (Exception e)
         {
