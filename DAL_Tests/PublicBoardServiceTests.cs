@@ -19,6 +19,12 @@ public class PublicBoardServiceTests
         FirstNameHeb = "יובל",
         LastNameHeb = "אונר",
     };
+
+    private static readonly User _testUser2 = new User()
+    {
+        UserId = 53,
+        Email = "bbb"
+    };
     
     private static readonly Campaign _preferredCampaign = new Campaign()
     {
@@ -49,6 +55,14 @@ public class PublicBoardServiceTests
     private static Announcement _testAnnouncement = new Announcement()
     {
         AnnouncementTitle = "Test"
+    };
+
+    private static NotificationUponPublishSettings _settings = new NotificationUponPublishSettings()
+    {
+        ViaEmail = true,
+        ViaSms = true,
+        UserId = _testUser2.UserId,
+        CampaignGuid = _preferredCampaign.CampaignGuid
     };
 
     public PublicBoardServiceTests()
@@ -688,4 +702,306 @@ public class PublicBoardServiceTests
         // Assert
         Assert.Empty(res);
     }
-}
+
+    [Fact, TestPriority(35)]
+    public void GetNotificationSettingsForUser_ShouldReturnEmpty_ForNoNotificationSettingsYet()
+    {
+        // Arrange
+        
+        // Act
+        var res = _publicBoardService.GetNotificationSettingsForUser(_testUser2.UserId).Result;
+        
+        // Assert
+        Assert.Empty(res);
+    }
+    
+    [Fact, TestPriority(36)]
+    public void GetNotificationSettingsForCampaign_ShouldReturnEmpty_ForNoNotificationSettingsYet()
+    {
+        // Arrange
+        
+        // Act
+        var res = _publicBoardService.GetNotificationSettingsForCampaign(_preferredCampaign.CampaignGuid.Value).Result;
+        
+        // Assert
+        Assert.Empty(res);
+    }
+
+    [Fact, TestPriority(37)]
+    public void AddNotificationSettingsForUser_ShouldWork()
+    {
+        // Arrange
+        
+        // Act
+        var res = _publicBoardService.AddNotificationSettings(_settings).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, res);
+    }
+
+    [Fact, TestPriority(38)]
+    public void AddNotificationSettingsForUser_ShouldFailForWrongUserId()
+    {
+        // Arrange
+        var settings = new NotificationUponPublishSettings()
+        {
+            UserId = -1,
+            CampaignGuid = _preferredCampaign.CampaignGuid.Value,
+            ViaSms = true,
+            ViaEmail = true
+        };
+        
+        // Act
+        var res = _publicBoardService.AddNotificationSettings(settings).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.UserNotFound, res);
+    }
+    
+    [Fact, TestPriority(39)]
+    public void AddNotificationSettingsForUser_ShouldFailForWrongCampaignGuid()
+    {
+        // Arrange
+        var settings = new NotificationUponPublishSettings()
+        {
+            UserId = _testUser2.UserId,
+            CampaignGuid = Guid.Empty,
+            ViaSms = true,
+            ViaEmail = true
+        };
+        
+        // Act
+        var res = _publicBoardService.AddNotificationSettings(settings).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.CampaignNotFound, res);
+    }
+    
+    [Fact, TestPriority(40)]
+    public void GetNotificationSettingsForUser_ShouldReturnSettings_ForCorrectUserId()
+    {
+        // Arrange
+        
+        // Act
+        var res = _publicBoardService.GetNotificationSettingsForUser(_testUser2.UserId).Result;
+        
+        // Assert
+        Assert.NotEmpty(res);
+        Assert.All(res, x =>
+        {
+            Assert.Equal(_preferredCampaign.CampaignGuid, x.CampaignGuid);
+            Assert.Equal(true, x.ViaSms);
+            Assert.Equal(true, x.ViaEmail);
+        });
+    }
+    
+    [Fact, TestPriority(41)]
+    public void GetNotificationSettingsForCampaign_ShouldReturnSettings_ForCorrectCampaignGuid()
+    {
+        // Arrange
+        
+        // Act
+        var res = _publicBoardService.GetNotificationSettingsForCampaign(_preferredCampaign.CampaignGuid.Value).Result;
+        
+        // Assert
+        Assert.NotEmpty(res);
+        Assert.All(res, x =>
+        {
+            Assert.Equal(_testUser2.Email, x.Email);
+            Assert.Equal(true, x.ViaSms);
+            Assert.Equal(true, x.ViaEmail);
+        });
+    }
+    
+    [Fact, TestPriority(42)]
+    public void UpdateNotificationSettings_ShouldWork()
+    {
+        // Arrange
+        var settings = new NotificationUponPublishSettings()
+        {
+            UserId = _testUser2.UserId,
+            CampaignGuid = _preferredCampaign.CampaignGuid.Value,
+            ViaSms = true,
+            ViaEmail = false
+        };
+        
+        // Act
+        var res = _publicBoardService.UpdateNotificationSettings(settings).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, res);
+        _settings = settings;
+    }
+    
+    [Fact, TestPriority(43)]
+    public void UpdateNotificationSettings_ShouldFailForWrongUserId()
+    {
+        // Arrange
+        var settings = new NotificationUponPublishSettings()
+        {
+            UserId = -1,
+            CampaignGuid = _preferredCampaign.CampaignGuid.Value,
+            ViaSms = true,
+            ViaEmail = false
+        };
+        
+        // Act
+        var res = _publicBoardService.UpdateNotificationSettings(settings).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.UserNotFound, res);
+    }
+    
+    [Fact, TestPriority(44)]
+    public void UpdateNotificationSettings_ShouldFailForWrongCampaignGuid()
+    {
+        // Arrange
+        var settings = new NotificationUponPublishSettings()
+        {
+            UserId = _testUser2.UserId,
+            CampaignGuid = Guid.Empty,
+            ViaSms = true,
+            ViaEmail = false
+        };
+        
+        // Act
+        var res = _publicBoardService.UpdateNotificationSettings(settings).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.CampaignNotFound, res);
+    }
+    
+    [Fact, TestPriority(45)]
+    public void GetNotificationSettingsForUser_ShouldReturnUpdatedSettings_ForCorrectUserId()
+    {
+        // Arrange
+        
+        // Act
+        var res = _publicBoardService.GetNotificationSettingsForUser(_testUser2.UserId).Result;
+        
+        // Assert
+        Assert.NotEmpty(res);
+        Assert.All(res, x =>
+        {
+            Assert.Equal(_preferredCampaign.CampaignGuid, x.CampaignGuid);
+            Assert.Equal(true, x.ViaSms);
+            Assert.Equal(false, x.ViaEmail);
+        });
+    }
+    
+    [Fact, TestPriority(46)]
+    public void GetNotificationSettingsForCampaign_ShouldReturnUpdatedSettings_ForCorrectCampaignGuid()
+    {
+        // Arrange
+        
+        // Act
+        var res = _publicBoardService.GetNotificationSettingsForCampaign(_preferredCampaign.CampaignGuid.Value).Result;
+        
+        // Assert
+        Assert.NotEmpty(res);
+        Assert.All(res, x =>
+        {
+            Assert.Equal(_testUser2.Email, x.Email);
+            Assert.Equal(true, x.ViaSms);
+            Assert.Equal(false, x.ViaEmail);
+        });
+    }
+
+    [Fact, TestPriority(47)]
+    public void GetNotificationSettingsForUser_ShouldReturnEmpty_ForWrongUserId()
+    {
+        // Arrange
+        
+        // Act
+        var res = _publicBoardService.GetNotificationSettingsForUser(-1).Result;
+        
+        // Assert
+        Assert.Empty(res);
+    }
+    
+    [Fact, TestPriority(48)]
+    public void GetNotificationSettingsForCampaign_ShouldReturnEmpty_ForWrongCampaignGuid()
+    {
+        // Arrange
+        
+        // Act
+        var res = _publicBoardService.GetNotificationSettingsForCampaign(Guid.Empty).Result;
+        
+        // Assert
+        Assert.Empty(res);
+    }
+    
+    [Fact, TestPriority(49)]
+    public void DeleteNotificationSettings_ShouldWork()
+    {
+        // Arrange
+        
+        // Act
+        var res = _publicBoardService.RemoveNotificationSettings(_settings).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.Ok, res);
+    }
+    
+    [Fact, TestPriority(50)]
+    public void DeleteNotificationSettings_ShouldFailForWrongUserId()
+    {
+        // Arrange
+        var settings = new NotificationUponPublishSettings()
+        {
+            UserId = -1,
+            CampaignGuid = _preferredCampaign.CampaignGuid.Value,
+            ViaSms = true,
+            ViaEmail = false
+        };
+        
+        // Act
+        var res = _publicBoardService.RemoveNotificationSettings(settings).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.UserNotFound, res);
+    }
+    
+    [Fact, TestPriority(51)]
+    public void DeleteNotificationSettings_ShouldFailForWrongCampaignGuid()
+    {
+        // Arrange
+        var settings = new NotificationUponPublishSettings()
+        {
+            UserId = _testUser2.UserId,
+            CampaignGuid = Guid.Empty,
+            ViaSms = true,
+            ViaEmail = false
+        };
+        
+        // Act
+        var res = _publicBoardService.RemoveNotificationSettings(settings).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.CampaignNotFound, res);
+    }
+    
+    [Fact, TestPriority(52)]
+    public void GetNotificationSettingsForUserAfterDelete_ShouldReturnEmpty_ForCorrectUserId()
+    {
+        // Arrange
+        
+        // Act
+        var res = _publicBoardService.GetNotificationSettingsForUser(_testUser2.UserId).Result;
+        
+        // Assert
+        Assert.Empty(res);
+    }
+
+    [Fact, TestPriority(53)]
+    public void GetNotificationSettingsForCampaignAfterDelete_ShouldReturnEmpty_ForCorrectCampaignGuid()
+    {
+        // Arrange
+
+        // Act
+        var res = _publicBoardService.GetNotificationSettingsForCampaign(_preferredCampaign.CampaignGuid.Value).Result;
+
+        // Assert
+        Assert.Empty(res);
+    }
+}   
