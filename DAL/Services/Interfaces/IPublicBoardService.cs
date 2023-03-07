@@ -1,4 +1,5 @@
-﻿using DAL.Models;
+﻿using DAL.DbAccess;
+using DAL.Models;
 
 namespace DAL.Services.Interfaces;
 
@@ -41,4 +42,42 @@ public interface IPublicBoardService
     /// All fields left null will be ignored.</param>
     /// <returns></returns>
     Task<IEnumerable<AnnouncementWithPublisherDetails>> SearchAnnouncements(AnnouncementsSearchParams searchParams);
+
+    /// <summary>
+    /// Adds a new notification settings entry for a user.
+    /// </summary>
+    /// <param name="settings">An instance of <see cref="NotificationUponPublishSettings"/> containing the settings required,
+    /// as well as the user id and campaign Guid.</param>
+    /// <returns>Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist.</returns>
+    Task<CustomStatusCode> AddNotificationSettings(NotificationUponPublishSettings settings);
+
+    /// <summary>
+    /// Removes a notification settings entry for a user.
+    /// </summary>
+    /// <param name="settings">An instance of <see cref="NotificationUponPublishSettings"/> with userId and campaignGuid filled in.</param>
+    /// <returns>Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist.</returns>
+    Task<CustomStatusCode> RemoveNotificationSettings(NotificationUponPublishSettings settings);
+
+    /// <summary>
+    /// Updates an existing notification settings entry for a user.
+    /// </summary>
+    /// <param name="settings">An instance of <see cref="NotificationUponPublishSettings"/> containing the settings required.</param>
+    /// <returns>Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist.</returns>
+    Task<CustomStatusCode> UpdateNotificationSettings(NotificationUponPublishSettings settings);
+
+    /// <summary>
+    /// Gets the notification settings for a user.
+    /// </summary>
+    /// <param name="userId">User id of the user to get the settings for.</param>
+    /// <returns>A list of <see cref="NotificationUponPublishSettingsForUser"/> with the information about each campaign
+    /// the user is subscribed to.</returns>
+    Task<IEnumerable<NotificationUponPublishSettingsForUser>> GetNotificationSettingsForUser(int userId);
+
+    /// <summary>
+    /// Gets the notification settings of every user subscribed to a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">The campaign to get the settings for.</param>
+    /// <returns>A list of <see cref="NotificationUponPublishSettingsForCampaign"/> that includes the name and contact info
+    /// of each user.</returns>
+    Task<IEnumerable<NotificationUponPublishSettingsForCampaign>> GetNotificationSettingsForCampaign(Guid campaignGuid);
 }
