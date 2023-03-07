@@ -706,7 +706,8 @@ public static class StoredProcedureNames
     /// Events are ordered such that events from preferred campaigns are returned first, followed by events from
     /// other campaigns, and all are ordered by publishing date.<br/>
     /// Events from avoided campaigns are filtered out.<br/>
-    /// Params: userId (int), limit (int) - optional, how many rows to return, defaults to 50.<br/>
+    /// Params: userId (int), limit (int) - optional, how many rows to return, defaults to 50,
+    /// offset (int) - optional, how many rows to skip before fetching limit number of rows, defaults to 0.<br/>
     /// </summary>
     public const string GetPublishedEventsByUserPreferences = "usp_PublicBoardEventsGetForUserByPreferences";
     
@@ -715,7 +716,8 @@ public static class StoredProcedureNames
     /// Announcements are ordered such that announcements from preferred campaigns are returned first, followed by
     /// other campaigns, and all are ordered by publishing date.<br/>
     /// Announcements from avoided campaigns are filtered out.<br/>
-    /// Params: userId (int), limit (int) - optional, how many rows to return, defaults to 50.<br/>
+    /// Params: userId (int), limit (int) - optional, how many rows to return, defaults to 50,
+    /// offset (int) - optional, how many rows to skip before fetching limit number of rows, defaults to 0.<br/>
     /// </summary>
     public const string GetPublishedAnnouncementsByUserPreferences = "usp_PublicBoardAnnouncementsGetForUserByPreferences";
     
