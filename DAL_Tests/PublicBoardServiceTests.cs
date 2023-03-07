@@ -81,7 +81,7 @@ public class PublicBoardServiceTests
         // Arrange
         
         // Act
-        var res = _publicBoardService.GetEventsForUser(null, null).Result;
+        var res = _publicBoardService.GetEventsForUser(null, null, null).Result;
         var resList = res.ToList();
         
         // Assert
@@ -106,7 +106,7 @@ public class PublicBoardServiceTests
         // Arrange
         
         // Act
-        var res = _publicBoardService.GetEventsForUser(_testUser.UserId, null).Result;
+        var res = _publicBoardService.GetEventsForUser(_testUser.UserId, null, null).Result;
         var resList = res.ToList();
         
         // Assert
@@ -148,7 +148,7 @@ public class PublicBoardServiceTests
         // Arrange
         
         // Act
-        var res = _publicBoardService.GetAnnouncementsForUser(null, null).Result;
+        var res = _publicBoardService.GetAnnouncementsForUser(null, null, null).Result;
         var resList = res.ToList();
         
         // Assert
@@ -173,7 +173,7 @@ public class PublicBoardServiceTests
         // Arrange
         
         // Act
-        var res = _publicBoardService.GetAnnouncementsForUser(_testUser.UserId, null).Result;
+        var res = _publicBoardService.GetAnnouncementsForUser(_testUser.UserId, null, null).Result;
         var resList = res.ToList();
         
         // Assert

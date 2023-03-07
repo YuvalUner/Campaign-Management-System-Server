@@ -15,7 +15,7 @@ public class PublicBoardService: IPublicBoardService
         _dbAccess = dbAccess;
     }
 
-    public async Task<IEnumerable<PublishedEventWithPublisher>> GetEventsForUser(int? userId, int? limit)
+    public async Task<IEnumerable<PublishedEventWithPublisher>> GetEventsForUser(int? userId, int? limit, int? offset)
     {
         var param = new DynamicParameters(new
         {
@@ -25,12 +25,16 @@ public class PublicBoardService: IPublicBoardService
         {
             param.Add("limit", limit);
         }
+        if (offset.HasValue)
+        {
+            param.Add("offset", offset);
+        }
 
         return await _dbAccess.GetData<PublishedEventWithPublisher, DynamicParameters>
             (StoredProcedureNames.GetPublishedEventsByUserPreferences, param);
     }
 
-    public async Task<IEnumerable<AnnouncementWithPublisherDetails>> GetAnnouncementsForUser(int? userId, int? limit)
+    public async Task<IEnumerable<AnnouncementWithPublisherDetails>> GetAnnouncementsForUser(int? userId, int? limit, int? offset)
     {
         var param = new DynamicParameters(new
         {
@@ -39,6 +43,10 @@ public class PublicBoardService: IPublicBoardService
         if (limit.HasValue)
         {
             param.Add("limit", limit);
+        }
+        if (offset.HasValue)
+        {
+            param.Add("offset", offset);
         }
         
         return await _dbAccess.GetData<AnnouncementWithPublisherDetails, DynamicParameters>

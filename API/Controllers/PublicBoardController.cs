@@ -23,14 +23,19 @@ public class PublicBoardController: Controller
     }
     
     [HttpGet("public-board")]
-    public async Task<IActionResult> GetPersonalizedPublicBoard([FromQuery] int? limit)
+    public async Task<IActionResult> GetPersonalizedPublicBoard([FromQuery] int? limit, [FromQuery] int? offset)
     {
         try
         {
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
+
+            if (offset is null or < 0)
+            {
+                offset = 0;
+            }
             
-            var events = await _publicBoardService.GetEventsForUser(userId, limit);
-            var announcements = await _publicBoardService.GetAnnouncementsForUser(userId, limit);
+            var events = await _publicBoardService.GetEventsForUser(userId, limit, offset);
+            var announcements = await _publicBoardService.GetAnnouncementsForUser(userId, limit, offset);
             
             return Ok(new {events, announcements});
         }
