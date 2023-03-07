@@ -706,7 +706,8 @@ public static class StoredProcedureNames
     /// Events are ordered such that events from preferred campaigns are returned first, followed by events from
     /// other campaigns, and all are ordered by publishing date.<br/>
     /// Events from avoided campaigns are filtered out.<br/>
-    /// Params: userId (int), limit (int) - optional, how many rows to return, defaults to 50.<br/>
+    /// Params: userId (int), limit (int) - optional, how many rows to return, defaults to 50,
+    /// offset (int) - optional, how many rows to skip before fetching limit number of rows, defaults to 0.<br/>
     /// </summary>
     public const string GetPublishedEventsByUserPreferences = "usp_PublicBoardEventsGetForUserByPreferences";
     
@@ -715,7 +716,8 @@ public static class StoredProcedureNames
     /// Announcements are ordered such that announcements from preferred campaigns are returned first, followed by
     /// other campaigns, and all are ordered by publishing date.<br/>
     /// Announcements from avoided campaigns are filtered out.<br/>
-    /// Params: userId (int), limit (int) - optional, how many rows to return, defaults to 50.<br/>
+    /// Params: userId (int), limit (int) - optional, how many rows to return, defaults to 50,
+    /// offset (int) - optional, how many rows to skip before fetching limit number of rows, defaults to 0.<br/>
     /// </summary>
     public const string GetPublishedAnnouncementsByUserPreferences = "usp_PublicBoardAnnouncementsGetForUserByPreferences";
     
@@ -740,4 +742,27 @@ public static class StoredProcedureNames
     /// copied the parameters from the stored procedure.<br/>
     /// </summary>
     public const string SearchPublishedAnnouncements = "usp_PublicBoardAnnouncementsSearch";
+    
+    /// <summary>
+    /// Modifies the notification settings for notifications upon a campaign publishing something for a user.<br/>
+    /// Params: userId (int), campaignGuid (Guid), viaEmail (bool), viaSms (bool).<br/>
+    /// To delete a notification setting, set both viaEmail and viaSms to false.<br/>
+    /// Otherwise, if at-least one of them is true, the notification setting will be added or updated.<br/>
+    /// Returns: Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist.<br/>
+    /// </summary>
+    public const string ModifyUserNotificationSettingsOnPublish = "usp_UserPublishNotificationSettingsModify";
+    
+    /// <summary>
+    /// Gets the notification settings for notifying a user upon a campaign publishing something, for all users
+    /// subscribed to the campaign. Also gets their name and contact info, for ease of use.<br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// </summary>
+    public const string GetUserNotificationSettingsOnPublishForCampaign = "usp_UsersPublishNotificationSettingsGetForCampaign";
+    
+    /// <summary>
+    /// Gets the notification settings for notifying a user upon a campaign publishing something, for a specific user.
+    /// Also gets the basic, public info of the campaign.<br/>
+    /// Params: userId (int).<br/>
+    /// </summary>
+    public const string GetUserNotificationSettingsOnPublishForUser = "usp_UserPublishNotificationSettingsGet";
 }

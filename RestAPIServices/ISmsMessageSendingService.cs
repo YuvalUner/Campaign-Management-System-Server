@@ -121,4 +121,29 @@ public interface ISmsMessageSendingService
     /// <returns></returns>
     Task SendEventUpdatedMessageAsync(string? eventName, string? eventLocation,
         DateTime? startTime, DateTime? endTime, string? phoneNumber, string? senderName, CountryCodes countryCode);
+
+    /// <summary>
+    /// Sends a standard event published message to the phone number.
+    /// </summary>
+    /// <param name="eventName"></param>
+    /// <param name="eventLocation"></param>
+    /// <param name="startTime"></param>
+    /// <param name="endTime"></param>
+    /// <param name="phoneNumber"></param>
+    /// <param name="senderName"></param>
+    /// <param name="countryCode"></param>
+    /// <returns></returns>
+    Task SendEventPublishedMessageAsync(string? eventName, string? eventLocation,
+        DateTime? startTime, DateTime? endTime, string? phoneNumber, string? senderName, CountryCodes countryCode);
+
+    /// <summary>
+    /// Sends a standard announcement created message to the phone number.
+    /// </summary>
+    /// <param name="announcementTitle"></param>
+    /// <param name="phoneNumber"></param>
+    /// <param name="senderName"></param>
+    /// <param name="countryCode"></param>
+    /// <returns></returns>
+    Task SendAnnouncementPublishedMessageAsync(string? announcementTitle, string? phoneNumber,
+        string? senderName, CountryCodes countryCode);
 }

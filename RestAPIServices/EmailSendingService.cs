@@ -170,4 +170,34 @@ public class EmailSendingService : IEmailSendingService
         }
         await SendEmailAsync(emailTo, subject, message, senderName);
     }
+
+    public async Task SendEventPublishedEmailAsync(string? eventName, string? eventLocation,
+        DateTime? startTime, DateTime? endTime, string? emailTo, string? senderName)
+    {
+        string subject = $"Event published";
+        string message = $"Event name: {eventName} \n";
+        if (eventLocation != null)
+        {
+            message += $"Location: {eventLocation} \n";
+        }
+        if (startTime != null)
+        {
+            message += $"Start time: {startTime} \n";
+        }
+        if (endTime != null)
+        {
+            message += $"End time: {endTime} \n";
+        }
+        await SendEmailAsync(emailTo, subject, message, senderName);
+    }
+
+    public async Task SendAnnouncementPublishedEmailAsync(string? announcementTitle, string? announcementContent,
+        string? emailTo, string? senderName)
+    {
+        string subject = $"Announcement published";
+        string message = $"Announcement title: {announcementTitle} \n";
+        message += $"Announcement content: {announcementContent} \n";
+        
+        await SendEmailAsync(emailTo, subject, message, senderName);
+    }
 }
