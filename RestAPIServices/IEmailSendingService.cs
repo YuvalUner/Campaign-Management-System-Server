@@ -94,4 +94,29 @@ public interface IEmailSendingService
     /// <returns></returns>
     Task SendEventUpdatedEmailAsync(string? eventName, string? eventLocation,
         DateTime? startTime, DateTime? endTime, string? emailTo, string? senderName);
+
+    /// <summary>
+    /// Sends a standard event published notification to the email address.
+    /// </summary>
+    /// <param name="eventName"></param>
+    /// <param name="eventLocation"></param>
+    /// <param name="startTime"></param>
+    /// <param name="endTime"></param>
+    /// <param name="emailTo"></param>
+    /// <param name="senderName"></param>
+    /// <returns></returns>
+    Task SendEventPublishedEmailAsync(string? eventName, string? eventLocation,
+        DateTime? startTime, DateTime? endTime, string? emailTo, string? senderName);
+
+
+    /// <summary>
+    /// Sends a standard announcement created notification to the email address.
+    /// </summary>
+    /// <param name="announcementTitle"></param>
+    /// <param name="announcementContent"></param>
+    /// <param name="emailTo"></param>
+    /// <param name="senderName"></param>
+    /// <returns></returns>
+    Task SendAnnouncementPublishedEmailAsync(string? announcementTitle, string? announcementContent,
+        string? emailTo, string? senderName);
 }
