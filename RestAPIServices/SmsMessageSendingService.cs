@@ -260,4 +260,37 @@ public class SmsMessageSendingService : ISmsMessageSendingService
         }
         await SendSmsMessageAsync(phoneNumber, message);
     }
+
+    public async Task SendEventPublishedMessageAsync(string? eventName, string? eventLocation,
+        DateTime? startTime, DateTime? endTime, string? phoneNumber, string? senderName, CountryCodes countryCode)
+    {
+        phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
+            .Transform(phoneNumber);
+        
+        string message = $"{senderName}'s event {eventName} published \n";
+        if (eventLocation != null)
+        {
+            message += $"Location: {eventLocation} \n";
+        }
+        if (startTime != null)
+        {
+            message += $"Start time: {startTime} \n";
+        }
+        if (endTime != null)
+        {
+            message += $"End time: {endTime} \n";
+        }
+        await SendSmsMessageAsync(phoneNumber, message);
+    }
+
+    public async Task SendAnnouncementPublishedMessageAsync(string? announcementTitle, string? phoneNumber,
+        string? senderName, CountryCodes countryCode)
+    {
+        phoneNumber = PhoneNumberTransformer.Create().CleanPhoneNumber().AddCountryCode(countryCode, true)
+            .Transform(phoneNumber);
+        
+        string message = $"""{senderName}'s new announcement "{announcementTitle}" published""";
+        
+        await SendSmsMessageAsync(phoneNumber, message);
+    }
 }
