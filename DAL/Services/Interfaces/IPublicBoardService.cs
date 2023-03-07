@@ -13,9 +13,10 @@ public interface IPublicBoardService
     /// </summary>
     /// <param name="userId">Id of the user to match the preferences to. Keep null to not take preferences into account.</param>
     /// <param name="limit">How many rows to get. Keep null to get 50.</param>
+    /// <param name="offset">Row offset. Used to "scroll" the feed. Keep null for offset 0.</param>
     /// <returns></returns>
-    Task<IEnumerable<PublishedEventWithPublisher>> GetEventsForUser(int? userId, int? limit);
-    
+    Task<IEnumerable<PublishedEventWithPublisher>> GetEventsForUser(int? userId, int? limit, int? offset);
+
     /// <summary>
     /// Gets published announcements for a specific user, based on their preferences.<br/>
     /// Announcements are ordered such that announcements from preferred campaigns are returned first, followed by
@@ -24,8 +25,9 @@ public interface IPublicBoardService
     /// </summary>
     /// <param name="userId">Id of the user to match the preferences to. Keep null to not take preferences into account.</param>
     /// <param name="limit">How many rows to get. Keep null to get 50.</param>
+    /// <param name="offset">Row offset. Used to "scroll" the feed. Keep null for offset 0.</param>
     /// <returns></returns>
-    Task<IEnumerable<AnnouncementWithPublisherDetails>> GetAnnouncementsForUser(int? userId, int? limit);
+    Task<IEnumerable<AnnouncementWithPublisherDetails>> GetAnnouncementsForUser(int? userId, int? limit, int? offset);
 
     /// <summary>
     /// Searches published events according to the given parameters.
