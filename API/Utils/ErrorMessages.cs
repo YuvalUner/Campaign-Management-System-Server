@@ -71,6 +71,8 @@ public static class ErrorMessages
     public const string TooManyFinancialTypes = "Too many financial types in campaign - you may not have over 100";
     public const string FinancialTypeNotFound = "Financial type not found";
     public const string CanNotModifyThisType = "You can not modify this type in any way";
+    public const string InvalidFinancialTypeName = "Financial type name must not be empty or over 100 characters";
+    public const string InvalidFinancialTypeDescription = "Financial type description must not be over 300 characters";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {

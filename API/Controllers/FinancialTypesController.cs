@@ -11,12 +11,15 @@ namespace API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class FinancialTypesController: Controller
+public class FinancialTypesController : Controller
 {
     private readonly IFinancialTypesService _financialTypesService;
     private readonly ILogger<FinancialTypesController> _logger;
+    private readonly int _maxFinancialTypeTitleLength = 100;
+    private readonly int _maxFinancialTypeDescriptionLength = 300;
 
-    public FinancialTypesController(IFinancialTypesService financialTypesService, ILogger<FinancialTypesController> logger)
+    public FinancialTypesController(IFinancialTypesService financialTypesService,
+        ILogger<FinancialTypesController> logger)
     {
         _financialTypesService = financialTypesService;
         _logger = logger;
@@ -37,9 +40,9 @@ public class FinancialTypesController: Controller
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
-            
+
             var financialTypes = await _financialTypesService.GetFinancialTypes(campaignGuid);
-            
+
             return Ok(financialTypes);
         }
         catch (Exception e)
@@ -48,23 +51,36 @@ public class FinancialTypesController: Controller
             return StatusCode(500, "Error while getting financial types for campaign");
         }
     }
-    
+
     [HttpPost("create/{campaignGuid:guid}")]
     public async Task<IActionResult> CreateFinancialType(Guid campaignGuid, FinancialType financialType)
     {
         try
         {
             if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
-                new Permission()
-                {
-                    PermissionTarget = PermissionTargets.Financial,
-                    PermissionType = PermissionTypes.Edit
-                }))
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.Financial,
+                        PermissionType = PermissionTypes.Edit
+                    }))
             {
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
-            
+
+            // Validate the user input
+            if (string.IsNullOrWhiteSpace(financialType.TypeName) ||
+                financialType.TypeName.Length > _maxFinancialTypeTitleLength)
+            {
+                return BadRequest(FormatErrorMessage(InvalidFinancialTypeName, CustomStatusCode.IllegalValue));
+            }
+
+            if (financialType.TypeDescription != null &&
+                financialType.TypeDescription.Length > _maxFinancialTypeDescriptionLength)
+            {
+                return BadRequest(FormatErrorMessage(InvalidFinancialTypeDescription, CustomStatusCode.IllegalValue));
+            }
+
             var (statusCode, typeGuid) = await _financialTypesService.CreateFinancialType(financialType);
 
             return statusCode switch
@@ -81,28 +97,42 @@ public class FinancialTypesController: Controller
             return StatusCode(500, "Error while creating financial type");
         }
     }
-    
+
     [HttpPut("update/{campaignGuid:guid}")]
     public async Task<IActionResult> UpdateFinancialType(Guid campaignGuid, FinancialType financialType)
     {
         try
         {
             if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
-                new Permission()
-                {
-                    PermissionTarget = PermissionTargets.Financial,
-                    PermissionType = PermissionTypes.Edit
-                }))
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.Financial,
+                        PermissionType = PermissionTypes.Edit
+                    }))
             {
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
             
+            // Validate the user input
+            if (string.IsNullOrWhiteSpace(financialType.TypeName) ||
+                financialType.TypeName.Length > _maxFinancialTypeTitleLength)
+            {
+                return BadRequest(FormatErrorMessage(InvalidFinancialTypeName, CustomStatusCode.IllegalValue));
+            }
+
+            if (financialType.TypeDescription != null &&
+                financialType.TypeDescription.Length > _maxFinancialTypeDescriptionLength)
+            {
+                return BadRequest(FormatErrorMessage(InvalidFinancialTypeDescription, CustomStatusCode.IllegalValue));
+            }
+
             var statusCode = await _financialTypesService.UpdateFinancialType(financialType);
 
             return statusCode switch
             {
-                CustomStatusCode.FinancialTypeNotFound => NotFound(FormatErrorMessage(FinancialTypeNotFound, statusCode)),
+                CustomStatusCode.FinancialTypeNotFound => NotFound(
+                    FormatErrorMessage(FinancialTypeNotFound, statusCode)),
                 CustomStatusCode.SqlIllegalValue => NotFound(FormatErrorMessage(CanNotModifyThisType, statusCode)),
                 _ => Ok()
             };
@@ -113,28 +143,29 @@ public class FinancialTypesController: Controller
             return StatusCode(500, "Error while updating financial type");
         }
     }
-    
+
     [HttpDelete("delete/{campaignGuid:guid}/{typeGuid:guid}")]
     public async Task<IActionResult> DeleteFinancialType(Guid campaignGuid, Guid typeGuid)
     {
         try
         {
             if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
-                new Permission()
-                {
-                    PermissionTarget = PermissionTargets.Financial,
-                    PermissionType = PermissionTypes.Edit
-                }))
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.Financial,
+                        PermissionType = PermissionTypes.Edit
+                    }))
             {
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
-            
+
             var statusCode = await _financialTypesService.DeleteFinancialType(typeGuid);
 
             return statusCode switch
             {
-                CustomStatusCode.FinancialTypeNotFound => NotFound(FormatErrorMessage(FinancialTypeNotFound, statusCode)),
+                CustomStatusCode.FinancialTypeNotFound => NotFound(
+                    FormatErrorMessage(FinancialTypeNotFound, statusCode)),
                 CustomStatusCode.SqlIllegalValue => NotFound(FormatErrorMessage(CanNotModifyThisType, statusCode)),
                 _ => Ok()
             };
