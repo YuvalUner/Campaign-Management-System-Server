@@ -236,7 +236,7 @@ public class EventsController : Controller
             // User is always added as a participant to their own event.
             _eventsService.AddEventParticipant(eventGuid.Value, userId.Value);
 
-            return Ok(eventGuid);
+            return Ok(new {eventGuid});
         }
         catch (Exception e)
         {
@@ -294,7 +294,7 @@ public class EventsController : Controller
             // User is always added as a watcher to the events they create for a campaign.
             _eventsService.AddEventWatcher(userId.Value, eventGuid);
 
-            return Ok(eventGuid);
+            return Ok(new {eventGuid});
         }
         catch (Exception e)
         {
@@ -912,9 +912,9 @@ public class EventsController : Controller
             }
 
             // If all the above checks pass, then the user is authorized to get the participants.
-            var participants = await _eventsService.GetEventParticipants(eventGuid);
+            var (statusCode, participants) = await _eventsService.GetEventParticipants(eventGuid);
 
-            return Ok(participants.Item2);
+            return Ok(participants);
         }
         catch (Exception e)
         {
@@ -947,9 +947,9 @@ public class EventsController : Controller
             }
 
             // If all the above checks pass, then the user is authorized to get the participants.
-            var participants = await _eventsService.GetEventParticipants(eventGuid);
+            var (statusCode, participants) = await _eventsService.GetEventParticipants(eventGuid);
 
-            return Ok(participants.Item2);
+            return Ok(participants);
         }
         catch (Exception e)
         {
@@ -1003,7 +1003,7 @@ public class EventsController : Controller
             }
 
 
-            return Ok(eventGuid);
+            return Ok(new {eventGuid});
 
         }
         catch (Exception e)

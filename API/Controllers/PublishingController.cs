@@ -303,7 +303,7 @@ public class PublishingController : Controller
                 SendAnnouncementPublishedNotification(settings, announcement, campaignInfo.CampaignName);
             }
             
-            return Ok(newAnnouncementGuid);
+            return Ok(new {newAnnouncementGuid});
         }
         catch (Exception e)
         {

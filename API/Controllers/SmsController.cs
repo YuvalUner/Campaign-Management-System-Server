@@ -64,7 +64,7 @@ public class SmsController: Controller
             // This is not awaited on purpose - it can take a long time, and we don't want not have reason to wait for it.
             _smsMessageService.SendSmsMessageToMultiplePhones(smsSendingParams, newMessageId, CountryCodes.Israel);
             
-            return Ok(newMessageGuid);
+            return Ok(new {newMessageGuid});
         }
         catch (Exception e)
         {
