@@ -779,14 +779,16 @@ public static class StoredProcedureNames
     /// Updates an existing financial type's name and description.<br/>
     /// Params: typeGuid (Guid), typeName (string) - optional, typeDescription (string) - optional. Only provided
     /// parameters will be updated.<br/>
-    /// Returns: Status code FinancialTypeNotFound if the financial type does not exist.<br/>
+    /// Returns: Status code FinancialTypeNotFound if the financial type does not exist, SqlIllegalValue if the user
+    /// tried to delete a built in type.<br/>
     /// </summary>
     public const string UpdateFinancialType = "usp_FinancialTypeUpdate";
     
     /// <summary>
     /// Deletes an existing financial type.<br/>
     /// Params: typeGuid (Guid).<br/>
-    /// Returns: Status code FinancialTypeNotFound if the financial type does not exist.<br/>
+    /// Returns: Status code FinancialTypeNotFound if the financial type does not exist, SqlIllegalValue if the user
+    /// tried to delete a built in type.<br/>
     /// </summary>
     public const string DeleteFinancialType = "usp_FinancialTypeDelete";
     
