@@ -55,4 +55,5 @@ public enum CustomStatusCode
     AnnouncementNotFound = 50022,
     PreferenceNotFound = 50023,
     FinancialTypeNotFound = 50024,
+    SqlIllegalValue = 50025,
 }

@@ -1,11 +1,12 @@
 ﻿using System.Data;
 using DAL.DbAccess;
 using DAL.Models;
+using DAL.Services.Interfaces;
 using Dapper;
 
 namespace DAL.Services.Implementations;
 
-public class FinancialTypesService
+public class FinancialTypesService: IFinancialTypesService
 {
     private readonly IGenericDbAccess _dbAccess;
 
