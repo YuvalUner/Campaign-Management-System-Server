@@ -66,7 +66,7 @@ public class JobsController : Controller
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
             
             var jobGuid = await _jobsService.AddJob(job, campaignGuid, userId);
-            return Ok(jobGuid);
+            return Ok(new {jobGuid});
         }
         catch (Exception e)
         {

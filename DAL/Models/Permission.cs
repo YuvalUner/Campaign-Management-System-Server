@@ -26,19 +26,22 @@ public static class PermissionTargets
     public const string Sms = "SMS";
     public const string Events = "Events";
     public const string Publishing = "Publishing";
+    public const string Financial = "Financial";
 
-    private static readonly string[] All =  { 
-        CampaignSettings, 
+    private static readonly string[] All =
+    {
+        CampaignSettings,
         Permissions,
         VotersLedger,
         CampaignUsersList,
-        CampaignRolesList, 
+        CampaignRolesList,
         CampaignRoles,
         Jobs,
         JobTypes,
         Sms,
         Events,
-        Publishing
+        Publishing,
+        Financial
     };
 
     public static bool IsValid(string screen)

@@ -68,6 +68,9 @@ public static class ErrorMessages
     public const string AnnouncementContentTooLong = "Announcement content must be 4000 characters or less";
     public const string AnnouncementNotFound = "Announcement not found";
     public const string NotificationSettingsRequired = "Notification settings are required and can not both be false";
+    public const string TooManyFinancialTypes = "Too many financial types in campaign - you may not have over 100";
+    public const string FinancialTypeNotFound = "Financial type not found";
+    public const string CanNotModifyThisType = "You can not modify this type in any way";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {
