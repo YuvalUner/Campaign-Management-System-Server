@@ -765,4 +765,35 @@ public static class StoredProcedureNames
     /// Params: userId (int).<br/>
     /// </summary>
     public const string GetUserNotificationSettingsOnPublishForUser = "usp_UserPublishNotificationSettingsGet";
+
+    /// <summary>
+    /// Adds a new financial type to the database for a campaign.<br/>
+    /// Params: campaignGuid (Guid), typeName (string), typeDescription (string), newTypeGuid (Guid) - the guid of the new
+    /// type, output parameter.<br/>
+    /// Returns: Status code CampaignNotFound if the campaign does not exist, TooManyEntries if the campaign already has
+    /// 100 financial types.<br/>
+    /// </summary>
+    public const string AddFinancialType = "usp_FinancialTypeAdd";
+    
+    /// <summary>
+    /// Updates an existing financial type's name and description.<br/>
+    /// Params: typeGuid (Guid), typeName (string) - optional, typeDescription (string) - optional. Only provided
+    /// parameters will be updated.<br/>
+    /// Returns: Status code FinancialTypeNotFound if the financial type does not exist.<br/>
+    /// </summary>
+    public const string UpdateFinancialType = "usp_FinancialTypeUpdate";
+    
+    /// <summary>
+    /// Deletes an existing financial type.<br/>
+    /// Params: typeGuid (Guid).<br/>
+    /// Returns: Status code FinancialTypeNotFound if the financial type does not exist.<br/>
+    /// </summary>
+    public const string DeleteFinancialType = "usp_FinancialTypeDelete";
+    
+    /// <summary>
+    /// Gets all financial types for a campaign.<br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// Returns: Status code CampaignNotFound if the campaign does not exist.<br/>
+    /// </summary>
+    public const string GetFinancialTypesForCampaign = "usp_FinancialTypesGetForCampaign";
 }
