@@ -77,6 +77,7 @@ public static class ErrorMessages
     public const string FinancialDataDescriptionTooLong = "Financial data description must not be over 500 characters";
     public const string IllegalAmount = "Amount must be greater than 0";
     public const string FinancialDataNotFound = "Financial data not found";
+    public const string UnknownError = "Unknown error, someone on the dev team forgot to add an error message for this situation";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {
