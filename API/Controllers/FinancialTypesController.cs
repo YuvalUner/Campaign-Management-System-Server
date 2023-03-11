@@ -11,6 +11,8 @@ namespace API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[Produces("application/json")]
+[Consumes("application/json")]
 public class FinancialTypesController : Controller
 {
     private readonly IFinancialTypesService _financialTypesService;
