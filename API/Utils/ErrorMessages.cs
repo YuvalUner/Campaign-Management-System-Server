@@ -68,6 +68,16 @@ public static class ErrorMessages
     public const string AnnouncementContentTooLong = "Announcement content must be 4000 characters or less";
     public const string AnnouncementNotFound = "Announcement not found";
     public const string NotificationSettingsRequired = "Notification settings are required and can not both be false";
+    public const string TooManyFinancialTypes = "Too many financial types in campaign - you may not have over 100";
+    public const string FinancialTypeNotFound = "Financial type not found";
+    public const string CanNotModifyThisType = "You can not modify this type in any way";
+    public const string InvalidFinancialTypeName = "Financial type name must not be empty or over 100 characters";
+    public const string InvalidFinancialTypeDescription = "Financial type description must not be over 300 characters";
+    public const string FinancialDataTitleTooLong = "Financial data title must not be over 50 characters";
+    public const string FinancialDataDescriptionTooLong = "Financial data description must not be over 500 characters";
+    public const string IllegalAmount = "Amount must be greater than 0";
+    public const string FinancialDataNotFound = "Financial data not found";
+    public const string UnknownError = "Unknown error, someone on the dev team forgot to add an error message for this situation";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {
