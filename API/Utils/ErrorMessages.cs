@@ -73,6 +73,10 @@ public static class ErrorMessages
     public const string CanNotModifyThisType = "You can not modify this type in any way";
     public const string InvalidFinancialTypeName = "Financial type name must not be empty or over 100 characters";
     public const string InvalidFinancialTypeDescription = "Financial type description must not be over 300 characters";
+    public const string FinancialDataTitleTooLong = "Financial data title must not be over 50 characters";
+    public const string FinancialDataDescriptionTooLong = "Financial data description must not be over 500 characters";
+    public const string IllegalAmount = "Amount must be greater than 0";
+    public const string FinancialDataNotFound = "Financial data not found";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {
