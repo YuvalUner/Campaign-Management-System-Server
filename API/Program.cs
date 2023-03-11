@@ -36,6 +36,8 @@ builder.Services.AddScoped<IEventsService, EventsService>();
 builder.Services.AddScoped<IScheduleManagersService, ScheduleManagersService>();
 builder.Services.AddScoped<IPublishingService, PublishingService>();
 builder.Services.AddScoped<IPublicBoardService, PublicBoardService>();
+builder.Services.AddScoped<IFinancialTypesService, FinancialTypesService>();
+builder.Services.AddScoped<IFinancialDataService, FinancialDataService>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", optionsBuilder => {

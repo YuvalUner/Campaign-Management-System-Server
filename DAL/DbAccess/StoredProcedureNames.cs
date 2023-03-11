@@ -765,4 +765,76 @@ public static class StoredProcedureNames
     /// Params: userId (int).<br/>
     /// </summary>
     public const string GetUserNotificationSettingsOnPublishForUser = "usp_UserPublishNotificationSettingsGet";
+
+    /// <summary>
+    /// Adds a new financial type to the database for a campaign.<br/>
+    /// Params: campaignGuid (Guid), typeName (string), typeDescription (string), newTypeGuid (Guid) - the guid of the new
+    /// type, output parameter.<br/>
+    /// Returns: Status code CampaignNotFound if the campaign does not exist, TooManyEntries if the campaign already has
+    /// 100 financial types.<br/>
+    /// </summary>
+    public const string AddFinancialType = "usp_FinancialTypeAdd";
+    
+    /// <summary>
+    /// Updates an existing financial type's name and description.<br/>
+    /// Params: typeGuid (Guid), typeName (string) - optional, typeDescription (string) - optional. Only provided
+    /// parameters will be updated.<br/>
+    /// Returns: Status code FinancialTypeNotFound if the financial type does not exist, SqlIllegalValue if the user
+    /// tried to delete a built in type.<br/>
+    /// </summary>
+    public const string UpdateFinancialType = "usp_FinancialTypeUpdate";
+    
+    /// <summary>
+    /// Deletes an existing financial type.<br/>
+    /// Params: typeGuid (Guid).<br/>
+    /// Returns: Status code FinancialTypeNotFound if the financial type does not exist, SqlIllegalValue if the user
+    /// tried to delete a built in type.<br/>
+    /// </summary>
+    public const string DeleteFinancialType = "usp_FinancialTypeDelete";
+    
+    /// <summary>
+    /// Gets all financial types for a campaign.<br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// Returns: Status code CampaignNotFound if the campaign does not exist.<br/>
+    /// </summary>
+    public const string GetFinancialTypesForCampaign = "usp_FinancialTypesGetForCampaign";
+    
+    /// <summary>
+    /// Adds a new financial data entry related to a campaign.<br/>
+    /// Params: campaignGuid (Guid), typeGuid (Guid), amount (decimal), isExpense (bit) - true if the amount is an expense,
+    /// false if it is an income, dateCreated (DateTime), dataDescription (string) - optional, dataTitle (string) - optional,
+    /// creatorUserId (int), newDataGuid (Guid) - output.<br/>
+    /// Returns: Status code CampaignNotFound if the campaign does not exist, FinancialTypeNotFound if the financial type
+    /// does not exist, UserNotFound if the user does not exist.<br/>
+    /// </summary>
+    public const string AddFinancialData = "usp_FinancialDataAdd";
+    
+    /// <summary>
+    /// Gets a summary - sum of income and expenses for each financial type - for a campaign.<br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// </summary>
+    public const string GetFinancialSummaryForCampaign = "usp_FinancialSummaryGetForCampaign";
+    
+    /// <summary>
+    /// Gets all financial data for a campaign, ordered by date.<br/>
+    /// Params: campaignGuid (Guid), typeGuid (Guid) - optional, if provided will only return for that type.<br/>
+    /// </summary>
+    public const string GetFinancialDataForCampaign = "usp_FinancialDataGetForCampaign";
+    
+    /// <summary>
+    /// Updates an existing financial data entry.<br/>
+    /// Params: dataGuid (Guid), typeGuid (Guid) - optional, amount (decimal) - optional, isExpense (bit) - optional, 
+    /// dateCreated (DateTime) - optional, dataDescription (string) - optional, dataTitle (string) - optional.<br/>
+    /// Provided parameters will be updated, while unprovided ones will be ignored.<br/>
+    /// Returns: Status code FinancialDataNotFound if the financial data does not exist, FinancialTypeNotFound if the
+    ///  financial type does not exist.<br/>
+    /// </summary>
+    public const string UpdateFinancialData = "usp_FinancialDataUpdate";
+    
+    /// <summary>
+    /// Deletes an existing financial data entry.<br/>
+    /// Params: dataGuid (Guid).<br/>
+    /// Returns: Status code FinancialDataNotFound if the financial data does not exist.<br/>
+    /// </summary>
+    public const string DeleteFinancialData = "usp_FinancialDataDelete";
 }

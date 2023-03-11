@@ -54,4 +54,7 @@ public enum CustomStatusCode
     IncorrectEventType = 50021,
     AnnouncementNotFound = 50022,
     PreferenceNotFound = 50023,
+    FinancialTypeNotFound = 50024,
+    SqlIllegalValue = 50025,
+    FinancialDataNotFound = 50026,
 }
