@@ -17,8 +17,6 @@ public class FinancialTypesController : Controller
 {
     private readonly IFinancialTypesService _financialTypesService;
     private readonly ILogger<FinancialTypesController> _logger;
-    private readonly int _maxFinancialTypeTitleLength = 100;
-    private readonly int _maxFinancialTypeDescriptionLength = 300;
 
     public FinancialTypesController(IFinancialTypesService financialTypesService,
         ILogger<FinancialTypesController> logger)
@@ -69,18 +67,16 @@ public class FinancialTypesController : Controller
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
-
+            
             // Validate the user input
-            if (string.IsNullOrWhiteSpace(financialType.TypeName) ||
-                financialType.TypeName.Length > _maxFinancialTypeTitleLength)
+            var validationFailureCode = financialType.VerifyLegalValues();
+            if (validationFailureCode != FinancialType.ValidationFailureCodes.Ok)
             {
-                return BadRequest(FormatErrorMessage(InvalidFinancialTypeName, CustomStatusCode.IllegalValue));
-            }
-
-            if (financialType.TypeDescription != null &&
-                financialType.TypeDescription.Length > _maxFinancialTypeDescriptionLength)
-            {
-                return BadRequest(FormatErrorMessage(InvalidFinancialTypeDescription, CustomStatusCode.IllegalValue));
+                return BadRequest(FormatErrorMessage(validationFailureCode switch
+                {
+                    FinancialType.ValidationFailureCodes.TitleTooLong => InvalidFinancialTypeName,
+                    FinancialType.ValidationFailureCodes.DescriptionTooLong => InvalidFinancialTypeDescription,
+                }, CustomStatusCode.IllegalValue));
             }
 
             var (statusCode, typeGuid) = await _financialTypesService.CreateFinancialType(financialType);
@@ -116,17 +112,14 @@ public class FinancialTypesController : Controller
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
             
-            // Validate the user input
-            if (string.IsNullOrWhiteSpace(financialType.TypeName) ||
-                financialType.TypeName.Length > _maxFinancialTypeTitleLength)
+            var validationFailureCode = financialType.VerifyLegalValues(isCreation: false);
+            if (validationFailureCode != FinancialType.ValidationFailureCodes.Ok)
             {
-                return BadRequest(FormatErrorMessage(InvalidFinancialTypeName, CustomStatusCode.IllegalValue));
-            }
-
-            if (financialType.TypeDescription != null &&
-                financialType.TypeDescription.Length > _maxFinancialTypeDescriptionLength)
-            {
-                return BadRequest(FormatErrorMessage(InvalidFinancialTypeDescription, CustomStatusCode.IllegalValue));
+                return BadRequest(FormatErrorMessage(validationFailureCode switch
+                {
+                    FinancialType.ValidationFailureCodes.TitleTooLong => InvalidFinancialTypeName,
+                    FinancialType.ValidationFailureCodes.DescriptionTooLong => InvalidFinancialTypeDescription,
+                }, CustomStatusCode.IllegalValue));
             }
 
             var statusCode = await _financialTypesService.UpdateFinancialType(financialType);
