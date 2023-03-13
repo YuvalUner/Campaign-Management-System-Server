@@ -2,6 +2,12 @@
 
 namespace API.Utils;
 
+/// <summary>
+/// A util for storing and formatting error messages that are used in multiple places.<br/>
+/// Used to avoid having the same error message in multiple places, and to avoid typos.<br/>
+/// To use, use the method <see cref="FormatErrorMessage"/> within this class, and pass it the name of the error message
+/// you want to use + the status code of the error from <see cref="CustomStatusCode"/>.<br/>
+/// </summary>
 public static class ErrorMessages
 {
     public const string JobNameRequired = "Job name is required";
@@ -92,6 +98,13 @@ public static class ErrorMessages
         "Ballot not found. If you are a minor, this may be because you are not old enough to vote." +
         "Otherwise, the error may be on our end or the civil registry's end. Please contact us.";
 
+    /// <summary>
+    /// Formats an error message with a custom status code, such that it can be returned to the client in a consistent way.
+    /// </summary>
+    /// <param name="message">The string describing the error. Should be any of the above strings.</param>
+    /// <param name="customStatusCode">A status code from <see cref="CustomStatusCode"/>, so that the error can be
+    /// easily tracked.</param>
+    /// <returns>An error string for the error that occurred, with a uniform structure for all errors.</returns>
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {
         return $"Error Num {(int)customStatusCode} - {message}";
