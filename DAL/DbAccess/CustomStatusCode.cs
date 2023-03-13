@@ -27,6 +27,7 @@ public enum CustomStatusCode
     NotLoggedIn = 13,
     IllegalValue = 14,
     ValueNullOrEmpty = 15,
+    NotVerified = 16,
     
     // 50000 and above are SQL errors, meant to match requirement of throwing between 50000 and 2147483647
     // These are for errors that would have been thrown by the database if not caught by the stored procedure

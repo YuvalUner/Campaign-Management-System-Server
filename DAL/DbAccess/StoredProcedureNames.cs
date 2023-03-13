@@ -837,4 +837,10 @@ public static class StoredProcedureNames
     /// Returns: Status code FinancialDataNotFound if the financial data does not exist.<br/>
     /// </summary>
     public const string DeleteFinancialData = "usp_FinancialDataDelete";
+    
+    /// <summary>
+    /// Gets the ballot a user is assigned to vote on.<br/>
+    /// Params: userId (int).<br/>
+    /// </summary>
+    public const string GetBallotForUser = "usp_BallotGetForUser";
 }

@@ -12,7 +12,10 @@ public static class ErrorMessages
     public const string JobTypeAlreadyExists = "Job type already exists";
     public const string JobTypeNotFound = "Job type not found";
     public const string TooManyRoles = "Too many roles in campaign";
-    public const string UserAlreadyVerified = "User with this ID is already verified, this may require a report to the admin";
+
+    public const string UserAlreadyVerified =
+        "User with this ID is already verified, this may require a report to the admin";
+
     public const string PermissionDoesNotExist = "Permission does not exist";
     public const string AlreadyHasPermission = "User already has this permission";
     public const string CityNotFound = "City not found";
@@ -25,7 +28,9 @@ public static class ErrorMessages
     public const string VerificationCodeExpired = "Verification code expired, please request a new one";
     public const string AuthorizationError = "Authorization error - you are not authorized to do this";
     public const string PermissionError = "Permission error - you do not have permission to do this";
-    public const string PermissionOrAuthorizationError = "Permission or authorization error - you do not have permission to do this";
+    public const string PermissionOrAuthorizationError =
+        "Permission or authorization error - you do not have permission to do this";
+
     public const string CityNameRequired = "City name is required when filtering for non-municipal campaigns";
     public const string CampaignNameRequired = "Campaign name is required";
     public const string CampaignNotFound = "Campaign not found";
@@ -61,7 +66,9 @@ public static class ErrorMessages
     public const string MaxAttendeesNotNullOrZero = "Max attendees must be greater than 0";
     public const string ManagerAlreadyExists = "User is already your manager";
     public const string EventAlreadyPublished = "Event is already published";
-    public const string EventNotAssociatedToCampaign = "Event is not associated to any campaign and can not be published";
+    public const string EventNotAssociatedToCampaign =
+        "Event is not associated to any campaign and can not be published";
+    
     public const string AnnouncementTitleRequired = "Announcement title is required";
     public const string AnnouncementContentRequired = "Announcement content is required";
     public const string AnnouncementTitleTooLong = "Announcement title must be 100 characters or less";
@@ -77,7 +84,13 @@ public static class ErrorMessages
     public const string FinancialDataDescriptionTooLong = "Financial data description must not be over 500 characters";
     public const string IllegalAmount = "Amount must be greater than 0";
     public const string FinancialDataNotFound = "Financial data not found";
-    public const string UnknownError = "Unknown error, someone on the dev team forgot to add an error message for this situation";
+    public const string UnknownError =
+        "Unknown error, someone on the dev team forgot to add an error message for this situation";
+    
+    public const string MustBeVerified = "You must be verified to do this";
+    public const string NoBallotFound =
+        "Ballot not found. If you are a minor, this may be because you are not old enough to vote." +
+        "Otherwise, the error may be on our end or the civil registry's end. Please contact us.";
 
     public static string FormatErrorMessage(string message, CustomStatusCode customStatusCode)
     {
