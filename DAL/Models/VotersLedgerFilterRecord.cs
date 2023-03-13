@@ -1,6 +1,12 @@
 ﻿namespace DAL.Models;
+using DbAccess;
 
-public class VoterLedgerFilterRecord
+/// <summary>
+/// A model for the result of the <see cref="StoredProcedureNames.FilterVotersLedger"/> stored procedure.<br/>
+/// Each instance of this class represents a single record from the voters ledger table, with the addition of the user's
+/// phone number(s), email address(es), support status for a campaign, and the ballot assigned to them.
+/// </summary>
+public class VotersLedgerFilterRecord
 {
     public int IdNum { get; set; } 
     public string? LastName { get; set; } 
