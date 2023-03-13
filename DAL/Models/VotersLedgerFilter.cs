@@ -1,5 +1,9 @@
 ﻿namespace DAL.Models;
 
+/// <summary>
+/// A model used for filtering the voters ledger table.<br/>
+/// All parameters but CampaignGuid are optional, and if a parameter is null, it will not be used for filtering.
+/// </summary>
 public class VotersLedgerFilter
 {
     public Guid? CampaignGuid { get; set; }

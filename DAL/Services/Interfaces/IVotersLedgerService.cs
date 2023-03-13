@@ -8,17 +8,19 @@ public interface IVotersLedgerService
     /// <summary>
     /// Gets a single record from the voters ledger table by the given id number.
     /// </summary>
-    /// <param name="voterId"></param>
-    /// <returns></returns>
+    /// <param name="voterId">The Id number of a single voter.</param>
+    /// <returns>A single <see cref="VotersLedgerRecord"/> object with all of its fields populated (assuming they are not
+    /// null in the database) if person with that id number exists.</returns>
     Task<VotersLedgerRecord?> GetSingleVotersLedgerRecord(int? voterId);
     
     /// <summary>
     /// Gets results from the voters ledger table by the given search criteria.
     /// The results also include the user's support status for a campaign and their assigned ballot.
     /// </summary>
-    /// <param name="filterOptions">An object containing the list of which filters to use and their values</param>
-    /// <returns></returns>
-    Task<IEnumerable<VoterLedgerFilterRecord>> GetFilteredVotersLedgerResults(VotersLedgerFilter filterOptions);
+    /// <param name="filterOptions">A <see cref="VotersLedgerFilter"/> object containing the list of which filters to use and their values</param>
+    /// <returns>A list of <see cref="VotersLedgerFilterRecord"/>, with each containing a record about a user that
+    /// matched the filters.</returns>
+    Task<IEnumerable<VotersLedgerFilterRecord>> GetFilteredVotersLedgerResults(VotersLedgerFilter filterOptions);
 
     /// <summary>
     /// Updates the support status of a voter in the voters ledger table.

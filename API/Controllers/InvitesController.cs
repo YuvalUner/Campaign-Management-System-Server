@@ -8,6 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using RestAPIServices;
 using static API.Utils.ErrorMessages;
 
+// Disable warning CS4014 - there are some async methods that are not awaited, but this is intentional.
+// The methods are called in the background, and the result is not needed.
+#pragma warning disable CS4014
+
 namespace API.Controllers;
 
 [ApiController]
