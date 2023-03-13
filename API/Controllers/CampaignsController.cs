@@ -2,7 +2,6 @@
 using API.Utils;
 using DAL.DbAccess;
 using DAL.Models;
-using DAL.Services.Implementations;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,11 @@ using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
+/// <summary>
+/// A controller for all campaign-related actions.
+/// Mostly used to expose a web API for <see cref="ICampaignsService"/>, and makes heavy usage of the model
+/// <see cref="Campaign"/>.<br/>
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -19,7 +23,7 @@ public class CampaignsController : Controller
     private readonly ICampaignsService _campaignService;
     private readonly IPermissionsService _permissionsService;
     private readonly IRolesService _rolesService;
-    
+
 
     public CampaignsController(ILogger<CampaignsController> logger, ICampaignsService campaignService,
         IPermissionsService permissionsService, IRolesService rolesService)
@@ -32,7 +36,7 @@ public class CampaignsController : Controller
 
     /// <summary>
     /// An action the client is expected to perform each time they load a campaign page.
-    /// This sets the current active campaign for the user, and fetches data about the user's role in it.
+    /// This sets the current active campaign for the user, and fetches data about the user's role and permissions in it.
     /// </summary>
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
@@ -48,7 +52,7 @@ public class CampaignsController : Controller
             }
 
             CampaignAuthorizationUtils.EnterCampaign(HttpContext, campaignGuid);
-            
+
             // Set the user's permissions and role in the active campaign in session
             await PermissionUtils.SetPermissions(_permissionsService, HttpContext);
             await RoleUtils.SetRole(_rolesService, HttpContext);
@@ -62,6 +66,13 @@ public class CampaignsController : Controller
         }
     }
 
+    /// <summary>
+    /// Creates a new campaign in the database, with the user as the campaign owner.
+    /// </summary>
+    /// <param name="campaign">A populated <see cref="Campaign"/> object, with at-least the CampaignName,
+    /// IsMunicipal, IsSubCampaign, CityName fields filled in.</param>
+    /// <returns>Ok with the Guid of the newly created campaign on success, Unauthorized or BadRequest
+    /// with an error message otherwise.</returns>
     [HttpPost("create")]
     public async Task<IActionResult> CreateCampaign([FromBody] Campaign campaign)
     {
@@ -86,9 +97,12 @@ public class CampaignsController : Controller
                 || campaign.IsMunicipal == null
                 || campaign.IsMunicipal == true && string.IsNullOrEmpty(campaign.CityName))
             {
-                return BadRequest(FormatErrorMessage(CampaignNameOrCityNameRequired, CustomStatusCode.ValueCanNotBeNull));
+                return BadRequest(
+                    FormatErrorMessage(CampaignNameOrCityNameRequired, CustomStatusCode.ValueCanNotBeNull));
             }
 
+            // If the campaign is not municipal, it is a national campaign, and the city name should be set to "ארצי".
+            // This is obviously not a real city, but it is valid for the database and avoids a foreign key violation.
             if (campaign.IsMunicipal == false)
             {
                 campaign.CityName = "ארצי";
@@ -115,6 +129,13 @@ public class CampaignsController : Controller
         }
     }
 
+    /// <summary>
+    /// Updates a campaign in the database.
+    /// </summary>
+    /// <param name="campaignGuid">The guid of the campaign to update.</param>
+    /// <param name="campaign">A <see cref="Campaign"/> object, with the fields to be updated set to not null.
+    /// Specifically, the fields that can be updated are CampaignDescription and CampaignLogoUrl.</param>
+    /// <returns></returns>
     [HttpPut("update/{campaignGuid:guid}")]
     public async Task<IActionResult> UpdateCampaign(Guid campaignGuid, [FromBody] Campaign campaign)
     {
@@ -142,7 +163,13 @@ public class CampaignsController : Controller
             return StatusCode(500);
         }
     }
-    
+
+    /// <summary>
+    /// Gets the list of users in a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">The Guid of the campaign.</param>
+    /// <returns>Unauthorized if the user does not have permission to get this list in the given campaign, Ok with the
+    /// list otherwise.</returns>
     [HttpGet("getUsers/{campaignGuid:guid}")]
     public async Task<IActionResult> GetCampaignUsers(Guid campaignGuid)
     {
@@ -162,6 +189,8 @@ public class CampaignsController : Controller
             }
 
             var users = await _campaignService.GetUsersInCampaign(campaignGuid);
+
+            // Return only the info that is ok to be displayed publicly (unlike id numbers and user ids).
             var usersPartialInfo = users.Select(u =>
                 new
                 {
@@ -180,13 +209,26 @@ public class CampaignsController : Controller
             return StatusCode(500);
         }
     }
-    
+
+    /// <summary>
+    /// Gets the basic info of a campaign - name, city, description, logo, etc - all of the info that is ok to be
+    /// displayed publicly.<br/>
+    /// </summary>
+    /// <param name="campaignGuid">The Guid of the campaign to get the info for</param>
+    /// <returns>NotFound if campaign was not found, else Ok with a JSON object containing all of the campaign's public
+    /// info.</returns>
     [HttpGet("get-basic-info/{campaignGuid:guid}")]
     public async Task<IActionResult> GetCampaignBasicInfo(Guid campaignGuid)
     {
         try
         {
             var campaign = await _campaignService.GetCampaignBasicInfo(campaignGuid);
+
+            if (campaign == null)
+            {
+                return NotFound(FormatErrorMessage(CampaignNotFound, CustomStatusCode.CampaignNotFound));
+            }
+
             return Ok(new
             {
                 campaign.CampaignName,
