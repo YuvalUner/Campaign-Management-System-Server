@@ -40,7 +40,7 @@ public class ElectionDayController : Controller
 
             if (isAuthenticated == null || !isAuthenticated.Value)
             {
-                return Unauthorized(FormatErrorMessage(MustBeVerified, CustomStatusCode.NotVerified));
+                return Unauthorized(FormatErrorMessage(VerificationStatusError, CustomStatusCode.VerificationStatusError));
             }
 
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
