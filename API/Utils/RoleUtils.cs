@@ -4,8 +4,17 @@ using DAL.Services.Interfaces;
 
 namespace API.Utils;
 
+/// <summary>
+/// A collection of utility methods for roles.<br/>
+/// Can set the role of the user in the active campaign, and check if the user can modify another user's role.<br/>
+/// </summary>
 public static class RoleUtils
 {
+    /// <summary>
+    /// Sets the role of the user in the active campaign in the session.<br/>
+    /// </summary>
+    /// <param name="rolesService">An implementation of <see cref="IRolesService"/></param>
+    /// <param name="context">The HttpContext object of the controller.</param>
     public static async Task SetRole(IRolesService rolesService, HttpContext context)
     {
         var userId = context.Session.GetInt32(Constants.UserId);
@@ -23,11 +32,11 @@ public static class RoleUtils
     /// They are allowed to do so if their role level is higher or if they are the campaign owner, as well as
     /// the user they are assigning the role having a lower role level than them.
     /// </summary>
-    /// <param name="rolesService"></param>
-    /// <param name="context"></param>
-    /// <param name="roleName"></param>
-    /// <param name="campaignGuid"></param>
-    /// <param name="userId"></param>
+    /// <param name="rolesService">An implementation of <see cref="IRolesService"/></param>
+    /// <param name="context">The HttpContext object of the controller.</param>
+    /// <param name="roleName">The name of the role to assign to the other user.</param>
+    /// <param name="campaignGuid">The Guid of the active campaign.</param>
+    /// <param name="userId">The user id of the other user.</param>
     /// <returns></returns>
     public static async Task<bool> CanAssignRole(IRolesService rolesService, HttpContext context,
         string? roleName, Guid? campaignGuid, int? userId)
