@@ -93,7 +93,6 @@ public static class ErrorMessages
     public const string UnknownError =
         "Unknown error, someone on the dev team forgot to add an error message for this situation";
     
-    public const string MustBeVerified = "You must be verified to do this";
     public const string NoBallotFound =
         "Ballot not found. If you are a minor, this may be because you are not old enough to vote." +
         "Otherwise, the error may be on our end or the civil registry's end. Please contact us.";

@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using RestAPIServices;
 using static API.Utils.ErrorMessages;
 
-// Disable warnings for possibly null values - we know that the values are not null, but the compiler doesn't (due to models defining them as nullable)
+// Disable warnings for possibly null values - we know that the values are not null, but the compiler doesn't
+// (due to models defining them as nullable)
 #pragma warning disable CS4014
 #pragma warning disable CS8629
+#pragma warning disable CS8602
 // Disable warnings for not awaiting async methods - they are not awaited on purpose.
 #pragma warning disable CS8604
 
@@ -296,7 +298,7 @@ public class EventsController : Controller
             newEvent.IsOpenJoin ??= false;
 
             // The event is always created successfully, so long as the event name is not empty and campaignGuid is null.
-            var (statusCode, eventId, eventGuid) = await _eventsService.AddEvent(newEvent);
+            var (_, _, eventGuid) = await _eventsService.AddEvent(newEvent);
 
             // No need to await this - all of its fail conditions can not happen, since the event was just created
             // and its Guid is 100% correct.
@@ -424,13 +426,12 @@ public class EventsController : Controller
                     return BadRequest(FormatErrorMessage(CampaignNotFound, CustomStatusCode.CampaignNotFound));
             }
 
-            ;
 
             // Otherwise, the event was updated successfully, and we check if we need to send messages to the participants.
             if (sendSms || sendEmail)
             {
-                var (statusCode, eventParticipants) = await _eventsService.GetEventParticipants(eventGuid);
-                var (statusCode2, eventWatchers) = await _eventsService.GetEventWatchers(eventGuid);
+                var (_, eventParticipants) = await _eventsService.GetEventParticipants(eventGuid);
+                var (_, eventWatchers) = await _eventsService.GetEventWatchers(eventGuid);
                 eventParticipants = eventParticipants.Concat(eventWatchers);
 
                 var campaign = await _campaignsService.GetCampaignBasicInfo(campaignGuid);
@@ -509,13 +510,13 @@ public class EventsController : Controller
             // Otherwise, the event was updated successfully, and we check if we need to send messages to the participants.
             if (sendSms || sendEmail)
             {
-                var (statusCode, eventParticipants) = await _eventsService.GetEventParticipants(eventGuid);
-                var (statusCode2, eventWatchers) = await _eventsService.GetEventWatchers(eventGuid);
+                var (_, eventParticipants) = await _eventsService.GetEventParticipants(eventGuid);
+                var (_, eventWatchers) = await _eventsService.GetEventWatchers(eventGuid);
                 eventParticipants = eventParticipants.Concat(eventWatchers);
 
                 // Get the name of the user who updated the event.
                 var sendingUser = await _usersService.GetUserPublicInfo(userId);
-                string name = sendingUser.FirstNameHeb != null
+                string? name = sendingUser.FirstNameHeb != null
                     ? sendingUser.FirstNameHeb + " " + sendingUser.LastNameHeb
                     : sendingUser.DisplayNameEng;
 
@@ -587,7 +588,6 @@ public class EventsController : Controller
             var eventBackup = new EventWithCreatorDetails();
             if (sendEmail || sendSms)
             {
-                CustomStatusCode statusCode = CustomStatusCode.Ok;
                 eventBackup = await _eventsService.GetEvent(eventGuid);
                 var res = await _eventsService.GetEventParticipants(eventGuid);
                 eventParticipants = res.Item2.ToList();
@@ -605,7 +605,6 @@ public class EventsController : Controller
                     return BadRequest(FormatErrorMessage(CampaignNotFound, CustomStatusCode.CampaignNotFound));
             }
 
-            ;
 
             if (sendSms || sendEmail)
             {
@@ -666,7 +665,6 @@ public class EventsController : Controller
             var eventBackup = new EventWithCreatorDetails();
             if (sendEmail || sendSms)
             {
-                CustomStatusCode statusCode = CustomStatusCode.Ok;
                 eventBackup = await _eventsService.GetEvent(eventGuid);
                 var res = await _eventsService.GetEventParticipants(eventGuid);
                 eventParticipants = res.Item2.ToList();
@@ -684,7 +682,7 @@ public class EventsController : Controller
             if (sendSms || sendEmail)
             {
                 var sendingUser = await _usersService.GetUserPublicInfo(userId);
-                string name = sendingUser.FirstNameHeb != null
+                string? name = sendingUser.FirstNameHeb != null
                     ? sendingUser.FirstNameHeb + " " + sendingUser.LastNameHeb
                     : sendingUser.DisplayNameEng;
 
@@ -831,7 +829,6 @@ public class EventsController : Controller
                     return BadRequest(FormatErrorMessage(AlreadyParticipating, CustomStatusCode.DuplicateKey));
             }
 
-            ;
 
             if (sendSms || sendEmail)
             {
@@ -908,7 +905,6 @@ public class EventsController : Controller
                     return BadRequest(FormatErrorMessage(AlreadyParticipating, CustomStatusCode.DuplicateKey));
             }
 
-            ;
 
             // Else, send the message if needed.
             if (sendSms || sendEmail)
@@ -1095,7 +1091,7 @@ public class EventsController : Controller
             }
 
             // If all the above checks pass, then the user is authorized to get the participants.
-            var (statusCode, participants) = await _eventsService.GetEventParticipants(eventGuid);
+            var (_, participants) = await _eventsService.GetEventParticipants(eventGuid);
 
             return Ok(participants);
         }
@@ -1138,7 +1134,7 @@ public class EventsController : Controller
             }
 
             // If all the above checks pass, then the user is authorized to get the participants.
-            var (statusCode, participants) = await _eventsService.GetEventParticipants(eventGuid);
+            var (_, participants) = await _eventsService.GetEventParticipants(eventGuid);
 
             return Ok(participants);
         }
@@ -1196,7 +1192,7 @@ public class EventsController : Controller
             newEvent.CampaignId = null;
 
             // Else, the user is authorized to add an event for the managed user.
-            var (statusCode, eventId, eventGuid) = await _eventsService.AddEvent(newEvent);
+            var (_, _, eventGuid) = await _eventsService.AddEvent(newEvent);
 
             _eventsService.AddEventParticipant(eventGuid.Value, userId: userId.Value);
             _eventsService.AddEventWatcher(userId.Value, eventGuid.Value);
@@ -1205,7 +1201,7 @@ public class EventsController : Controller
             if (sendSms || sendEmail)
             {
                 var eventCreator = await _usersService.GetUserPublicInfo(userId.Value);
-                string senderName = eventCreator.FirstNameHeb != null
+                string? senderName = eventCreator.FirstNameHeb != null
                     ? eventCreator.FirstNameHeb + " " + eventCreator.LastNameHeb
                     : eventCreator.DisplayNameEng;
 
