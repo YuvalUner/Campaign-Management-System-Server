@@ -2,6 +2,9 @@
 
 namespace DAL.Services.Interfaces;
 
+/// <summary>
+/// A collection of methods used for storing, retrieving, and modifying data related to campaigns.
+/// </summary>
 public interface ICampaignsService
 {
     /// <summary>

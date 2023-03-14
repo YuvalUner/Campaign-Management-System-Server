@@ -6,9 +6,11 @@
 /// </summary>
 public enum CustomStatusCode
 {
-    // 0 is the default return value for stored procedures, so we use it for success
-    // Outside of tests, this should never be used.
-    // However, as it is needed to be defined for the enum to work, it is here and removing it will break literally everything.
+    ///<summary>
+    /// 0 is the default return value for stored procedures, so we use it for success.<br/>
+    /// Outside of tests, this should never be used.<br/>
+    /// However, as it is needed to be defined for the enum to work, it is here and removing it will break literally everything.
+    /// </summary>
     Ok = 0,
     // 1 and above are custom error codes, relating to specific errors that can happen within the app.
     // Some relate to SQL, but are not SQL errors but rather errors due to user input or other logic
