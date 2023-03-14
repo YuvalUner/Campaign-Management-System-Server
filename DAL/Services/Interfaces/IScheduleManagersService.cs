@@ -18,7 +18,7 @@ public interface IScheduleManagersService
     /// if both userId and userEmail are empty,
     /// <see cref="CustomStatusCode.TooManyValuesProvided"/> if both userId and userEmail are provided</returns>
     Task<(CustomStatusCode, IEnumerable<User>)> GetScheduleManagers(string? userEmail = null, int? userId = null);
-    
+
     /// <summary>
     /// Adds a schedule manager to the given user.
     /// </summary>
@@ -27,7 +27,7 @@ public interface IScheduleManagersService
     /// <returns>Status code <see cref="CustomStatusCode.UserNotFound"/> if the permission receiver does not exist,
     /// <see cref="CustomStatusCode.DuplicateKey"/> if user is already a schedule manage of the requesting user</returns>
     Task<CustomStatusCode> AddScheduleManager(int giverUserId, string receiverEmail);
-    
+
     /// <summary>
     /// Removes a schedule manager from the given user.
     /// </summary>

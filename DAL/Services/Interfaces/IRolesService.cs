@@ -15,7 +15,7 @@ public interface IRolesService
     /// <param name="userId">User id of the user to get the role for.</param>
     /// <returns>An instance of <see cref="Role"/> if the user is part of the campaign, null otherwise.</returns>
     Task<Role?> GetRoleInCampaign(Guid? campaignGuid, int? userId);
-    
+
     /// <summary>
     /// Adds a custom role to a campaign.
     /// </summary>
@@ -70,7 +70,7 @@ public interface IRolesService
     /// <param name="roleDescription">New description of the role.</param>
     /// <returns></returns>
     Task UpdateRole(Guid? campaignGuid, string? roleName, string? roleDescription);
-    
+
     /// <summary>
     /// Removes a user from their role and sets them back to the volunteer role.
     /// </summary>
@@ -78,7 +78,7 @@ public interface IRolesService
     /// <param name="userEmail">Email of the user to remove from the role.</param>
     /// <returns></returns>
     Task RemoveUserFromRole(Guid? campaignGuid, string? userEmail);
-    
+
     /// <summary>
     /// Gets all the info about a role from the database, by its name and campaign.
     /// </summary>

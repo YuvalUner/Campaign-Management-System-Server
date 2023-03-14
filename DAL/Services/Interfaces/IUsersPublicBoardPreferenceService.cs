@@ -18,7 +18,7 @@ public interface IUsersPublicBoardPreferenceService
     /// <returns>Status code <see cref="CustomStatusCode.UserNotFound"/> if the user does not exist,
     /// <see cref="CustomStatusCode.CampaignNotFound"/> if the campaign does not exist,</returns>
     Task<CustomStatusCode> AddPreference(int? userId, Guid campaignGuid, bool isPreferred);
-    
+
     /// <summary>
     /// Removes a preference for a user regarding a campaign.
     /// </summary>
@@ -28,7 +28,7 @@ public interface IUsersPublicBoardPreferenceService
     /// <see cref="CustomStatusCode.CampaignNotFound"/> if the campaign does not exist,
     /// <see cref="CustomStatusCode.PreferenceNotFound"/> if the user does not have a preference for this campaign</returns>
     Task<CustomStatusCode> RemovePreference(int? userId, Guid campaignGuid);
-    
+
     /// <summary>
     /// Updates a preference for a user regarding a campaign.
     /// </summary>
@@ -40,7 +40,7 @@ public interface IUsersPublicBoardPreferenceService
     /// <see cref="CustomStatusCode.CampaignNotFound"/> if the campaign does not exist,
     /// <see cref="CustomStatusCode.PreferenceNotFound"/> if the user does not have a preference for this campaign.</returns>
     Task<CustomStatusCode> UpdatePreference(int? userId, Guid campaignGuid, bool isPreferred);
-    
+
     /// <summary>
     /// Gets all preferences for a user, including the name, logo and guid of each campaign.
     /// </summary>

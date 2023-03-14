@@ -14,14 +14,14 @@ public interface IVerificationCodeService
     /// <param name="code">An instance of <see cref="PhoneVerificationCode"/> with the phone number and code in it.</param>
     /// <returns></returns>
     Task CreateVerificationCode(int? userId, PhoneVerificationCode code);
-    
+
     /// <summary>
     /// Gets a user's verification code and phone number from the database.
     /// </summary>
     /// <param name="userId">The user id to get the code for.</param>
     /// <returns>An instance of <see cref="PhoneVerificationCode"/> with the code in it.</returns>
     Task<PhoneVerificationCode?> GetVerificationCode(int? userId);
-    
+
     /// <summary>
     /// Approves the verification code for a user and removes it from the database, as well as stores the phone number.
     /// </summary>
