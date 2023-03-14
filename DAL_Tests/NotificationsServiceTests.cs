@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using DAL.DbAccess;
+﻿using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Implementations;
 using DAL.Services.Interfaces;

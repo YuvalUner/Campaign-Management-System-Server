@@ -19,7 +19,8 @@ namespace API.Controllers;
 
 /// <summary>
 /// A controller for handling all requests related to events.<br/>
-/// Generally, provides a web API for <see cref="IEventsService"/>, along with other functionality related to events.
+/// Generally, provides a web API and service policy for <see cref="IEventsService"/>,
+/// along with other functionality related to events.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]

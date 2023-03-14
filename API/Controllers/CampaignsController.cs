@@ -11,7 +11,7 @@ namespace API.Controllers;
 
 /// <summary>
 /// A controller for all campaign-related actions.
-/// Mostly used to expose a web API for <see cref="ICampaignsService"/>, and makes heavy usage of the model
+/// Mostly used to expose a web API and service policy for <see cref="ICampaignsService"/>, and makes heavy usage of the model
 /// <see cref="Campaign"/>.<br/>
 /// </summary>
 [ApiController]

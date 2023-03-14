@@ -15,7 +15,7 @@ namespace API.Controllers;
 
 /// <summary>
 /// A controller for handling financial data related requests.<br/>
-/// Generally, exposes a web API for <see cref="IFinancialDataService"/> methods,
+/// Generally, provides a web API and service policy for <see cref="IFinancialDataService"/> methods,
 /// allowing the client to perform CRUD operations on financial data.
 /// </summary>
 [ApiController]

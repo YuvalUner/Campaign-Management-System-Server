@@ -10,7 +10,7 @@ namespace API.Controllers;
 
 /// <summary>
 /// A controller for handling all requests related to the election day.
-/// Generally, provides a web API for <see cref="IElectionDayService"/>.
+/// Generally, provides a web API and service policy for <see cref="IElectionDayService"/>.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
