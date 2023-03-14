@@ -8,6 +8,10 @@ using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
+/// <summary>
+/// A controller for handling job type assignment capabilities.
+/// Provides a web API and service policy for <see cref="IJobTypeAssignmentCapabilityService"/>.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -23,6 +27,15 @@ public class JobTypeAssignmentCapabilityController : Controller
         _logger = logger;
     }
     
+    /// <summary>
+    /// Adds a user to a job type's assignment capable users.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign the job type belongs to.</param>
+    /// <param name="jobTypeAssignmentCapabilityParams">An instance of <see cref="JobTypeAssignmentCapabilityParams"/>
+    /// with all values filled in.</param>
+    /// <returns>Unauthorized if the requesting user does not have permission to edit job types in the campaign,
+    /// NotFound if the user or job type from the parameters was not found, Conflict if the user can already
+    /// assign to the job type, Ok otherwise.</returns>
     [HttpPost("add/{campaignGuid:guid}")]
     public async Task<IActionResult> AddJobTypeAssignmentCapableUser(Guid campaignGuid, [FromBody] JobTypeAssignmentCapabilityParams jobTypeAssignmentCapabilityParams)
     {
@@ -57,6 +70,14 @@ public class JobTypeAssignmentCapabilityController : Controller
         }
     }
     
+    /// <summary>
+    /// Removes a user from a job type's assignment capable users.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign the job type belongs to.</param>
+    /// <param name="jobTypeAssignmentCapabilityParams">An instance of <see cref="JobTypeAssignmentCapabilityParams"/>
+    /// with all values filled in.</param>
+    /// <returns>Unauthorized if the requesting user does not have permission to edit job types in the campaign,
+    /// Ok otherwise.</returns>
     [HttpDelete("remove/{campaignGuid:guid}")]
     public async Task<IActionResult> RemoveJobTypeAssignmentCapableUser(Guid campaignGuid, [FromBody] JobTypeAssignmentCapabilityParams jobTypeAssignmentCapabilityParams)
     {
@@ -83,6 +104,14 @@ public class JobTypeAssignmentCapabilityController : Controller
         }
     }
     
+    /// <summary>
+    /// Gets all users that can assign to a job type.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign the job type belongs to.</param>
+    /// <param name="jobTypeName">Name of the requested job type.</param>
+    /// <returns>Unauthorized if the requesting user does not have permission to view job types in the campaign,
+    /// Ok with a list with the same fields as <see cref="UserPublicInfo"/> (this was made before that model was created)
+    /// otherwise.</returns>
     [HttpGet("get/{campaignGuid:guid}/{jobTypeName}")]
     public async Task<IActionResult> GetJobTypeAssignmentCapableUsers(Guid campaignGuid, string jobTypeName)
     {
