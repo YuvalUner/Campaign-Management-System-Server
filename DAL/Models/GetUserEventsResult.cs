@@ -1,20 +1,15 @@
 ﻿namespace DAL.Models;
+using DbAccess;
 
-public class GetUserEventsResult
+/// <summary>
+/// An extension of <see cref="CustomEvent"/>, meant to represent a single returning row from the
+/// <see cref="StoredProcedureNames.GetUserEvents"/> stored procedure.<br/>
+/// Contains additional information about the event - campaign's name and logo, as well as if the user is a participant
+/// in the event.<br/>
+/// </summary>
+public class GetUserEventsResult: CustomEvent
 {
-    public Guid EventGuid { get; set; }
-    public string? EventName { get; set; }
-    public string? EventDescription { get; set; }
-    public string? EventLocation { get; set; }
-    public DateTime? EventStartTime { get; set; }
-    public DateTime? EventEndTime { get; set; }
-    public int? MaxAttendees { get; set; }
-    public Guid? CampaignGuid { get; set; }
     public string? CampaignName { get; set; }
     public string? CampaignLogoUrl { get; set; }
     public bool Participating { get; set; }
-    
-    public bool IsOpenJoin { get; set; } = false;
-    
-    public int? NumAttending { get; set; }
 }

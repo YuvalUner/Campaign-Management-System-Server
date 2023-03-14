@@ -1,10 +1,16 @@
 ﻿namespace DAL.Models;
 
+/// <summary>
+/// A model for a single row of the financial_types table.<br/>
+/// </summary>
 public class FinancialType
 {
     private readonly int _maxFinancialTypeTitleLength = 100;
     private readonly int _maxFinancialTypeDescriptionLength = 300;
     
+    /// <summary>
+    /// A collection of codes to use to determine success or failure of a validation operation of this model.<br/>
+    /// </summary>
     public enum ValidationFailureCodes
     {
         Ok = 0,
@@ -15,8 +21,20 @@ public class FinancialType
     public Guid? CampaignGuid { get; set; }
     public string? TypeName { get; set; }
     public string? TypeDescription { get; set; }
+    
+    /// <summary>
+    /// A unique identifier for the financial type.<br/>
+    /// Can and should be exposed to the user.<br/>
+    /// </summary>
     public Guid? TypeGuid { get; set; }
     
+    /// <summary>
+    /// A method for validating user input when creating or updating a financial type.<br/>
+    /// </summary>
+    /// <param name="isCreation">Set to true when creating a new financial type, false otherwise. Modifies the method's
+    /// behavior to fit these cases.</param>
+    /// <returns>A <see cref="ValidationFailureCodes"/> value - Ok if everything is fine, one of the error codes, depending on
+    /// the first error found, otherwise.</returns>
     public ValidationFailureCodes VerifyLegalValues(bool isCreation = true)
     {
         // If we're creating a new financial type, the title must be non-null, non-empty and not too long

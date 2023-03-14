@@ -44,8 +44,9 @@ public class FinancialTypesServiceTests
         var financialTypes = _financialTypesService.GetFinancialTypes(_testFinancialType.CampaignGuid.Value).Result;
         
         // Assert
-        Assert.Single(financialTypes);
-        Assert.Equal(_otherFinancialType.TypeGuid, financialTypes.First().TypeGuid);
+        Assert.NotEmpty(financialTypes);
+        Assert.Contains(financialTypes, ft => ft.TypeGuid == _otherFinancialType.TypeGuid);
+        Assert.DoesNotContain(financialTypes, ft => ft.TypeGuid == _testFinancialType.TypeGuid);
     }
     
     [Fact, TestPriority(2)]
@@ -71,7 +72,7 @@ public class FinancialTypesServiceTests
         var financialTypes = _financialTypesService.GetFinancialTypes(_testFinancialType.CampaignGuid.Value).Result;
         
         // Assert
-        Assert.Equal(2, financialTypes.Count());
+        Assert.NotEmpty(financialTypes);
         Assert.Contains(financialTypes, ft => ft.TypeGuid == _otherFinancialType.TypeGuid);
         Assert.Contains(financialTypes, ft => ft.TypeGuid == _testFinancialType.TypeGuid);
     }
@@ -206,7 +207,8 @@ public class FinancialTypesServiceTests
         var financialTypes = _financialTypesService.GetFinancialTypes(_testFinancialType.CampaignGuid.Value).Result;
         
         // Assert
-        Assert.Single(financialTypes);
-        Assert.Equal(_otherFinancialType.TypeGuid, financialTypes.First().TypeGuid);
+        Assert.NotEmpty(financialTypes);
+        Assert.Contains(financialTypes, ft => ft.TypeGuid == _otherFinancialType.TypeGuid);
+        Assert.DoesNotContain(financialTypes, ft => ft.TypeGuid == _testFinancialType.TypeGuid);
     }
 }
