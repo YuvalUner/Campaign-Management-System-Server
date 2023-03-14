@@ -2,7 +2,6 @@
 using DAL.Models;
 using DAL.Services.Implementations;
 using DAL.Services.Interfaces;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Xunit.Abstractions;
 using Xunit.Sdk;

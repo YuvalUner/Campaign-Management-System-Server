@@ -4,7 +4,6 @@ using DAL.Models;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;

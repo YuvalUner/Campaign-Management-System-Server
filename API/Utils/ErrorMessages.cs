@@ -91,11 +91,13 @@ public static class ErrorMessages
     public const string IllegalAmount = "Amount must be greater than 0";
     public const string FinancialDataNotFound = "Financial data not found";
     public const string UnknownError =
-        "Unknown error, someone on the dev team forgot to add an error message for this situation";
+        "Unknown error, someone on the dev team forgot to add an error message for this situation and just stuck this here. Please contact us.";
     
     public const string NoBallotFound =
         "Ballot not found. If you are a minor, this may be because you are not old enough to vote." +
         "Otherwise, the error may be on our end or the civil registry's end. Please contact us.";
+    
+    public const string NotInCampaign = "You are not a member of this campaign";
 
     /// <summary>
     /// Formats an error message with a custom status code, such that it can be returned to the client in a consistent way.

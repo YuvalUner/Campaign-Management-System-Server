@@ -15,8 +15,8 @@ namespace API.Controllers;
 
 /// <summary>
 /// Controller for financial types.<br/>
-/// Generally, exposes a web API for <see cref="IFinancialTypesService"/>, allowing the client to perform CRUD
-/// operations on financial types.
+/// Generally, provides a web API and service policy for <see cref="IFinancialTypesService"/>,
+/// allowing the client to perform CRUD operations on financial types.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
