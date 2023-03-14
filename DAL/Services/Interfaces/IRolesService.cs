@@ -3,6 +3,9 @@ using DAL.Models;
 
 namespace DAL.Services.Interfaces;
 
+/// <summary>
+/// 
+/// </summary>
 public interface IRolesService
 {
     /// <summary>

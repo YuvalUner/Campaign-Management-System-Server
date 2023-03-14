@@ -37,9 +37,9 @@ public class NotificationsService : INotificationsService
         await _dbAccess.ModifyData(StoredProcedureNames.ModifyUserToNotify, param);
     }
     
-    public async Task ModifyUserToNotify(int? userId, Guid campaignGuid, bool viaSms, bool viaEmail)
+    public async Task UpdateUserToNotify(int? userId, Guid campaignGuid, bool viaSms, bool viaEmail)
     {
-        // Due to the way the stored procedure ModifyUserToNotify is written, all 3 scenarios of add, update and 
+        // Due to the way the stored procedure UpdateUserToNotify is written, all 3 scenarios of add, update and 
         // remove are handled by the same stored procedure.
         // Therefore, this method is only a wrapper for AddUserToNotify, made for the sake of clarity.
         // Otherwise, places where you expect to modify a user will have to call a method called AddUserToNotify.

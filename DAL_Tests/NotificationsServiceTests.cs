@@ -74,7 +74,7 @@ public class NotificationsServiceTests
         testNotificationSettings.ViaSms = false;
         
         // Act
-        _notificationsService.ModifyUserToNotify(testUser.UserId, testCampaign.CampaignGuid.Value, testNotificationSettings.ViaSms, testNotificationSettings.ViaEmail).Wait();
+        _notificationsService.UpdateUserToNotify(testUser.UserId, testCampaign.CampaignGuid.Value, testNotificationSettings.ViaSms, testNotificationSettings.ViaEmail).Wait();
         
         // Assert
         var result = _notificationsService.GetUsersToNotify(testCampaign.CampaignGuid.Value).Result;

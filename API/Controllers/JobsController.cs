@@ -460,7 +460,7 @@ public class JobsController : Controller
             
             filterParams.CampaignGuid = campaignGuid;
             
-            var users = await _jobsService.GetUsersAvaialbleForJob(filterParams);
+            var users = await _jobsService.GetUsersAvailableForJob(filterParams);
             return Ok(users);
         }
         catch (Exception e)
