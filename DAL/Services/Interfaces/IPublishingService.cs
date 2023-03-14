@@ -18,7 +18,7 @@ public interface IPublishingService
     /// <see cref="CustomStatusCode.IncorrectEventType"/> if event is not associated to any campaign,
     /// <see cref="CustomStatusCode.UserNotFound"/> if publisher id is not a valid user</returns>
     Task<CustomStatusCode> PublishEvent(Guid? eventGuid, int? publisherId);
-    
+
     /// <summary>
     /// Unpublishes an event by removing it from the published events table
     /// </summary>

@@ -15,7 +15,7 @@ public interface IVotersLedgerService
     /// <returns>A single <see cref="VotersLedgerRecord"/> object with all of its fields populated (assuming they are not
     /// null in the database) if person with that id number exists.</returns>
     Task<VotersLedgerRecord?> GetSingleVotersLedgerRecord(int? voterId);
-    
+
     /// <summary>
     /// Gets results from the voters ledger table by the given search criteria.
     /// The results also include the user's support status for a campaign and their assigned ballot.

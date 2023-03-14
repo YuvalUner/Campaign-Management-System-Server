@@ -66,7 +66,7 @@ public interface IUsersService
     /// <param name="phoneNumber">The phone number to add.</param>
     /// <returns></returns>
     Task AddPhoneNumber(int? userId, string phoneNumber);
-    
+
     /// <summary>
     /// Gets the user's phone and email, if they exist.
     /// </summary>
@@ -80,7 +80,7 @@ public interface IUsersService
     /// <param name="userEmail">The user's email address.</param>
     /// <returns>An instance of <see cref="User"/> with only the phone and email set to not null.</returns>
     Task<User?> GetUserContactInfoByEmail(string userEmail);
-    
+
     /// <summary>
     /// Removes a user's phone number from their account.
     /// </summary>
