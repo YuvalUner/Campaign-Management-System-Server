@@ -11,19 +11,17 @@ public class Ballot
     /// For example, 57.1, 6.3, etc - these ids are unique within the city, but not globally.<br/>
     /// </summary>
     public Decimal? InnerCityBallotId { get; set; }
+
     public string? CityName { get; set; }
-    
-    /// <summary>
-    /// The address of the ballot.<br/>
-    /// </summary>
+
     public string? BallotAddress { get; set; }
-    
+
     /// <summary>
     /// The physical landmark the ballot is in.<br/>
     /// For example, the name of a school, the name of a building, etc.<br/>
     /// </summary>
-    public string? BallotLocation  { get; set; }
-    
+    public string? BallotLocation { get; set; }
+
     /// <summary>
     /// Whether the ballot is accessible to people with disabilities.<br/>
     /// True if it is accessible, false if it is not, null if it is unknown.<br/>

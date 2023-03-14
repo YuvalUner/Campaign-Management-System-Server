@@ -1,13 +1,11 @@
 ﻿namespace DAL.Models;
 
-public class UserInCampaign
+/// <summary>
+/// An extension of <see cref="UserPublicInfo"/>.<br/>
+/// Contains additional information about the user's role in the campaign.<br/>
+/// </summary>
+public class UserInCampaign : UserPublicInfo
 {
-    public string? Email { get; set; }
-    public string? FirstNameEng { get; set; }
-    public string? LastNameEng { get; set; }
-    public string? FirstNameHeb { get; set; }
-    public string? LastNameHeb { get; set; }
-    public string? ProfilePicUrl { get; set; }
     public string? RoleName { get; set; }
     public string? RoleLevel { get; set; }
 }

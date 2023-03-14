@@ -802,7 +802,7 @@ public class EventsController : Controller
 
             // If the event is not open join, then only the creator can add participants.
             // If the event is open join, then anyone can add participants.
-            if (!requestedEvent.IsOpenJoin)
+            if (requestedEvent.IsOpenJoin == false)
             {
                 var creator = await _eventsService.GetEventCreatorUserId(eventGuid);
                 if (creator == null)
@@ -838,7 +838,7 @@ public class EventsController : Controller
                     sendEmail,
                     sendSms,
                     userEmail,
-                    CustomEvent.FromEventWithCreatorDetails(requestedEvent),
+                    requestedEvent,
                     sender.FirstNameHeb + sender.LastNameHeb
                 );
             }
@@ -916,7 +916,7 @@ public class EventsController : Controller
                     sendEmail,
                     sendSms,
                     userEmail,
-                    CustomEvent.FromEventWithCreatorDetails(requestedEvent),
+                    requestedEvent,
                     sendingCampaign.CampaignName
                 );
             }

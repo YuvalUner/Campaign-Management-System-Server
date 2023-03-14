@@ -1,16 +1,13 @@
 ﻿namespace DAL.Models;
 
-public class FinancialDataEntryWithTypeAndCreator
+/// <summary>
+/// An extension of <see cref="FinancialDataEntry"/> that also includes the financial type's name and description,
+/// as well as the details of the entry's creator.<br/>
+/// </summary>
+public class FinancialDataEntryWithTypeAndCreator: FinancialDataEntry
 {
-    public Guid? DataGuid { get; set; }
-    public Guid? TypeGuid { get; set; }
     public string? TypeName { get; set; }
     public string? TypeDescription { get; set; }
-    public bool IsExpense { get; set; }
-    public Decimal? Amount { get; set; }
-    public string? DataTitle { get; set; }
-    public string? DataDescription { get; set; }
-    public DateTime? DateCreated { get; set; }
     public string? Email { get; set; }
     public string? FirstNameHeb { get; set; }
     public string? LastNameHeb { get; set; }

@@ -1,5 +1,11 @@
 ﻿namespace DAL.Models;
 
+using DbAccess;
+
+/// <summary>
+/// A model for a single row of the <see cref="StoredProcedureNames.GetBaseSmsLogs"/> stored procedure.<br/>
+/// Each row represents a single SMS that was sent.<br/>
+/// </summary>
 public class SmsLogResult
 {
     public Guid MessageGuid { get; set; }

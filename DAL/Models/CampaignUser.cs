@@ -1,8 +1,11 @@
 ﻿namespace DAL.Models;
 
+using DbAccess;
+
 /// <summary>
-/// A model for representing the data needed when loading the home page.
-/// Meant to contain the rows from the output of the stored procedure GetUserCampaigns.
+/// A model for representing the data needed when loading the home page, showing each campaign the user belongs to
+/// and their role in it.<br/>
+/// Meant to contain the rows from the output of the stored procedure <see cref="StoredProcedureNames.GetUserCampaigns"/>.
 /// </summary>
 public class CampaignUser
 {

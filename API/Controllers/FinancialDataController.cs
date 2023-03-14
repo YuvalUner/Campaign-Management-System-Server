@@ -71,6 +71,70 @@ public class FinancialDataController : Controller
     }
 
     /// <summary>
+    /// A helper method for creating a list of <see cref="FinancialSummaryBalance"/> from a list of <see cref="FinancialSummaryEntry"/>.<br/>
+    /// Also returns the list of expenses and incomes, as these are needed for the summary.
+    /// </summary>
+    /// <param name="financialDataSummary">An IEnumerable of <see cref="FinancialSummaryEntry"/> retrieved from the database.</param>
+    /// <returns>A tuple containing the list of incomes, the list of expenses, and the created list of balances.</returns>
+    private (List<FinancialSummaryBalance>, List<FinancialSummaryEntry>, List<FinancialSummaryEntry>)
+        CreateBalancesList(IEnumerable<FinancialSummaryEntry> financialDataSummary)
+    {
+        // Converting to a list to avoid multiple enumerations.
+        var financialSummaryEntries = financialDataSummary.ToList();
+
+        var incomes = financialSummaryEntries.Where(x => !x.IsExpense).ToList();
+        var expenses = financialSummaryEntries.Where(x => x.IsExpense).ToList();
+
+        var balances = new List<FinancialSummaryBalance>();
+
+        // For every income, find the matching expense and calculate the balance.
+        foreach (var income in incomes)
+        {
+            var matchingExpense = expenses.FirstOrDefault(x => x.TypeGuid == income.TypeGuid);
+            if (matchingExpense != null)
+            {
+                balances.Add(new FinancialSummaryBalance()
+                {
+                    TypeGuid = income.TypeGuid,
+                    TypeName = income.TypeName,
+                    Balance = income.TotalAmount - matchingExpense.TotalAmount,
+                    IncomeTotal = income.TotalAmount,
+                    ExpenseTotal = matchingExpense.TotalAmount
+                });
+            }
+            else
+            {
+                balances.Add(new FinancialSummaryBalance()
+                {
+                    TypeGuid = income.TypeGuid,
+                    TypeName = income.TypeName,
+                    Balance = income.TotalAmount,
+                    IncomeTotal = income.TotalAmount,
+                    ExpenseTotal = 0
+                });
+            }
+        }
+
+        // For any expense that had no matching income, create an entry in the balance.
+        foreach (var expense in expenses)
+        {
+            if (balances.All(b => b.TypeGuid != expense.TypeGuid))
+            {
+                balances.Add(new FinancialSummaryBalance()
+                {
+                    TypeGuid = expense.TypeGuid,
+                    TypeName = expense.TypeName,
+                    Balance = -expense.TotalAmount,
+                    IncomeTotal = 0,
+                    ExpenseTotal = expense.TotalAmount
+                });
+            }
+        }
+
+        return (balances, expenses, incomes);
+    }
+
+    /// <summary>
     /// Gets a campaign's financial summary.<br/>
     /// </summary>
     /// <param name="campaignGuid">Guid of the campaign.</param>
@@ -95,41 +159,8 @@ public class FinancialDataController : Controller
 
             var financialDataSummary = await _financialDataService.GetFinancialSummary(campaignGuid);
 
-            // Converting to a list to avoid multiple enumerations.
-            var financialSummaryEntries = financialDataSummary.ToList();
+            var (balances, expenses, incomes) = CreateBalancesList(financialDataSummary);
 
-            var incomes = financialSummaryEntries.Where(x => !x.IsExpense).ToList();
-            var expenses = financialSummaryEntries.Where(x => x.IsExpense).ToList();
-
-            var balances = new List<FinancialSummaryBalance>();
-
-            // For every income, find the matching expense and calculate the balance.
-            foreach (var income in incomes)
-            {
-                var matchingExpense = expenses.FirstOrDefault(x => x.TypeGuid == income.TypeGuid);
-                if (matchingExpense != null)
-                {
-                    balances.Add(new FinancialSummaryBalance()
-                    {
-                        TypeGuid = income.TypeGuid,
-                        TypeName = income.TypeName,
-                        Balance = income.TotalAmount - matchingExpense.TotalAmount,
-                        IncomeTotal = income.TotalAmount,
-                        ExpenseTotal = matchingExpense.TotalAmount
-                    });
-                }
-                else
-                {
-                    balances.Add(new FinancialSummaryBalance()
-                    {
-                        TypeGuid = income.TypeGuid,
-                        TypeName = income.TypeName,
-                        Balance = income.TotalAmount,
-                        IncomeTotal = income.TotalAmount,
-                        ExpenseTotal = 0
-                    });
-                }
-            }
 
             // Get the totals of all expenses, incomes and the balance.
             var totalExpenses = expenses.Sum(x => x.TotalAmount);

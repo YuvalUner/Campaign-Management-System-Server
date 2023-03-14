@@ -1,5 +1,9 @@
 ﻿namespace DAL.Models;
 
+/// <summary>
+/// A static collection of all the possible permission types.<br/>
+/// Only these types are allowed for use.<br/>
+/// </summary>
 public static class PermissionTypes
 {
     public const string View = "view";
@@ -7,12 +11,22 @@ public static class PermissionTypes
 
     private static readonly string[] All = { View, Edit };
 
+    /// <summary>
+    /// Checks if the given permission type is valid.<br/>
+    /// </summary>
+    /// <param name="permissionType">The name of the permission type to check.</param>
+    /// <returns>True if the given permissionType is one the built in ones, false otherwise.</returns>
     public static bool IsValid(string permissionType)
     {
         return All.Contains(permissionType);
     }
 }
 
+/// <summary>
+/// A collection of all the possible permission targets.<br/>
+/// Only these targets are allowed for use.<br/>
+/// Permission targets are the screens that the user can view or edit.<br/>
+/// </summary>
 public static class PermissionTargets
 {
     public const string CampaignSettings = "Campaign Settings";
@@ -44,20 +58,30 @@ public static class PermissionTargets
         Financial
     };
 
+    /// <summary>
+    /// Checks if the given target is valid.<br/>
+    /// </summary>
+    /// <param name="screen">Name of the screen that is the permission target to check for</param>
+    /// <returns>True if the target is a built in one, false otherwise.</returns>
     public static bool IsValid(string screen)
     {
         return All.Contains(screen);
     }
 }
 
+/// <summary>
+/// A model for the permissions table of the database.<br/>
+/// Will throw an exception if the permission type or target are invalid.<br/>
+/// Can be compared to other permissions.<br/>
+/// </summary>
 public class Permission : IEquatable<Permission>
 {
-    private string? _permissionType;
+    private readonly string? _permissionType;
 
     public string? PermissionType
     {
         get => _permissionType;
-        set
+        init
         {
             if (!PermissionTypes.IsValid(value))
             {
@@ -68,12 +92,12 @@ public class Permission : IEquatable<Permission>
         }
     }
 
-    private string? _target;
+    private readonly string? _target;
 
     public string? PermissionTarget
     {
         get => _target;
-        set
+        init
         {
             if (!PermissionTargets.IsValid(value))
             {

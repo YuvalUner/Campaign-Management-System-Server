@@ -40,7 +40,7 @@ public class SmsController: Controller
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
             
-            if (smsSendingParams.PhoneNumbers.Count == 0)
+            if (smsSendingParams.PhoneNumbers == null || smsSendingParams.PhoneNumbers.Count == 0)
             {
                 return BadRequest(FormatErrorMessage(PhoneNumbersRequired, CustomStatusCode.ValueNullOrEmpty));
             }

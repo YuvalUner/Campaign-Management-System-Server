@@ -1,5 +1,9 @@
 ﻿namespace DAL.Models;
 
+/// <summary>
+/// A model for the parameters that can be used to search for events.<br/>
+/// All fields are nullable, so that they can be used as optional parameters.<br/>
+/// </summary>
 public class EventsSearchParams
 {
     public Guid? CampaignGuid { get; set; }
