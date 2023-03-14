@@ -3,6 +3,10 @@ using DAL.Models;
 
 namespace DAL.Services.Interfaces;
 
+/// <summary>
+/// A service for getting published events and announcements, as well as searching for them and also
+/// for adding, removing, and updating notification settings for publishings for a user.
+/// </summary>
 public interface IPublicBoardService
 {
     /// <summary>
@@ -14,7 +18,8 @@ public interface IPublicBoardService
     /// <param name="userId">Id of the user to match the preferences to. Keep null to not take preferences into account.</param>
     /// <param name="limit">How many rows to get. Keep null to get 50.</param>
     /// <param name="offset">Row offset. Used to "scroll" the feed. Keep null for offset 0.</param>
-    /// <returns></returns>
+    /// <returns>A list of <see cref="PublishedEventWithPublisher"/>, with the event and info on the publisher for each
+    /// event.</returns>
     Task<IEnumerable<PublishedEventWithPublisher>> GetEventsForUser(int? userId, int? limit, int? offset);
 
     /// <summary>
@@ -26,7 +31,8 @@ public interface IPublicBoardService
     /// <param name="userId">Id of the user to match the preferences to. Keep null to not take preferences into account.</param>
     /// <param name="limit">How many rows to get. Keep null to get 50.</param>
     /// <param name="offset">Row offset. Used to "scroll" the feed. Keep null for offset 0.</param>
-    /// <returns></returns>
+    /// <returns>A list of <see cref="AnnouncementWithPublisherDetails"/> with details on the announcement and its publisher
+    /// in each entry.</returns>
     Task<IEnumerable<AnnouncementWithPublisherDetails>> GetAnnouncementsForUser(int? userId, int? limit, int? offset);
 
     /// <summary>
@@ -34,7 +40,7 @@ public interface IPublicBoardService
     /// </summary>
     /// <param name="searchParams">The search parameters to use. For specification, see <see cref="EventsSearchParams"/>. 
     /// All fields left null will be ignored.</param>
-    /// <returns></returns>
+    /// <returns>A list of <see cref="PublishedEventWithPublisher"/>s that match the filter.</returns>
     Task<IEnumerable<PublishedEventWithPublisher>> SearchEvents(EventsSearchParams searchParams);
 
     /// <summary>
@@ -42,7 +48,7 @@ public interface IPublicBoardService
     /// </summary>
     /// <param name="searchParams">The search parameters to use. For specification, see <see cref="AnnouncementsSearchParams"/>.
     /// All fields left null will be ignored.</param>
-    /// <returns></returns>
+    /// <returns>A list of <see cref="AnnouncementWithPublisherDetails"/>s that match the filters.</returns>
     Task<IEnumerable<AnnouncementWithPublisherDetails>> SearchAnnouncements(AnnouncementsSearchParams searchParams);
 
     /// <summary>
@@ -50,21 +56,24 @@ public interface IPublicBoardService
     /// </summary>
     /// <param name="settings">An instance of <see cref="NotificationUponPublishSettings"/> containing the settings required,
     /// as well as the user id and campaign Guid.</param>
-    /// <returns>Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist.</returns>
+    /// <returns>Status code <see cref="CustomStatusCode.UserNotFound"/>  if the user does not exist,
+    /// <see cref="CustomStatusCode.CampaignNotFound"/> if the campaign does not exist.</returns>
     Task<CustomStatusCode> AddNotificationSettings(NotificationUponPublishSettings settings);
 
     /// <summary>
     /// Removes a notification settings entry for a user.
     /// </summary>
     /// <param name="settings">An instance of <see cref="NotificationUponPublishSettings"/> with userId and campaignGuid filled in.</param>
-    /// <returns>Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist.</returns>
+    /// <returns>Status code <see cref="CustomStatusCode.UserNotFound"/> if the user does not exist,
+    /// <see cref="CustomStatusCode.CampaignNotFound"/> if the campaign does not exist.</returns>
     Task<CustomStatusCode> RemoveNotificationSettings(NotificationUponPublishSettings settings);
 
     /// <summary>
     /// Updates an existing notification settings entry for a user.
     /// </summary>
     /// <param name="settings">An instance of <see cref="NotificationUponPublishSettings"/> containing the settings required.</param>
-    /// <returns>Status code UserNotFound if the user does not exist, CampaignNotFound if the campaign does not exist.</returns>
+    /// <returns>Status code <see cref="CustomStatusCode.UserNotFound"/> if the user does not exist,
+    /// <see cref="CustomStatusCode.CampaignNotFound"/> if the campaign does not exist.</returns>
     Task<CustomStatusCode> UpdateNotificationSettings(NotificationUponPublishSettings settings);
 
     /// <summary>

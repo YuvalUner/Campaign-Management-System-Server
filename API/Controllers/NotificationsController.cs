@@ -97,7 +97,7 @@ public class NotificationsController : Controller
 
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
 
-            await _notificationsService.ModifyUserToNotify(userId, campaignGuid, notificationSettings.ViaSms, notificationSettings.ViaEmail);
+            await _notificationsService.UpdateUserToNotify(userId, campaignGuid, notificationSettings.ViaSms, notificationSettings.ViaEmail);
             return Ok();
         }
         catch (Exception e)
