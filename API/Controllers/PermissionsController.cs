@@ -9,6 +9,10 @@ using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
+/// <summary>
+/// A controller for handling permissions.
+/// Provides a web API and service policy for <see cref="IPermissionsService"/>.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -28,6 +32,15 @@ public class PermissionsController : Controller
         _rolesService = rolesService;
     }
 
+    /// <summary>
+    /// Adds a new permission to a user within a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign.</param>
+    /// <param name="userEmail">Email of the user to add the permission to.</param>
+    /// <param name="permission">A <see cref="Permission"/>, the permission to add.</param>
+    /// <returns>Unauthorized if the requesting user can not edit permissions in the campaign or can not add this permission to
+    /// this user, NotFound if the user to add the permission to or the permission itself do not exist,
+    /// BadRequest if the user already has this permission, Ok otherwise.</returns>
     [HttpPost("add/{campaignGuid:guid}/{userEmail}")]
     public async Task<IActionResult> AddPermission(Guid campaignGuid, string userEmail,
         [FromBody] Permission permission)
@@ -71,6 +84,12 @@ public class PermissionsController : Controller
         }
     }
 
+    /// <summary>
+    /// Gets the permissions of the currently logged in user within a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign.</param>
+    /// <returns>Unauthorized if user does not have access to this campaign,
+    /// Ok with a list of <see cref="Permission"/> otherwise.</returns>
     [HttpGet("getSelf/{campaignGuid:guid}")]
     public async Task<IActionResult> GetSelfPermissions(Guid campaignGuid)
     {
@@ -82,8 +101,10 @@ public class PermissionsController : Controller
             {
                 return Unauthorized(FormatErrorMessage(AuthorizationError, CustomStatusCode.AuthorizationError));
             }
-
+            
             var userId = HttpContext.Session.GetInt32(Constants.UserId);
+            // This should never happen, as the user should be logged in to access this method.
+            // I have no idea why my past self did this, but my current self is too scared to change it.
             if (userId == null)
             {
                 return BadRequest(FormatErrorMessage(UserNotFound, CustomStatusCode.ValueNotFound));
@@ -102,6 +123,13 @@ public class PermissionsController : Controller
         }
     }
 
+    /// <summary>
+    /// Gets the permissions of a specific user within a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign.</param>
+    /// <param name="userEmail">Email of the user to get the permissions of.</param>
+    /// <returns>Unauthorized if the requesting user can not view permissions in the campaign,
+    /// NotFound if there is no user with that email, Ok with a list of <see cref="Permission"/> otherwise.</returns>
     [HttpGet("get/{campaignGuid:guid}/{userEmail}")]
     public async Task<IActionResult> GetPermissions(Guid campaignGuid, string userEmail)
     {
@@ -134,6 +162,14 @@ public class PermissionsController : Controller
         }
     }
     
+    /// <summary>
+    /// Removes a permission from a user within a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign.</param>
+    /// <param name="userEmail">Email of the user to remove the permission from.</param>
+    /// <param name="permission">A <see cref="Permission"/>, the permission to add.</param>
+    /// <returns>Unauthorized if the requesting user can not edit permissions in the campaign or can not remove
+    /// this permission to from this user, Ok otherwise.</returns>
     [HttpDelete("delete/{campaignGuid:guid}/{userEmail}")]
     public async Task<IActionResult> DeletePermission(Guid campaignGuid, string userEmail,
         [FromBody] Permission permission)

@@ -8,6 +8,10 @@ using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
+/// <summary>
+/// A controller for handling notifications settings for users.
+/// Provides a web API and service policy for <see cref="INotificationsService"/>.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -22,6 +26,13 @@ public class NotificationsController : Controller
         _logger = logger;
     }
 
+    /// <summary>
+    /// Adds a user to a campaign's list of users to notify when a new user joins the campaign.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the related campaign.</param>
+    /// <param name="notificationSettings">An instance of <see cref="NotificationSettings"/> with the settings the user
+    /// wants.</param>
+    /// <returns>Unauthorized if the user does not have permission to view the campaign's users list, Ok otherwise.</returns>
     [HttpPost("add/{campaignGuid:guid}")]
     public async Task<IActionResult> AddUserToNotify(Guid campaignGuid, [FromBody] NotificationSettings notificationSettings)
     {
@@ -50,6 +61,11 @@ public class NotificationsController : Controller
         }
     }
 
+    /// <summary>
+    /// Removes a user from a campaign's list of users to notify when a new user joins the campaign.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the related campaign.</param>
+    /// <returns>Unauthorized if the user does not have permission to view the campaign's users list, Ok otherwise.</returns>
     [HttpDelete("remove/{campaignGuid:guid}")]
     public async Task<IActionResult> RemoveUserToNotify(Guid campaignGuid)
     {
@@ -78,6 +94,13 @@ public class NotificationsController : Controller
         }
     }
     
+    /// <summary>
+    /// Updates a user's existing notification settings for a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the related campaign.</param>
+    /// <param name="notificationSettings">An instance of <see cref="NotificationSettings"/> with the settings the user
+    /// wants.</param>
+    /// <returns>Unauthorized if the user does not have permission to view the campaign's users list, Ok otherwise.</returns>
     [HttpPut("update/{campaignGuid:guid}")]
     public async Task<IActionResult> UpdateUserToNotify(Guid campaignGuid, [FromBody] NotificationSettings notificationSettings)
     {

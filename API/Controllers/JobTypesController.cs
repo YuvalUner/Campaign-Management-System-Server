@@ -8,6 +8,10 @@ using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
+/// <summary>
+/// A controller for handling job types.
+/// Provides a web API and service policy for <see cref="IJobTypesService"/>.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
@@ -24,6 +28,14 @@ public class JobTypesController : Controller
         _logger = logger;
     }
 
+    /// <summary>
+    /// Adds a new job type to a campaign.
+    /// </summary>
+    /// <param name="jobType">An instance of <see cref="JobType"/> with all the required parameters filled in.</param>
+    /// <param name="campaignGuid">Guid of the campaign to add to.</param>
+    /// <returns>Unauthorized if the requesting user does not have permission to edit job types in the campaign,
+    /// BadRequest if the job type name is a built in one, is empty, already exists for the campaign, or the campaign
+    /// already has too many job types, Ok otherwise.</returns>
     [HttpPost("add/{campaignGuid:guid}")]
     public async Task<IActionResult> AddJobType([FromBody] JobType jobType, Guid campaignGuid)
     {
@@ -67,6 +79,13 @@ public class JobTypesController : Controller
         }
     }
 
+    /// <summary>
+    /// Deletes an existing job type from a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign.</param>
+    /// <param name="jobTypeName">Name of the job type to delete.</param>
+    /// <returns>Unauthorized if the requesting user does not have permission to edit job types in the campaign,
+    /// BadRequest if the name is of a built in job type, Ok otherwise.</returns>
     [HttpDelete("delete/{campaignGuid:guid}/{jobTypeName}")]
     public async Task<IActionResult> DeleteJobType(Guid campaignGuid, string jobTypeName)
     {
@@ -98,6 +117,12 @@ public class JobTypesController : Controller
         }
     }
     
+    /// <summary>
+    /// Gets a list of all job types for a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign.</param>
+    /// <returns>Unauthorized if the requesting user does not have permission to view job types in the campaign,
+    /// Ok with a list of <see cref="JobType"/> otherwise.</returns>
     [HttpGet("get/{campaignGuid:guid}")]
     public async Task<IActionResult> GetJobTypes(Guid campaignGuid)
     {
@@ -124,6 +149,14 @@ public class JobTypesController : Controller
         }
     }
     
+    /// <summary>
+    /// Updates an existing job type's name or description.
+    /// </summary>
+    /// <param name="jobType">An instance of <see cref="JobType"/> with the desired parameters to update set to not null.</param>
+    /// <param name="campaignGuid">Guid of the campaign the job type belongs to.</param>
+    /// <param name="jobTypeName">Current name of the job type.</param>
+    /// <returns>Unauthorized if the requesting user does not have permission to edit job types in the campaign,
+    /// BadRequest if the name given is a built in name, empty, or already exists, Ok otherwise.</returns>
     [HttpPut("update/{campaignGuid:guid}/{jobTypeName}")]
     public async Task<IActionResult> UpdateJobType([FromBody] JobType jobType, Guid campaignGuid, string jobTypeName)
     {
