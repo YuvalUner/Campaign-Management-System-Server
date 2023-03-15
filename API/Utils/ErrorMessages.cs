@@ -98,6 +98,7 @@ public static class ErrorMessages
         "Otherwise, the error may be on our end or the civil registry's end. Please contact us.";
     
     public const string NotInCampaign = "You are not a member of this campaign";
+    public const string VerificationCodeError = "Verification code error - please check your code and try again";
 
     /// <summary>
     /// Formats an error message with a custom status code, such that it can be returned to the client in a consistent way.

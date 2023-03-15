@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+/// <summary>
+/// A controller for logging in and out.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class TokenController : Controller
@@ -54,11 +57,13 @@ public class TokenController : Controller
     }
     
     /// <summary>
-    /// API function for logging a user in via their google account.
-    /// Creates a new user if they don't exist in the database.
+    /// API function for logging a user in via their google account.<br/>
+    /// Creates a new user if they don't exist in the database.<br/>
+    /// Sets cookies and session data for the user.
     /// </summary>
-    /// <param name="idToken"></param>
-    /// <returns></returns>
+    /// <param name="externalAuth">A <see cref="ExternalAuthDto"/> containing the token and provider.</param>
+    /// <returns>BadRequest if the token is not valid, 500 if something failed in user creation (should not happen),
+    /// Ok otherwise.</returns>
     [HttpPost("googleSignIn")]
     public async Task<IActionResult> SignUserIn([FromBody] ExternalAuthDto externalAuth)
     {
@@ -143,7 +148,10 @@ public class TokenController : Controller
         }
     }
     
-
+    /// <summary>
+    /// Signs the user out by clearing the session and cookies.
+    /// </summary>
+    /// <returns>Ok.</returns>
     [HttpPost("signOut")]
     public async Task<IActionResult> SignUserOut()
     {
@@ -160,6 +168,11 @@ public class TokenController : Controller
         }
     }
 
+    /// <summary>
+    /// Signs in to my account (Yuval).
+    /// Purely for ease of testing, remove this when development is done.
+    /// </summary>
+    /// <returns></returns>
     [HttpPost("TestSignInRemoveLater")]
     public async Task<IActionResult> TestSignInRemoveLater()
     {

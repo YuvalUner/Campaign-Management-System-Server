@@ -11,6 +11,10 @@ using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
+/// <summary>
+/// A controller for performing actions and getting data related to users.
+/// Provides a web API and service policy for <see cref="IUsersService"/>.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class UsersController : Controller
@@ -29,6 +33,11 @@ public class UsersController : Controller
         _votersLedgerService = votersLedgerService;
     }
 
+    /// <summary>
+    /// Gets the info the client needs to fill in parts of the home page.<br/>
+    /// Specifically, the user's info and the campaigns they are part of.
+    /// </summary>
+    /// <returns>Ok with a <see cref="User"/> object and list of <see cref="Campaign"/>.</returns>
     [Authorize]
     [HttpGet("HomePageInfo")]
     public async Task<IActionResult> HomePageInfo()
@@ -68,6 +77,11 @@ public class UsersController : Controller
         }
     }
 
+    /// <summary>
+    /// Verifies that the user's private info matches that in the voters ledger.
+    /// </summary>
+    /// <param name="userInfo">An instance of <see cref="UserPrivateInfo"/> to verify.</param>
+    /// <returns>True if all verifications check, false otherwise.</returns>
     private async Task<bool> VerifyUserPrivateInfo(UserPrivateInfo userInfo)
     {
         // Checking that the user filled in all of the required fields.
@@ -101,8 +115,8 @@ public class UsersController : Controller
     /// <summary>
     /// Verifies that the user has not already filled out their private info.
     /// </summary>
-    /// <param name="userId"></param>
-    /// <returns></returns>
+    /// <param name="userId">User id of the user trying to verify.</param>
+    /// <returns>True if the info is not a duplicate, false otherwise.</returns>
     private async Task<bool> VerifyNonDuplicatePrivateInfo(int? userId)
     {
         User? user = await _usersService.GetUserPublicInfo(userId);
@@ -122,6 +136,13 @@ public class UsersController : Controller
         return false;
     }
 
+    /// <summary>
+    /// Verifies the user's private info against the voters ledger, and sets the user's authentication status to true
+    /// if the info is correct.
+    /// </summary>
+    /// <param name="userInfo">An instance of <see cref="UserPrivateInfo"/> that contains all the needed information.</param>
+    /// <returns>Unauthorized in case of duplicate verification, BadRequest in case of bad info submitted,
+    /// Ok otherwise.</returns>
     [Authorize]
     [HttpPut("UserPrivateInfo")]
     public async Task<IActionResult> UserPrivateInfo([FromBody] UserPrivateInfo userInfo)
