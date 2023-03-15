@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using DAL.DbAccess;
+﻿using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Implementations;
 using DAL.Services.Interfaces;
@@ -7,6 +6,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace DAL_Tests;
 
+/// <summary>
+/// A collection of tests for the <see cref="INotificationsService"/> interface and its implementation, <see cref="NotificationsService"/>.<br/>
+/// The tests are executed in a sequential order, as defined by the <see cref="PriorityOrderer"/>,
+/// using the <see cref="TestPriorityAttribute"/> attribute.
+/// </summary>
 [Collection("sequential")]
 [TestCaseOrderer("DAL_Tests.PriorityOrderer", "DAL_Tests")]
 public class NotificationsServiceTests
@@ -74,7 +78,7 @@ public class NotificationsServiceTests
         testNotificationSettings.ViaSms = false;
         
         // Act
-        _notificationsService.ModifyUserToNotify(testUser.UserId, testCampaign.CampaignGuid.Value, testNotificationSettings.ViaSms, testNotificationSettings.ViaEmail).Wait();
+        _notificationsService.UpdateUserToNotify(testUser.UserId, testCampaign.CampaignGuid.Value, testNotificationSettings.ViaSms, testNotificationSettings.ViaEmail).Wait();
         
         // Assert
         var result = _notificationsService.GetUsersToNotify(testCampaign.CampaignGuid.Value).Result;

@@ -15,6 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Adding all the many, many services
 builder.Services.AddScoped<IGenericDbAccess, GenericDbAccess>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IVotersLedgerService, VotersLedgerService>();
@@ -40,6 +41,7 @@ builder.Services.AddScoped<IFinancialTypesService, FinancialTypesService>();
 builder.Services.AddScoped<IFinancialDataService, FinancialDataService>();
 builder.Services.AddScoped<IElectionDayService, ElectionDayService>();
 
+// CORS policy - for now, just allow all. Change as needed
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", optionsBuilder => {
         optionsBuilder.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
@@ -52,6 +54,8 @@ builder.Services.AddCors(options => {
 
 builder.Services.AddDistributedMemoryCache();
 
+// Session and cookie authentication configuration - do not remove cookie authentication, as the app constantly
+// uses HttpContext.Session to store data, and that requires cookie authentication.
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(2);
@@ -95,6 +99,7 @@ builder.Logging.AddSerilog(new LoggerConfiguration()
 
 var app = builder.Build();
 
+// Anti-XSS middleware to prevent XSS attacks
 app.UseMiddleware<AntiXssMiddleware>();
 
 // Configure the HTTP request pipeline.

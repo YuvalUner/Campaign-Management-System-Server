@@ -2,11 +2,15 @@
 using DAL.Models;
 using DAL.Services.Implementations;
 using DAL.Services.Interfaces;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 namespace DAL_Tests;
 
+/// <summary>
+/// A collection of tests for the <see cref="INotificationsService"/> interface and its implementation, <see cref="NotificationsService"/>.<br/>
+/// The tests are executed in a sequential order, as defined by the <see cref="PriorityOrderer"/>,
+/// using the <see cref="TestPriorityAttribute"/> attribute.
+/// </summary>
 [Collection("sequential")]
 [TestCaseOrderer("DAL_Tests.PriorityOrderer", "DAL_Tests")]
 public class VotersLedgerServiceTests
@@ -22,7 +26,7 @@ public class VotersLedgerServiceTests
         CityName = "גבעתיים",
         IsMunicipal = true
     };
-    
+
     private static User testUser = new()
     {
         UserId = 53,
@@ -47,7 +51,7 @@ public class VotersLedgerServiceTests
     };
 
     private static Decimal innerCityBallotId = Decimal.Parse("72.1");
-    
+
     public VotersLedgerServiceTests()
     {
         _configuration = new ConfigurationBuilder()
@@ -64,36 +68,36 @@ public class VotersLedgerServiceTests
     public void TestSetup()
     {
         // Arrange
-        
+
         // Act
-        var result = _campaignsService.AddCampaign(testCampaign,testUser.UserId).Result;
+        var result = _campaignsService.AddCampaign(testCampaign, testUser.UserId).Result;
         testCampaign.CampaignId = result;
         testCampaign.CampaignGuid = _campaignsService.GetCampaignGuid(testCampaign.CampaignId).Result;
-        
+
         // Assert
         Assert.True(result > 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetVotersLedgerRecordShouldReturnNullForNonExistingId()
     {
         // Arrange
-        
+
         // Act
         var result = _votersLedgerService.GetSingleVotersLedgerRecord(-1).Result;
-        
+
         // Assert
         Assert.Null(result);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetVotersLedgerRecordShouldReturnRecord()
     {
         // Arrange
-        
+
         // Act
         var result = _votersLedgerService.GetSingleVotersLedgerRecord(testVotersLedgerRecord.IdNum).Result;
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.Equal(testVotersLedgerRecord.IdNum, result.IdNum);
@@ -120,16 +124,16 @@ public class VotersLedgerServiceTests
             CityName = testVotersLedgerRecord.ResidenceName,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count > 100);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerByCityAndIdRecordShouldReturnNone()
     {
@@ -140,15 +144,15 @@ public class VotersLedgerServiceTests
             IdNum = 999999999,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerByCityAndIdRecordShouldReturnOne()
     {
@@ -159,16 +163,16 @@ public class VotersLedgerServiceTests
             IdNum = testVotersLedgerRecord.IdNum,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 1);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerByCityAndNameRecordShouldReturnAtLeastOne()
     {
@@ -180,16 +184,16 @@ public class VotersLedgerServiceTests
             LastName = testVotersLedgerRecord.LastName,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count > 0);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerByCityAndNameRecordShouldReturnNone()
     {
@@ -201,10 +205,10 @@ public class VotersLedgerServiceTests
             LastName = "testVotersLedgerRecord.LastName",
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
@@ -219,10 +223,10 @@ public class VotersLedgerServiceTests
             SupportStatus = true,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
@@ -235,15 +239,15 @@ public class VotersLedgerServiceTests
         {
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsShouldThrowErrorForNoCampaignGuid()
     {
@@ -251,7 +255,7 @@ public class VotersLedgerServiceTests
         {
             CityName = testVotersLedgerRecord.ResidenceName
         };
-        
+
         // Act
 
         // Assert
@@ -269,16 +273,16 @@ public class VotersLedgerServiceTests
             StreetName = testVotersLedgerRecord.StreetName,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count > 1);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordByCityNameAndStreetNameShouldReturnNone()
     {
@@ -289,10 +293,10 @@ public class VotersLedgerServiceTests
             StreetName = "אפק2",
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
@@ -308,16 +312,16 @@ public class VotersLedgerServiceTests
             FirstName = testVotersLedgerRecord.FirstName,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count > 0);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityNameAndFirstNameShouldReturnNone()
     {
@@ -328,15 +332,15 @@ public class VotersLedgerServiceTests
             FirstName = "testVotersLedgerRecord.FirstName",
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityNameAndLastNameShouldWork()
     {
@@ -347,16 +351,16 @@ public class VotersLedgerServiceTests
             LastName = testVotersLedgerRecord.LastName,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count > 0);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityNameAndLastNameShouldReturnNone()
     {
@@ -367,15 +371,15 @@ public class VotersLedgerServiceTests
             LastName = "testVotersLedgerRecord.LastName",
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByIdNumShouldWork()
     {
@@ -385,16 +389,16 @@ public class VotersLedgerServiceTests
             IdNum = testVotersLedgerRecord.IdNum,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 1);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByIdNumShouldReturnNone()
     {
@@ -404,15 +408,15 @@ public class VotersLedgerServiceTests
             IdNum = -1,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByFirstNameAndLastNameShouldWork()
     {
@@ -423,16 +427,16 @@ public class VotersLedgerServiceTests
             LastName = testVotersLedgerRecord.LastName,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count > 0);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByFirstNameAndLastNameShouldReturnNone()
     {
@@ -443,15 +447,15 @@ public class VotersLedgerServiceTests
             LastName = "testVotersLedgerRecord.LastName",
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByFirstNameShouldWork()
     {
@@ -461,16 +465,16 @@ public class VotersLedgerServiceTests
             FirstName = testVotersLedgerRecord.FirstName,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count > 0);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByFirstNameShouldReturnNone()
     {
@@ -480,15 +484,15 @@ public class VotersLedgerServiceTests
             FirstName = "testVotersLedgerRecord.FirstName",
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByLastNameShouldWork()
     {
@@ -498,16 +502,16 @@ public class VotersLedgerServiceTests
             LastName = testVotersLedgerRecord.LastName,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count > 0);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByLastNameShouldReturnNone()
     {
@@ -517,10 +521,10 @@ public class VotersLedgerServiceTests
             LastName = "testVotersLedgerRecord.LastName",
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
@@ -537,16 +541,16 @@ public class VotersLedgerServiceTests
             StreetName = testVotersLedgerRecord.StreetName,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count > 0);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityNameBallotIdStreetNameShouldReturnNoneForFaultyStreetName()
     {
@@ -558,15 +562,15 @@ public class VotersLedgerServiceTests
             StreetName = "testVotersLedgerRecord.StreetName",
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityNameBallotIdStreetNameShouldReturnNoneForFaultyBallotId()
     {
@@ -578,15 +582,15 @@ public class VotersLedgerServiceTests
             StreetName = testVotersLedgerRecord.StreetName,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityNameBallotIdStreetNameShouldReturnNoneForFaultyCityName()
     {
@@ -598,10 +602,10 @@ public class VotersLedgerServiceTests
             StreetName = testVotersLedgerRecord.StreetName,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
@@ -615,10 +619,10 @@ public class VotersLedgerServiceTests
             CityName = "testVotersLedgerRecord.ResidenceName",
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
@@ -635,16 +639,16 @@ public class VotersLedgerServiceTests
             BallotId = innerCityBallotId,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count > 0);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityAndFirstNameAndBallotIdShouldReturnNoneForFaultyFirstName()
     {
@@ -656,15 +660,15 @@ public class VotersLedgerServiceTests
             BallotId = innerCityBallotId,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityAndFirstNameAndBallotIdShouldReturnNoneForFaultyBallotId()
     {
@@ -676,15 +680,15 @@ public class VotersLedgerServiceTests
             BallotId = -10,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityAndFirstNameAndBallotIdShouldReturnNoneForFaultyCityName()
     {
@@ -696,15 +700,15 @@ public class VotersLedgerServiceTests
             BallotId = innerCityBallotId,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityAndLastNameAndBallotIdShouldWork()
     {
@@ -716,16 +720,16 @@ public class VotersLedgerServiceTests
             BallotId = innerCityBallotId,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count > 0);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityAndLastNameAndBallotIdShouldReturnNoneForFaultyLastName()
     {
@@ -737,15 +741,15 @@ public class VotersLedgerServiceTests
             BallotId = innerCityBallotId,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityAndLastNameAndBallotIdShouldReturnNoneForFaultyBallotId()
     {
@@ -757,15 +761,15 @@ public class VotersLedgerServiceTests
             BallotId = -10,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByCityAndLastNameAndBallotIdShouldReturnNoneForFaultyCityName()
     {
@@ -777,10 +781,10 @@ public class VotersLedgerServiceTests
             BallotId = innerCityBallotId,
             CampaignGuid = testCampaign.CampaignGuid
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
@@ -795,10 +799,10 @@ public class VotersLedgerServiceTests
             IdNum = testVotersLedgerRecord.IdNum,
             SupportStatus = true
         };
-        
+
         // Act
         var result = _votersLedgerService.UpdateVoterSupportStatus(param, testCampaign.CampaignGuid.Value).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.Ok, result);
     }
@@ -812,10 +816,10 @@ public class VotersLedgerServiceTests
             IdNum = testVotersLedgerRecord.IdNum,
             SupportStatus = true
         };
-        
+
         // Act
         var result = _votersLedgerService.UpdateVoterSupportStatus(param, Guid.Empty).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.CityNotFound, result);
     }
@@ -830,16 +834,16 @@ public class VotersLedgerServiceTests
             CampaignGuid = testCampaign.CampaignGuid,
             CityName = testVotersLedgerRecord.ResidenceName
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 1);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(3)]
     public void GetFilteredVotersLedgerRecordsBySupportStatusShouldReturnNoneForSupportStatusFalse()
     {
@@ -850,15 +854,15 @@ public class VotersLedgerServiceTests
             CampaignGuid = testCampaign.CampaignGuid,
             CityName = testVotersLedgerRecord.ResidenceName
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(3)]
     public void GetFilteredVotersLedgerRecordsBySupportStatusShouldReturnNoneForFaultyCityName()
     {
@@ -869,15 +873,15 @@ public class VotersLedgerServiceTests
             CampaignGuid = testCampaign.CampaignGuid,
             CityName = "testVotersLedgerRecord.ResidenceName"
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(3)]
     public void GetFilteredVotersLedgerRecordsBySupportStatusShouldReturnNoneForFaultyCampaignGuid()
     {
@@ -888,15 +892,15 @@ public class VotersLedgerServiceTests
             CampaignGuid = Guid.Empty,
             CityName = testVotersLedgerRecord.ResidenceName
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(4)]
     public void UpdateVoterSupportStatusShouldWork()
     {
@@ -906,14 +910,14 @@ public class VotersLedgerServiceTests
             IdNum = testVotersLedgerRecord.IdNum,
             SupportStatus = false
         };
-        
+
         // Act
         var result = _votersLedgerService.UpdateVoterSupportStatus(param, testCampaign.CampaignGuid.Value).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.Ok, result);
     }
-    
+
     [Fact, TestPriority(5)]
     public void GetFilteredVotersLedgerRecordsBySupportStatusAfterUpdateShouldReturnNone()
     {
@@ -924,15 +928,15 @@ public class VotersLedgerServiceTests
             CampaignGuid = testCampaign.CampaignGuid,
             CityName = testVotersLedgerRecord.ResidenceName
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 0);
     }
-    
+
     [Fact, TestPriority(5)]
     public void GetFilteredVotersLedgerRecordsBySupportStatusAfterUpdateShouldReturnOne()
     {
@@ -943,16 +947,16 @@ public class VotersLedgerServiceTests
             CampaignGuid = testCampaign.CampaignGuid,
             CityName = testVotersLedgerRecord.ResidenceName
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 1);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(5)]
     public void GetFilteredVotersLedgerRecordsBySupportStatusAndFirstNameShouldReturnOne()
     {
@@ -963,16 +967,16 @@ public class VotersLedgerServiceTests
             CampaignGuid = testCampaign.CampaignGuid,
             FirstName = testVotersLedgerRecord.FirstName
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 1);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(5)]
     public void GetFilteredVotersLedgerRecordsBySupportStatusAndLastNameShouldReturnOne()
     {
@@ -983,16 +987,16 @@ public class VotersLedgerServiceTests
             CampaignGuid = testCampaign.CampaignGuid,
             LastName = testVotersLedgerRecord.LastName
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 1);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(5)]
     public void GetFilteredVotersLedgerRecordsBySupportStatusAndFirstNameAndLastNameShouldReturnOne()
     {
@@ -1004,16 +1008,16 @@ public class VotersLedgerServiceTests
             FirstName = testVotersLedgerRecord.FirstName,
             LastName = testVotersLedgerRecord.LastName
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 1);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-    
+
     [Fact, TestPriority(5)]
     public void GetFilteredVotersLedgerRecordsBySupportStatusAndFirstNameAndLastNameAndCityNameShouldReturnOne()
     {
@@ -1026,16 +1030,15 @@ public class VotersLedgerServiceTests
             LastName = testVotersLedgerRecord.LastName,
             CityName = testVotersLedgerRecord.ResidenceName
         };
-        
+
         // Act
         var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.True(result.Count == 1);
-        Assert.Contains(result , x => x.IdNum == testVotersLedgerRecord.IdNum);
+        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
     }
-
 
 
     /// <summary>
@@ -1046,13 +1049,12 @@ public class VotersLedgerServiceTests
     public void CleanUpCampaign()
     {
         // Arrange
-        
+
         // Act
         _campaignsService.DeleteCampaign(testCampaign.CampaignGuid).Wait();
         var result = _campaignsService.GetCampaignNameByGuid(testCampaign.CampaignGuid).Result;
-        
+
         // Assert
         Assert.Null(result);
     }
-    
 }

@@ -1,5 +1,12 @@
 ﻿namespace DAL.Models;
 
+/// <summary>
+/// A model for a single row of the voters ledger table.<br/>
+/// The fields are named according to the names of the columns in the table.<br/>
+/// The spare fields are because they can be provided by the official voters ledger, but are generally not used, so it
+/// is easier to ignore them (this line has been written because I tried figuring out what the spare fields are for way too long,
+/// so I would like to save the next person the trouble).
+/// </summary>
 public class VotersLedgerRecord
 {
     public int IdNum { get; set; }

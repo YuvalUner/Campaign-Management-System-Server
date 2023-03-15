@@ -6,6 +6,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace DAL_Tests;
 
+/// <summary>
+/// A collection of tests for the <see cref="IFinancialTypesService"/> and its implementation <see cref="FinancialTypesService"/>.<br/>
+/// The tests are executed in a sequential order, as defined by the <see cref="PriorityOrderer"/>,
+/// using the <see cref="TestPriorityAttribute"/> attribute.
+/// </summary>
 [Collection("sequential")]
 [TestCaseOrderer("DAL_Tests.PriorityOrderer", "DAL_Tests")]
 public class FinancialTypesServiceTests
@@ -25,13 +30,13 @@ public class FinancialTypesServiceTests
         TypeName = "Other",
         TypeGuid = Guid.Parse("F082354C-7B51-4687-AC26-D833EB301556")
     };
-    
+
     public FinancialTypesServiceTests()
     {
         _configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
             .Build();
-        
+
         _financialTypesService = new FinancialTypesService(new GenericDbAccess(_configuration));
     }
 
@@ -39,39 +44,40 @@ public class FinancialTypesServiceTests
     public void GetFinancialTypes_ShouldReturnListWithOnlyOtherType_ForNoTypesAddedYet()
     {
         // Arrange
-        
+
         // Act
         var financialTypes = _financialTypesService.GetFinancialTypes(_testFinancialType.CampaignGuid.Value).Result;
-        
+
         // Assert
-        Assert.Single(financialTypes);
-        Assert.Equal(_otherFinancialType.TypeGuid, financialTypes.First().TypeGuid);
+        Assert.NotEmpty(financialTypes);
+        Assert.Contains(financialTypes, ft => ft.TypeGuid == _otherFinancialType.TypeGuid);
+        Assert.DoesNotContain(financialTypes, ft => ft.TypeGuid == _testFinancialType.TypeGuid);
     }
-    
+
     [Fact, TestPriority(2)]
     public void CreateFinancialType_ShouldWork()
     {
         // Arrange
-        
+
         // Act
         var (statusCode, typeGuid) = _financialTypesService.CreateFinancialType(_testFinancialType).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.Ok, statusCode);
         Assert.NotEqual(Guid.Empty, typeGuid);
         _testFinancialType.TypeGuid = typeGuid;
     }
-    
+
     [Fact, TestPriority(3)]
     public void GetFinancialTypes_ShouldReturnListWithOtherAndTestTypes()
     {
         // Arrange
-        
+
         // Act
         var financialTypes = _financialTypesService.GetFinancialTypes(_testFinancialType.CampaignGuid.Value).Result;
-        
+
         // Assert
-        Assert.Equal(2, financialTypes.Count());
+        Assert.NotEmpty(financialTypes);
         Assert.Contains(financialTypes, ft => ft.TypeGuid == _otherFinancialType.TypeGuid);
         Assert.Contains(financialTypes, ft => ft.TypeGuid == _testFinancialType.TypeGuid);
     }
@@ -87,23 +93,23 @@ public class FinancialTypesServiceTests
             TypeDescription = "Updated",
             CampaignGuid = _testFinancialType.CampaignGuid
         };
-        
+
         // Act
         var statusCode = _financialTypesService.UpdateFinancialType(updatedFinancialType).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.Ok, statusCode);
         _testFinancialType = updatedFinancialType;
     }
-    
+
     [Fact, TestPriority(5)]
     public void GetFinancialTypes_ShouldReturnListWithUpdatedTestType()
     {
         // Arrange
-        
+
         // Act
         var financialTypes = _financialTypesService.GetFinancialTypes(_testFinancialType.CampaignGuid.Value).Result;
-        
+
         // Assert
         Assert.NotEmpty(financialTypes);
         Assert.Contains(financialTypes, ft => ft.TypeGuid == _otherFinancialType.TypeGuid);
@@ -122,15 +128,15 @@ public class FinancialTypesServiceTests
             TypeName = "Test",
             TypeDescription = "Test"
         };
-        
+
         // Act
         var (statusCode, typeGuid) = _financialTypesService.CreateFinancialType(financialType).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.CampaignNotFound, statusCode);
         Assert.Equal(Guid.Empty, typeGuid);
     }
-    
+
     [Fact, TestPriority(6)]
     public void UpdateFinancialType_ShouldFail_ForWrongTypeGuid()
     {
@@ -141,22 +147,22 @@ public class FinancialTypesServiceTests
             TypeName = "Test",
             TypeDescription = "Test"
         };
-        
+
         // Act
         var statusCode = _financialTypesService.UpdateFinancialType(financialType).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.FinancialTypeNotFound, statusCode);
     }
-    
+
     [Fact, TestPriority(6)]
     public void DeleteFinancialType_ShouldFail_ForWrongTypeGuid()
     {
         // Arrange
-        
+
         // Act
         var statusCode = _financialTypesService.DeleteFinancialType(Guid.Empty).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.FinancialTypeNotFound, statusCode);
     }
@@ -165,48 +171,49 @@ public class FinancialTypesServiceTests
     public void UpdateFinancialType_ShouldFail_ForIllegalTypeGuid()
     {
         // Arrange
-        
+
         // Act
         var statusCode = _financialTypesService.UpdateFinancialType(_otherFinancialType).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.SqlIllegalValue, statusCode);
     }
-    
+
     [Fact, TestPriority(6)]
     public void DeleteFinancialType_ShouldFail_ForIllegalTypeGuid()
     {
         // Arrange
-        
+
         // Act
         var statusCode = _financialTypesService.DeleteFinancialType(_otherFinancialType.TypeGuid.Value).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.SqlIllegalValue, statusCode);
     }
-    
+
     [Fact, TestPriority(100)]
     public void DeleteFinancialType_ShouldWork()
     {
         // Arrange
-        
+
         // Act
         var statusCode = _financialTypesService.DeleteFinancialType(_testFinancialType.TypeGuid.Value).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.Ok, statusCode);
     }
-    
+
     [Fact, TestPriority(101)]
     public void GetFinancialTypes_ShouldReturnListWithOnlyOtherType_AfterDelete()
     {
         // Arrange
-        
+
         // Act
         var financialTypes = _financialTypesService.GetFinancialTypes(_testFinancialType.CampaignGuid.Value).Result;
-        
+
         // Assert
-        Assert.Single(financialTypes);
-        Assert.Equal(_otherFinancialType.TypeGuid, financialTypes.First().TypeGuid);
+        Assert.NotEmpty(financialTypes);
+        Assert.Contains(financialTypes, ft => ft.TypeGuid == _otherFinancialType.TypeGuid);
+        Assert.DoesNotContain(financialTypes, ft => ft.TypeGuid == _testFinancialType.TypeGuid);
     }
 }

@@ -8,8 +8,17 @@ using Microsoft.AspNetCore.Mvc;
 using RestAPIServices;
 using static API.Utils.ErrorMessages;
 
+// Disable warning CS4014 - there are some async methods that are not awaited, but this is intentional.
+// The methods are called in the background, and the result is not needed.
+#pragma warning disable CS4014
+
 namespace API.Controllers;
 
+/// <summary>
+/// A controller for invite-related actions.<br/>
+/// Provides a web API and service policy for <see cref="IInvitesService"/> methods, and also other functionality such as
+/// message sending where needed.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class InvitesController : Controller
@@ -36,6 +45,12 @@ public class InvitesController : Controller
         _usersService = usersService;
     }
 
+    /// <summary>
+    /// A method for getting the invite for a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign to get the invite for.</param>
+    /// <returns>Unauthorized if the user does not have permission to view campaign settings, NotFound if the invite
+    /// does not exist, Ok with the invite guid otherwise.</returns>
     [Authorize]
     [HttpGet("/GetInvite/{campaignGuid:guid}")]
     public async Task<IActionResult> GetInvite(Guid campaignGuid)
@@ -68,6 +83,12 @@ public class InvitesController : Controller
         }
     }
 
+    /// <summary>
+    /// Updates the invite for a campaign by generating a new one. If the invite does not exist, it is created.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign to update the invite for.</param>
+    /// <returns>Unauthorized if the user does not have permission to edit campaign settings,
+    /// Ok otherwise. Use the get method again to get the new invite.</returns>
     [Authorize]
     [HttpPut("/UpdateInvite/{campaignGuid:guid}")]
     public async Task<IActionResult> UpdateInvite(Guid campaignGuid)
@@ -87,6 +108,12 @@ public class InvitesController : Controller
         return Ok();
     }
 
+    /// <summary>
+    /// Deletes the invite for a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign to delete the invite for.</param>
+    /// <returns>Unauthorized if the user does not have permission to edit campaign settings,
+    /// Ok otherwise. Use the get method again to get the new invite.</returns>
     [Authorize]
     [HttpDelete("/RevokeInvite/{campaignGuid:guid}")]
     public async Task<IActionResult> RevokeInvite(Guid campaignGuid)
@@ -114,6 +141,13 @@ public class InvitesController : Controller
         }
     }
 
+    /// <summary>
+    /// A method for accepting an invite to a campaign.<br/>
+    /// Upon accepting, the user is added to the campaign.
+    /// </summary>
+    /// <param name="campaignInviteGuid">The invite (a guid unique to the campaign's invite)</param>
+    /// <returns>Not found if the invite matches no campaign, Unauthorized if the user did not verify their information,
+    /// BadRequest if user is already a member of the campaign, Ok otherwise.</returns>
     [Authorize]
     [HttpPost("/AcceptInvite/{campaignInviteGuid:guid}")]
     public async Task<IActionResult> AcceptInvite(Guid campaignInviteGuid)
@@ -126,11 +160,12 @@ public class InvitesController : Controller
             {
                 return NotFound(FormatErrorMessage(CampaignNotFound, CustomStatusCode.ValueNotFound));
             }
-            
+
             var userAccountAuthorizationStatus = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);
             if (!userAccountAuthorizationStatus)
             {
-                return Unauthorized(FormatErrorMessage(VerificationStatusError, CustomStatusCode.VerificationStatusError));
+                return Unauthorized(FormatErrorMessage(VerificationStatusError,
+                    CustomStatusCode.VerificationStatusError));
             }
 
             // Checks if the user is already part of the campaign and if not, adds them
@@ -138,13 +173,17 @@ public class InvitesController : Controller
             // when it comes to this (assuming no one broke into the DB), and it's faster to check than the database.
             if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaign.CampaignGuid))
             {
+                // This condition shouldn't happen - if the previous check passed, the user should already not be 
+                // in the campaign. But just in case, we check again, because we get it "for free" from the return value
+                // and mistakes can happen.
                 var res = await _inviteService.AcceptInvite(campaign.CampaignGuid, userId);
                 if (res == CustomStatusCode.DuplicateKey)
                 {
                     return BadRequest(FormatErrorMessage(AlreadyAMember, CustomStatusCode.DuplicateKey));
                 }
+
                 CampaignAuthorizationUtils.AddAuthorizationForCampaign(HttpContext, campaign.CampaignGuid);
-                
+
                 // Notify all users that should be notified that a new user joined the campaign
                 var usersToNotify = await _notificationsService.GetUsersToNotify(campaign.CampaignGuid.Value);
                 User? user = await _usersService.GetUserPublicInfo(userId);
@@ -156,13 +195,14 @@ public class InvitesController : Controller
                         _emailSendingService.SendUserJoinedEmailAsync(user.FirstNameHeb + " " + user.LastNameHeb,
                             campaign.CampaignName, userToNotify.Email);
                     }
+
                     if (userToNotify.ViaSms && userToNotify.PhoneNumber != null)
                     {
                         _smsMessageSendingService.SendUserJoinedSmsAsync(user.FirstNameHeb + " " + user.LastNameHeb,
                             campaign.CampaignName, userToNotify.PhoneNumber, CountryCodes.Israel);
                     }
                 }
-                
+
                 return Ok(new { CampaignGuid = campaign });
             }
 

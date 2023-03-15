@@ -205,7 +205,7 @@ public class JobsService: IJobsService
         return await _dbAccess.GetData<UserJob, DynamicParameters>(StoredProcedureNames.GetUserJobs, param);
     }
 
-    public async Task<IEnumerable<UsersFilterResults>> GetUsersAvaialbleForJob(UsersFilterForJobsParams filterParams)
+    public async Task<IEnumerable<UsersFilterResults>> GetUsersAvailableForJob(UsersFilterForJobsParams filterParams)
     {
         return  await _dbAccess.GetData<UsersFilterResults, UsersFilterForJobsParams>(StoredProcedureNames.FilterUsersList, filterParams);
     }

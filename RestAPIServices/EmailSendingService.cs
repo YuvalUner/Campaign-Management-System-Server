@@ -16,41 +16,53 @@ public class EmailSendingService : IEmailSendingService
         _logger = logger;
     }
 
-    private async Task SendEmailAsync(string emailTo, string subject, string message, string? senderName = null)
+    /// <summary>
+    /// A general method for sending emails asynchronously, using the Gmail SMTP server. 
+    /// </summary>
+    /// <param name="emailTo">Email address to send the email to.</param>
+    /// <param name="subject">The subject of the email.</param>
+    /// <param name="message">The contents of the email.</param>
+    /// <param name="senderName">The name of the sender, will be the email address if left unspecified.</param>
+    private async Task SendEmailAsync(string? emailTo, string subject, string message, string? senderName = null)
     {
-
         try
         {
-            SmtpClient smtpServer = new SmtpClient(_configuration["EmailConfiguration:Gmail:SmtpServer"],
-                Convert.ToInt32(_configuration["EmailConfiguration:Gmail:SmtpPort"]));
-            smtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
-            MailMessage email = new MailMessage();
-            
-            if (senderName != null)
-                email.From = new MailAddress(_configuration["EmailConfiguration:Gmail:Email"], senderName);
+            // If emailTo is null, there is no point in sending an email, so we just stop here.
+            if (emailTo != null)
+            {
+                SmtpClient smtpServer = new SmtpClient(_configuration["EmailConfiguration:Gmail:SmtpServer"],
+                    Convert.ToInt32(_configuration["EmailConfiguration:Gmail:SmtpPort"]));
+                smtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
+                MailMessage email = new MailMessage();
+
+                email.From = senderName != null
+                    ? new MailAddress(_configuration["EmailConfiguration:Gmail:Email"], senderName)
+                    : new MailAddress(_configuration["EmailConfiguration:Gmail:Email"]);
+                email.To.Add(emailTo);
+                email.Subject = subject;
+                email.Body = message;
+
+                smtpServer.Timeout = 5000;
+                smtpServer.EnableSsl = true;
+                smtpServer.UseDefaultCredentials = false;
+                smtpServer.Credentials = new NetworkCredential(_configuration["EmailConfiguration:Gmail:Email"],
+                    _configuration["EmailConfiguration:Gmail:Password"]);
+                smtpServer.SendAsync(email, null);
+            }
             else
             {
-                email.From = new MailAddress(_configuration["EmailConfiguration:Gmail:Email"]);
+                _logger.LogWarning(
+                    "EmailTo is null, so no email was sent. Other params sent: {subject}, {message}, {senderName}",
+                    subject, message, senderName ?? "null");
             }
-            email.To.Add(emailTo);
-            email.Subject = subject;
-            email.Body = message;
-            
-            smtpServer.Timeout = 5000;
-            smtpServer.EnableSsl = true;
-            smtpServer.UseDefaultCredentials = false;
-            smtpServer.Credentials = new NetworkCredential(_configuration["EmailConfiguration:Gmail:Email"],
-                _configuration["EmailConfiguration:Gmail:Password"]);
-            smtpServer.SendAsync(email, null);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while sending email");
         }
-
     }
-    
-    public async Task SendUserJoinedEmailAsync(string? userName, string? campaignName, string emailTo)
+
+    public async Task SendUserJoinedEmailAsync(string? userName, string? campaignName, string? emailTo)
     {
         string subject = $"User joined campaign";
         string message = $"User {userName} joined campaign {campaignName}";
@@ -63,23 +75,24 @@ public class EmailSendingService : IEmailSendingService
         string message = $"Role {roleName} was assigned to you in campaign {campaignName}";
         await SendEmailAsync(emailTo, subject, message, campaignName);
     }
-    
-    public async Task SendJobAssignedEmailAsync(string? jobName, DateTime? jobStartTime, DateTime? jobEndTime, string? location, string? emailTo)
+
+    public async Task SendJobAssignedEmailAsync(string? jobName, DateTime? jobStartTime, DateTime? jobEndTime,
+        string? location, string? emailTo)
     {
         string subject = $"Job assigned";
         string message = $"You were assigned the job {jobName} from {jobStartTime} to {jobEndTime} at {location}";
         await SendEmailAsync(emailTo, subject, message, jobName);
     }
-    
+
     public async Task SendJobUnAssignedEmailAsync(string? jobName, string? location, string? emailTo)
     {
         string subject = $"Job unassigned";
         string message = $"You were unassigned from the job {jobName} at {location}";
         await SendEmailAsync(emailTo, subject, message, jobName);
     }
-    
+
     public async Task SendAddedEventParticipationEmailAsync(string? eventName,
-        string? eventLocation, DateTime? startTime, DateTime? endTime,  string? emailTo, string? senderName)
+        string? eventLocation, DateTime? startTime, DateTime? endTime, string? emailTo, string? senderName)
     {
         string subject = $"Event participation added";
         string message;
@@ -99,6 +112,7 @@ public class EmailSendingService : IEmailSendingService
         {
             message = $"You were added to the event {eventName} at {eventLocation}";
         }
+
         await SendEmailAsync(emailTo, subject, message, senderName);
     }
 
@@ -110,20 +124,24 @@ public class EmailSendingService : IEmailSendingService
         string message;
         if (startTime != null && endTime != null)
         {
-            message = $"Event {eventName} at {eventLocation} from {startTime} to {endTime} was created by {creatorName} and added to your schedule";
+            message =
+                $"Event {eventName} at {eventLocation} from {startTime} to {endTime} was created by {creatorName} and added to your schedule";
         }
         else if (startTime != null)
         {
-            message = $"Event {eventName} at {eventLocation} starting at {startTime} was created by {creatorName} and added to your schedule";
+            message =
+                $"Event {eventName} at {eventLocation} starting at {startTime} was created by {creatorName} and added to your schedule";
         }
         else if (endTime != null)
         {
-            message = $"Event {eventName} at {eventLocation} ending at {endTime} was created by {creatorName} and added to your schedule";
+            message =
+                $"Event {eventName} at {eventLocation} ending at {endTime} was created by {creatorName} and added to your schedule";
         }
         else
         {
             message = $"Event {eventName} at {eventLocation} was created by {creatorName} and added to your schedule";
         }
+
         await SendEmailAsync(emailTo, subject, message, senderName);
     }
 
@@ -148,6 +166,7 @@ public class EmailSendingService : IEmailSendingService
         {
             message = $"Event {eventName} at {eventLocation} was deleted";
         }
+
         await SendEmailAsync(emailTo, subject, message, senderName);
     }
 
@@ -160,14 +179,17 @@ public class EmailSendingService : IEmailSendingService
         {
             message += $"Location moved to: {eventLocation} \n";
         }
+
         if (startTime != null)
         {
             message += $"Start time changed to: {startTime} \n";
         }
+
         if (endTime != null)
         {
             message += $"End time changed to: {endTime} \n";
         }
+
         await SendEmailAsync(emailTo, subject, message, senderName);
     }
 
@@ -180,14 +202,17 @@ public class EmailSendingService : IEmailSendingService
         {
             message += $"Location: {eventLocation} \n";
         }
+
         if (startTime != null)
         {
             message += $"Start time: {startTime} \n";
         }
+
         if (endTime != null)
         {
             message += $"End time: {endTime} \n";
         }
+
         await SendEmailAsync(emailTo, subject, message, senderName);
     }
 
@@ -197,7 +222,7 @@ public class EmailSendingService : IEmailSendingService
         string subject = $"Announcement published";
         string message = $"Announcement title: {announcementTitle} \n";
         message += $"Announcement content: {announcementContent} \n";
-        
+
         await SendEmailAsync(emailTo, subject, message, senderName);
     }
 }

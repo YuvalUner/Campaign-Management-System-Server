@@ -1,5 +1,11 @@
 ﻿namespace DAL.Models;
 
+using DbAccess;
+
+/// <summary>
+/// A model for the results of a single row from the <see cref="StoredProcedureNames.FilterUsersList"/> stored procedure.<br/>
+/// Contains all the information needed to be displayed about each user.
+/// </summary>
 public class UsersFilterResults
 {
     public string? Email { get; set; }

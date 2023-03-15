@@ -6,13 +6,18 @@ using Microsoft.Extensions.Configuration;
 
 namespace DAL_Tests;
 
+/// <summary>
+/// A collection of tests for the <see cref="INotificationsService"/> interface and its implementation, <see cref="NotificationsService"/>.<br/>
+/// The tests are executed in a sequential order, as defined by the <see cref="PriorityOrderer"/>,
+/// using the <see cref="TestPriorityAttribute"/> attribute.
+/// </summary>
 [Collection("sequential")]
 [TestCaseOrderer("DAL_Tests.PriorityOrderer", "DAL_Tests")]
 public class PublicBoardServiceTests
 {
     private readonly IConfiguration _configuration;
     private readonly IPublicBoardService _publicBoardService;
-    
+
     private static readonly User _testUser = new User()
     {
         UserId = 1,
@@ -25,12 +30,12 @@ public class PublicBoardServiceTests
         UserId = 53,
         Email = "bbb"
     };
-    
+
     private static readonly Campaign _preferredCampaign = new Campaign()
     {
         CampaignGuid = Guid.Parse("050528E2-ED6A-4192-B560-2594C9ED3370")
     };
-    
+
     private static readonly Campaign _neutralCampaign = new Campaign()
     {
         CampaignGuid = Guid.Parse("77A5A6E4-7177-4560-83C9-D559BC5210CD")
@@ -67,11 +72,10 @@ public class PublicBoardServiceTests
 
     public PublicBoardServiceTests()
     {
-        _configuration = new ConfigurationBuilder().
-            SetBasePath(Directory.GetCurrentDirectory())
+        _configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json")
-            .Build(); 
-        
+            .Build();
+
         _publicBoardService = new PublicBoardService(new GenericDbAccess(_configuration));
     }
 
@@ -79,11 +83,11 @@ public class PublicBoardServiceTests
     public void GetEventsForUser_ShouldReturnEventsFromAllCampaigns_ForNoUserIdGiven()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetEventsForUser(null, null, null).Result;
         var resList = res.ToList();
-        
+
         // Assert
         Assert.True(resList.Count > 0);
         Assert.Contains(resList, x => x.CampaignGuid == _preferredCampaign.CampaignGuid);
@@ -99,16 +103,16 @@ public class PublicBoardServiceTests
             Assert.True(resList[i].PublishingDate >= resList[i + 1].PublishingDate);
         }
     }
-    
+
     [Fact, TestPriority(2)]
     public void GetEventsForUser_ShouldReturnEventsFromPreferredCampaigns_ForUserIdGiven()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetEventsForUser(_testUser.UserId, null, null).Result;
         var resList = res.ToList();
-        
+
         // Assert
         Assert.True(resList.Count > 0);
         Assert.Contains(resList, x => x.CampaignGuid == _preferredCampaign.CampaignGuid);
@@ -130,6 +134,7 @@ public class PublicBoardServiceTests
             {
                 Assert.True(resList[i].PublishingDate >= resList[i + 1].PublishingDate);
             }
+
             if (resList[i].CampaignGuid == _preferredCampaign.CampaignGuid)
             {
                 Assert.False(flag);
@@ -141,16 +146,16 @@ public class PublicBoardServiceTests
             }
         }
     }
-    
+
     [Fact, TestPriority(3)]
     public void GetAnnouncementsForUser_ShouldReturnAnnouncementsFromAllCampaigns_ForNoUserIdGiven()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetAnnouncementsForUser(null, null, null).Result;
         var resList = res.ToList();
-        
+
         // Assert
         Assert.True(resList.Count > 0);
         Assert.Contains(resList, x => x.CampaignGuid == _preferredCampaign.CampaignGuid);
@@ -166,16 +171,16 @@ public class PublicBoardServiceTests
             Assert.True(resList[i].PublishingDate >= resList[i + 1].PublishingDate);
         }
     }
-    
+
     [Fact, TestPriority(4)]
     public void GetAnnouncementsForUser_ShouldReturnAnnouncementsFromPreferredCampaigns_ForUserIdGiven()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetAnnouncementsForUser(_testUser.UserId, null, null).Result;
         var resList = res.ToList();
-        
+
         // Assert
         Assert.True(resList.Count > 0);
         Assert.Contains(resList, x => x.CampaignGuid == _preferredCampaign.CampaignGuid);
@@ -197,6 +202,7 @@ public class PublicBoardServiceTests
             {
                 Assert.True(resList[i].PublishingDate >= resList[i + 1].PublishingDate);
             }
+
             if (resList[i].CampaignGuid == _preferredCampaign.CampaignGuid)
             {
                 Assert.False(flag);
@@ -217,14 +223,14 @@ public class PublicBoardServiceTests
         {
             CampaignGuid = Guid.Empty
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
-    
+
     [Fact, TestPriority(6)]
     public void SearchPublishedEvents_ShouldReturnEmptyList_ForPublisherFirstName()
     {
@@ -233,14 +239,14 @@ public class PublicBoardServiceTests
         {
             PublisherFirstName = "wrong search string"
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
-    
+
     [Fact, TestPriority(7)]
     public void SearchPublishedEvents_ShouldReturnEvents_ForCorrectCampaignGuid()
     {
@@ -249,15 +255,15 @@ public class PublicBoardServiceTests
         {
             CampaignGuid = _preferredCampaign.CampaignGuid
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.Equal(_preferredCampaign.CampaignGuid, x.CampaignGuid));
     }
-    
+
     [Fact, TestPriority(8)]
     public void SearchPublishedEvents_ShouldReturnEvents_ForCorrectPublisherFirstName()
     {
@@ -266,15 +272,15 @@ public class PublicBoardServiceTests
         {
             PublisherFirstName = _testUser.FirstNameHeb
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.Equal(_testUser.FirstNameHeb, x.FirstNameHeb));
     }
-    
+
     [Fact, TestPriority(9)]
     public void SearchPublishedEvents_ShouldReturnEvents_ForCorrectPublisherLastName()
     {
@@ -283,10 +289,10 @@ public class PublicBoardServiceTests
         {
             PublisherLastName = _testUser.LastNameHeb
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.Equal(_testUser.LastNameHeb, x.LastNameHeb));
@@ -300,14 +306,14 @@ public class PublicBoardServiceTests
         {
             PublisherLastName = "wrong search string"
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
-    
+
     [Fact, TestPriority(11)]
     public void SearchPublishedEvents_ShouldReturnEvents_ForCorrectEventName()
     {
@@ -316,15 +322,15 @@ public class PublicBoardServiceTests
         {
             EventName = _testEvent.EventName
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.Equal(_testEvent.EventName, x.EventName));
     }
-    
+
     [Fact, TestPriority(12)]
     public void SearchPublishedEvents_ShouldReturnEmpty_ForWrongEventName()
     {
@@ -333,10 +339,10 @@ public class PublicBoardServiceTests
         {
             EventName = "wrong search string"
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
@@ -349,15 +355,15 @@ public class PublicBoardServiceTests
         {
             EventLocation = _testEvent.EventLocation
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.Equal(_testEvent.EventLocation, x.EventLocation));
     }
-    
+
     [Fact, TestPriority(14)]
     public void SearchPublishedEvents_ShouldReturnEmpty_ForWrongEventLocation()
     {
@@ -366,10 +372,10 @@ public class PublicBoardServiceTests
         {
             EventLocation = "wrong search string"
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
@@ -382,15 +388,15 @@ public class PublicBoardServiceTests
         {
             EventStartTime = _testEvent.EventStartTime
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.Equal(_testEvent.EventStartTime, x.EventStartTime));
     }
-    
+
     [Fact, TestPriority(16)]
     public void SearchPublishedEvents_ShouldReturnEmpty_ForWrongEventStartTime()
     {
@@ -399,14 +405,14 @@ public class PublicBoardServiceTests
         {
             EventStartTime = DateTime.Parse("01/01/2100")
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
-    
+
     [Fact, TestPriority(17)]
     public void SearchPublishedEvents_ShouldReturnEvents_ForCorrectEventEndTime()
     {
@@ -415,15 +421,15 @@ public class PublicBoardServiceTests
         {
             EventEndTime = _testEvent.EventEndTime
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.True(_testEvent.EventEndTime <= x.EventEndTime));
     }
-    
+
     [Fact, TestPriority(18)]
     public void SearchPublishedEvents_ShouldReturnEmpty_ForWrongEventEndTime()
     {
@@ -432,10 +438,10 @@ public class PublicBoardServiceTests
         {
             EventEndTime = DateTime.Parse("01/01/1900")
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
@@ -448,15 +454,15 @@ public class PublicBoardServiceTests
         {
             PublishingDate = _testEventPublishingDate
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.Equal(_testEventPublishingDate.Date, x.PublishingDate.Value.Date));
     }
-    
+
     [Fact, TestPriority(20)]
     public void SearchPublishedEvents_ShouldReturnEmpty_ForWrongPublishingDate()
     {
@@ -465,14 +471,14 @@ public class PublicBoardServiceTests
         {
             PublishingDate = DateTime.Parse("01/01/1900")
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
-    
+
 
     [Fact, TestPriority(21)]
     public void SearchPublishedAnnouncements_ShouldReturnAnnouncements_ForCorrectCampaignGuid()
@@ -482,15 +488,15 @@ public class PublicBoardServiceTests
         {
             CampaignGuid = _preferredCampaign.CampaignGuid
         };
-        
+
         // Act
         var res = _publicBoardService.SearchAnnouncements(AnnouncementsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.Equal(_preferredCampaign.CampaignGuid, x.CampaignGuid));
     }
-    
+
     [Fact, TestPriority(22)]
     public void SearchPublishedAnnouncements_ShouldReturnAnnouncements_ForCorrectPublisherFirstName()
     {
@@ -499,15 +505,15 @@ public class PublicBoardServiceTests
         {
             PublisherFirstName = _testUser.FirstNameHeb
         };
-        
+
         // Act
         var res = _publicBoardService.SearchAnnouncements(AnnouncementsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.Equal(_testUser.FirstNameHeb, x.FirstNameHeb));
     }
-    
+
     [Fact, TestPriority(23)]
     public void SearchPublishedAnnouncements_ShouldReturnEmpty_ForWrongPublisherFirstName()
     {
@@ -516,14 +522,14 @@ public class PublicBoardServiceTests
         {
             PublisherFirstName = "wrong search string"
         };
-        
+
         // Act
         var res = _publicBoardService.SearchAnnouncements(AnnouncementsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
-    
+
     [Fact, TestPriority(24)]
     public void SearchPublishedAnnouncements_ShouldReturnAnnouncements_ForCorrectPublisherLastName()
     {
@@ -532,15 +538,15 @@ public class PublicBoardServiceTests
         {
             PublisherLastName = _testUser.LastNameHeb
         };
-        
+
         // Act
         var res = _publicBoardService.SearchAnnouncements(AnnouncementsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.Equal(_testUser.LastNameHeb, x.LastNameHeb));
     }
-    
+
     [Fact, TestPriority(25)]
     public void SearchPublishedAnnouncements_ShouldReturnEmpty_ForWrongPublisherLastName()
     {
@@ -549,10 +555,10 @@ public class PublicBoardServiceTests
         {
             PublisherLastName = "wrong search string"
         };
-        
+
         // Act
         var res = _publicBoardService.SearchAnnouncements(AnnouncementsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
@@ -565,14 +571,14 @@ public class PublicBoardServiceTests
         {
             CampaignGuid = Guid.Empty
         };
-        
+
         // Act
         var res = _publicBoardService.SearchAnnouncements(AnnouncementsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
-    
+
     [Fact, TestPriority(27)]
     public void SearchPublishedAnnouncements_ShouldReturnAnnouncements_ForCorrectAnnouncementTitle()
     {
@@ -581,15 +587,15 @@ public class PublicBoardServiceTests
         {
             AnnouncementTitle = _testAnnouncement.AnnouncementTitle
         };
-        
+
         // Act
         var res = _publicBoardService.SearchAnnouncements(AnnouncementsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.Equal(_testAnnouncement.AnnouncementTitle, x.AnnouncementTitle));
     }
-    
+
     [Fact, TestPriority(28)]
     public void SearchPublishedAnnouncements_ShouldReturnEmpty_ForWrongAnnouncementTitle()
     {
@@ -598,10 +604,10 @@ public class PublicBoardServiceTests
         {
             AnnouncementTitle = "wrong search string"
         };
-        
+
         // Act
         var res = _publicBoardService.SearchAnnouncements(AnnouncementsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
@@ -614,15 +620,15 @@ public class PublicBoardServiceTests
         {
             PublishingDate = _testEventPublishingDate
         };
-        
+
         // Act
         var res = _publicBoardService.SearchAnnouncements(AnnouncementsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x => Assert.Equal(_testEventPublishingDate.Date, x.PublishingDate.Value.Date));
     }
-    
+
     [Fact, TestPriority(30)]
     public void SearchPublishedAnnouncements_ShouldReturnEmpty_ForWrongPublishingDate()
     {
@@ -631,10 +637,10 @@ public class PublicBoardServiceTests
         {
             PublishingDate = DateTime.Parse("01/01/1900")
         };
-        
+
         // Act
         var res = _publicBoardService.SearchAnnouncements(AnnouncementsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
@@ -647,14 +653,14 @@ public class PublicBoardServiceTests
         {
             CampaignCity = _preferredCampaign.CityName
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
     }
-    
+
     [Fact, TestPriority(32)]
     public void SearchPublishedEvents_ShouldReturnEmpty_ForWrongCampaignCity()
     {
@@ -663,14 +669,14 @@ public class PublicBoardServiceTests
         {
             CampaignCity = "wrong search string"
         };
-        
+
         // Act
         var res = _publicBoardService.SearchEvents(EventsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
-    
+
     [Fact, TestPriority(33)]
     public void SearchPublishedAnnouncements_ShouldReturnAnnouncements_ForCorrectCampaignCity()
     {
@@ -679,14 +685,14 @@ public class PublicBoardServiceTests
         {
             CampaignCity = _preferredCampaign.CityName
         };
-        
+
         // Act
         var res = _publicBoardService.SearchAnnouncements(AnnouncementsSearchParams).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
     }
-    
+
     [Fact, TestPriority(34)]
     public void SearchPublishedAnnouncements_ShouldReturnEmpty_ForWrongCampaignCity()
     {
@@ -695,10 +701,10 @@ public class PublicBoardServiceTests
         {
             CampaignCity = "wrong search string"
         };
-        
+
         // Act
         var res = _publicBoardService.SearchAnnouncements(AnnouncementsSearchParams).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
@@ -707,22 +713,22 @@ public class PublicBoardServiceTests
     public void GetNotificationSettingsForUser_ShouldReturnEmpty_ForNoNotificationSettingsYet()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetNotificationSettingsForUser(_testUser2.UserId).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
-    
+
     [Fact, TestPriority(36)]
     public void GetNotificationSettingsForCampaign_ShouldReturnEmpty_ForNoNotificationSettingsYet()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetNotificationSettingsForCampaign(_preferredCampaign.CampaignGuid.Value).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
@@ -731,10 +737,10 @@ public class PublicBoardServiceTests
     public void AddNotificationSettingsForUser_ShouldWork()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.AddNotificationSettings(_settings).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.Ok, res);
     }
@@ -750,14 +756,14 @@ public class PublicBoardServiceTests
             ViaSms = true,
             ViaEmail = true
         };
-        
+
         // Act
         var res = _publicBoardService.AddNotificationSettings(settings).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.UserNotFound, res);
     }
-    
+
     [Fact, TestPriority(39)]
     public void AddNotificationSettingsForUser_ShouldFailForWrongCampaignGuid()
     {
@@ -769,22 +775,22 @@ public class PublicBoardServiceTests
             ViaSms = true,
             ViaEmail = true
         };
-        
+
         // Act
         var res = _publicBoardService.AddNotificationSettings(settings).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.CampaignNotFound, res);
     }
-    
+
     [Fact, TestPriority(40)]
     public void GetNotificationSettingsForUser_ShouldReturnSettings_ForCorrectUserId()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetNotificationSettingsForUser(_testUser2.UserId).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x =>
@@ -794,15 +800,15 @@ public class PublicBoardServiceTests
             Assert.Equal(true, x.ViaEmail);
         });
     }
-    
+
     [Fact, TestPriority(41)]
     public void GetNotificationSettingsForCampaign_ShouldReturnSettings_ForCorrectCampaignGuid()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetNotificationSettingsForCampaign(_preferredCampaign.CampaignGuid.Value).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x =>
@@ -812,7 +818,7 @@ public class PublicBoardServiceTests
             Assert.Equal(true, x.ViaEmail);
         });
     }
-    
+
     [Fact, TestPriority(42)]
     public void UpdateNotificationSettings_ShouldWork()
     {
@@ -824,15 +830,15 @@ public class PublicBoardServiceTests
             ViaSms = true,
             ViaEmail = false
         };
-        
+
         // Act
         var res = _publicBoardService.UpdateNotificationSettings(settings).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.Ok, res);
         _settings = settings;
     }
-    
+
     [Fact, TestPriority(43)]
     public void UpdateNotificationSettings_ShouldFailForWrongUserId()
     {
@@ -844,14 +850,14 @@ public class PublicBoardServiceTests
             ViaSms = true,
             ViaEmail = false
         };
-        
+
         // Act
         var res = _publicBoardService.UpdateNotificationSettings(settings).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.UserNotFound, res);
     }
-    
+
     [Fact, TestPriority(44)]
     public void UpdateNotificationSettings_ShouldFailForWrongCampaignGuid()
     {
@@ -863,22 +869,22 @@ public class PublicBoardServiceTests
             ViaSms = true,
             ViaEmail = false
         };
-        
+
         // Act
         var res = _publicBoardService.UpdateNotificationSettings(settings).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.CampaignNotFound, res);
     }
-    
+
     [Fact, TestPriority(45)]
     public void GetNotificationSettingsForUser_ShouldReturnUpdatedSettings_ForCorrectUserId()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetNotificationSettingsForUser(_testUser2.UserId).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x =>
@@ -888,15 +894,15 @@ public class PublicBoardServiceTests
             Assert.Equal(false, x.ViaEmail);
         });
     }
-    
+
     [Fact, TestPriority(46)]
     public void GetNotificationSettingsForCampaign_ShouldReturnUpdatedSettings_ForCorrectCampaignGuid()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetNotificationSettingsForCampaign(_preferredCampaign.CampaignGuid.Value).Result;
-        
+
         // Assert
         Assert.NotEmpty(res);
         Assert.All(res, x =>
@@ -911,38 +917,38 @@ public class PublicBoardServiceTests
     public void GetNotificationSettingsForUser_ShouldReturnEmpty_ForWrongUserId()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetNotificationSettingsForUser(-1).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
-    
+
     [Fact, TestPriority(48)]
     public void GetNotificationSettingsForCampaign_ShouldReturnEmpty_ForWrongCampaignGuid()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetNotificationSettingsForCampaign(Guid.Empty).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
-    
+
     [Fact, TestPriority(49)]
     public void DeleteNotificationSettings_ShouldWork()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.RemoveNotificationSettings(_settings).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.Ok, res);
     }
-    
+
     [Fact, TestPriority(50)]
     public void DeleteNotificationSettings_ShouldFailForWrongUserId()
     {
@@ -954,14 +960,14 @@ public class PublicBoardServiceTests
             ViaSms = true,
             ViaEmail = false
         };
-        
+
         // Act
         var res = _publicBoardService.RemoveNotificationSettings(settings).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.UserNotFound, res);
     }
-    
+
     [Fact, TestPriority(51)]
     public void DeleteNotificationSettings_ShouldFailForWrongCampaignGuid()
     {
@@ -973,22 +979,22 @@ public class PublicBoardServiceTests
             ViaSms = true,
             ViaEmail = false
         };
-        
+
         // Act
         var res = _publicBoardService.RemoveNotificationSettings(settings).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.CampaignNotFound, res);
     }
-    
+
     [Fact, TestPriority(52)]
     public void GetNotificationSettingsForUserAfterDelete_ShouldReturnEmpty_ForCorrectUserId()
     {
         // Arrange
-        
+
         // Act
         var res = _publicBoardService.GetNotificationSettingsForUser(_testUser2.UserId).Result;
-        
+
         // Assert
         Assert.Empty(res);
     }
@@ -1004,4 +1010,4 @@ public class PublicBoardServiceTests
         // Assert
         Assert.Empty(res);
     }
-}   
+}
