@@ -93,6 +93,12 @@ public enum CustomStatusCode
     /// A general status code for when a value is null or empty, but should not be.
     /// </summary>
     ValueNullOrEmpty = 15,
+    
+    /// <summary>
+    /// A status code for when 2 values do not match, but should.<br/>
+    /// For example, when the user tries to verify their phone number, but the code they entered does not match the one sent to them.
+    /// </summary>
+    NoMatch = 16,
 
     // 50000 and above are SQL errors, meant to match requirement of throwing between 50000 and 2147483647
     // These are for errors that would have been thrown by the database if not caught by the stored procedure
