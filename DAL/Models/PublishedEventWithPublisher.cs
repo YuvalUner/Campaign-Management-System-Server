@@ -1,15 +1,11 @@
 ﻿namespace DAL.Models;
 
-public class PublishedEventWithPublisher
+/// <summary>
+/// An extension of <see cref="CustomEvent"/>, meant for events that have been published.<br/>
+/// Also includes the publisher's details and the campaign's info.<br/>
+/// </summary>
+public class PublishedEventWithPublisher: CustomEvent
 {
-    public Guid EventGuid { get; set; }
-    public string? EventName { get; set; }
-    public string? EventDescription { get; set; }
-    public DateTime? EventStartTime { get; set; }
-    public DateTime? EventEndTime { get; set; }
-    public string? EventLocation { get; set; }
-    public int? MaxAttendees { get; set; }
-    public int? NumAttending { get; set; }
     public DateTime? PublishingDate { get; set; }
     public string? FirstNameHeb { get; set; }
     public string? LastNameHeb { get; set; }
@@ -19,5 +15,4 @@ public class PublishedEventWithPublisher
     public string? PhoneNumber { get; set; }
     public string? CampaignName { get; set; }
     public string? CampaignLogoUrl { get; set; }
-    public Guid? CampaignGuid { get; set; }
 }

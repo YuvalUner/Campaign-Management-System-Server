@@ -1,5 +1,9 @@
 ﻿namespace DAL.Models;
 
+/// <summary>
+/// A model for parameters used when filtering jobs.<br/>
+/// All properties are nullable, so that the user can choose which parameters to use.<br/>
+/// </summary>
 public class JobsFilterParameters
 {
     public string? JobTypeName { get; set; }

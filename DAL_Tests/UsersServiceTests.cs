@@ -2,15 +2,17 @@
 using DAL.Models;
 using DAL.Services.Implementations;
 using DAL.Services.Interfaces;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
 namespace DAL_Tests;
 
-
-
+/// <summary>
+/// A collection of tests for the <see cref="IUsersService"/> interface and its implementation, <see cref="UsersService"/>.<br/>
+/// The tests are executed in a sequential order, as defined by the <see cref="PriorityOrderer"/>,
+/// using the <see cref="TestPriorityAttribute"/> attribute.
+/// </summary>
 [Collection("sequential")]
 [TestCaseOrderer("DAL_Tests.PriorityOrderer", "DAL_Tests")]
 public class UsersServiceTests
@@ -26,13 +28,12 @@ public class UsersServiceTests
         ProfilePicUrl = "https://www.google.com",
         UserId = 0
     };
-    
+
     public UsersServiceTests()
     {
-         _configuration = new ConfigurationBuilder().
-             SetBasePath(Directory.GetCurrentDirectory())
-             .AddJsonFile("appsettings.json")
-             .Build(); 
+        _configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
+            .Build();
         _usersService = new UsersService(new GenericDbAccess(_configuration));
     }
 
@@ -40,27 +41,27 @@ public class UsersServiceTests
     public void AddUserShouldWork()
     {
         // Arrange
-        
+
         // Act
         int newUserId = _usersService.CreateUser(TestUser).Result;
-        
+
         // Assert
         Assert.True(newUserId > 0);
         TestUser.UserId = newUserId;
     }
-    
+
     [Fact, TestPriority(2)]
     public void AddUserShouldThrowException()
     {
         // Arrange
-        
+
         // Act
 
         // Assert
-        Assert.Throws<AggregateException>(() =>  _usersService.CreateUser(TestUser).Result );
+        Assert.Throws<AggregateException>(() => _usersService.CreateUser(TestUser).Result);
     }
-    
-    
+
+
     [Fact, TestPriority(2)]
     public void GetUserShouldWork()
     {
@@ -71,9 +72,10 @@ public class UsersServiceTests
 
         // Assert
         Assert.NotNull(user);
-        Assert.True(TestUser.Email == user.Email && TestUser.FirstNameEng == user.FirstNameEng && TestUser.LastNameEng == user.LastNameEng && TestUser.ProfilePicUrl == user.ProfilePicUrl);
+        Assert.True(TestUser.Email == user.Email && TestUser.FirstNameEng == user.FirstNameEng &&
+                    TestUser.LastNameEng == user.LastNameEng && TestUser.ProfilePicUrl == user.ProfilePicUrl);
     }
-    
+
     [Fact, TestPriority(2)]
     public void GetUserShouldFail()
     {
@@ -90,16 +92,18 @@ public class UsersServiceTests
     public void GetUserPublicInfoShouldWork()
     {
         var userPublicInfo = _usersService.GetUserPublicInfo(TestUser.UserId).Result;
-        
+
         Assert.NotNull(userPublicInfo);
-        Assert.True(TestUser.FirstNameEng == userPublicInfo.FirstNameEng && TestUser.LastNameEng == userPublicInfo.LastNameEng && TestUser.ProfilePicUrl == userPublicInfo.ProfilePicUrl);
+        Assert.True(TestUser.FirstNameEng == userPublicInfo.FirstNameEng &&
+                    TestUser.LastNameEng == userPublicInfo.LastNameEng &&
+                    TestUser.ProfilePicUrl == userPublicInfo.ProfilePicUrl);
     }
-    
+
     [Fact, TestPriority(2)]
     public void GetUserPublicInfoShouldFail()
     {
         var userPublicInfo = _usersService.GetUserPublicInfo(-1).Result;
-        
+
         Assert.Null(userPublicInfo);
     }
 
@@ -107,14 +111,14 @@ public class UsersServiceTests
     public void IsUserAuthenticatedShouldReturnFalse()
     {
         // Arrange
-        
+
         // Act
         var isAuthenticated = _usersService.IsUserAuthenticated(TestUser.UserId).Result;
-        
+
         // Assert
         Assert.False(isAuthenticated);
     }
-    
+
     [Fact, TestPriority(3)]
     public void VerifyUserPrivateInfoShouldWork()
     {
@@ -126,10 +130,10 @@ public class UsersServiceTests
             IdNumber = 1,
             CityName = "גבעתיים"
         };
-        
+
         // Act
         var userPrivateInfoResult = _usersService.AddUserPrivateInfo(info, TestUser.UserId).Result;
-        
+
         // Assert
         Assert.True(userPrivateInfoResult == CustomStatusCode.Ok);
     }
@@ -138,14 +142,14 @@ public class UsersServiceTests
     public void IsUserAuthenticatedShouldReturnTrue()
     {
         // Arrange
-        
+
         // Act
         var isAuthenticated = _usersService.IsUserAuthenticated(TestUser.UserId).Result;
-        
+
         // Assert
         Assert.True(isAuthenticated);
     }
-    
+
     [Fact, TestPriority(4)]
     public void VerifyUserPrivateInfoShouldFailForDuplicate()
     {
@@ -157,10 +161,10 @@ public class UsersServiceTests
             IdNumber = 1,
             CityName = "גבעתיים"
         };
-        
+
         // Act
         var userPrivateInfoResult = _usersService.AddUserPrivateInfo(info, TestUser.UserId).Result;
-        
+
         // Assert
         Assert.True(userPrivateInfoResult == CustomStatusCode.IdAlreadyExistsWhenVerifyingInfo);
     }
@@ -173,36 +177,36 @@ public class UsersServiceTests
 
         // Act
         _usersService.AddPhoneNumber(TestUser.UserId, TestUser.PhoneNumber).Wait();
-        
+
         var contactDetails = _usersService.GetUserContactInfo(TestUser.UserId).Result;
-        
+
         // Assert
         Assert.NotNull(contactDetails);
         Assert.True(contactDetails.PhoneNumber == TestUser.PhoneNumber);
     }
-    
+
     [Fact, TestPriority(5)]
     public void GetUserContactInfoShouldWork()
     {
         // Arrange
-        
+
         // Act
         var contactDetails = _usersService.GetUserContactInfo(TestUser.UserId).Result;
-        
+
         // Assert
         Assert.NotNull(contactDetails);
         Assert.True(contactDetails.PhoneNumber == TestUser.PhoneNumber);
         Assert.True(contactDetails.Email == TestUser.Email);
     }
-    
+
     [Fact, TestPriority(5)]
     public void GetUserContactInfoShouldFail()
     {
         // Arrange
-        
+
         // Act
         var contactDetails = _usersService.GetUserContactInfo(-1).Result;
-        
+
         // Assert
         Assert.Null(contactDetails);
     }
@@ -211,35 +215,35 @@ public class UsersServiceTests
     public void GetContactInfoByEmailShouldWork()
     {
         // Arrange
-        
+
         // Act
         var contactDetails = _usersService.GetUserContactInfoByEmail(TestUser.Email).Result;
-        
+
         // Assert
         Assert.NotNull(contactDetails);
         Assert.True(contactDetails.PhoneNumber == TestUser.PhoneNumber);
         Assert.True(contactDetails.Email == TestUser.Email);
     }
-    
+
     [Fact, TestPriority(5)]
     public void GetContactInfoByEmailShouldFail()
     {
         // Arrange
-        
+
         // Act
         var contactDetails = _usersService.GetUserContactInfoByEmail("AAAAA").Result;
-        
+
         // Assert
         Assert.Null(contactDetails);
     }
-    
 
-    [Fact, TestPriority(10)] 
+
+    [Fact, TestPriority(10)]
     public void DeleteUserShouldWork()
     {
         _usersService.DeleteUser(TestUser.UserId).Wait();
         User? user = _usersService.GetUserByEmail(TestUser.Email).Result;
-        
+
         Assert.Null(user);
     }
 }

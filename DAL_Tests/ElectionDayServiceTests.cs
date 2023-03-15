@@ -6,6 +6,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace DAL_Tests;
 
+/// <summary>
+/// A collection of tests for the <see cref="IElectionDayService"/> interface and its implementation, <see cref="ElectionDayService"/>.<br/>
+/// The tests are executed in a sequential order, as defined by the <see cref="PriorityOrderer"/>,
+/// using the <see cref="TestPriorityAttribute"/> attribute.
+/// </summary>
 [Collection("sequential")]
 [TestCaseOrderer("DAL_Tests.PriorityOrderer", "DAL_Tests")]
 public class ElectionDayServiceTests
@@ -26,13 +31,13 @@ public class ElectionDayServiceTests
         BallotLocation = """בי"ס ממלכתי רעות""",
         Accessible = false
     };
-    
+
     public ElectionDayServiceTests()
     {
         _configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
             .Build();
-        
+
         _electionDayService = new ElectionDayService(new GenericDbAccess(_configuration));
     }
 
@@ -40,10 +45,10 @@ public class ElectionDayServiceTests
     public void GetBallotForUser_ShouldWorkForValidUserId()
     {
         // Arrange
-        
+
         // Act
         var result = _electionDayService.GetUserAssignedBallot(_testUser.UserId).Result;
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.Equal(_testBallot.InnerCityBallotId, result?.InnerCityBallotId);
@@ -52,15 +57,15 @@ public class ElectionDayServiceTests
         Assert.Equal(_testBallot.BallotLocation, result?.BallotLocation);
         Assert.Equal(_testBallot.Accessible, result?.Accessible);
     }
-    
+
     [Fact, TestPriority(1)]
     public void GetBallotForUser_ShouldReturnNullForInvalidUserId()
     {
         // Arrange
-        
+
         // Act
         var result = _electionDayService.GetUserAssignedBallot(-1).Result;
-        
+
         // Assert
         Assert.Null(result);
     }

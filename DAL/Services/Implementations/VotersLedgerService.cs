@@ -27,7 +27,7 @@ public class VotersLedgerService : IVotersLedgerService
         return votersLedgerRecord.FirstOrDefault();
     }
 
-    public async Task<IEnumerable<VoterLedgerFilterRecord>> GetFilteredVotersLedgerResults(VotersLedgerFilter filterOptions)
+    public async Task<IEnumerable<VotersLedgerFilterRecord>> GetFilteredVotersLedgerResults(VotersLedgerFilter filterOptions)
     {
         var param = new DynamicParameters(new
         {
@@ -62,7 +62,7 @@ public class VotersLedgerService : IVotersLedgerService
             param.Add("ballotId", Decimal.Round(filterOptions.BallotId.Value, 1), DbType.Decimal, ParameterDirection.Input);
         }
         
-        var res = await _dbAccess.GetData<VoterLedgerFilterRecord, DynamicParameters>
+        var res = await _dbAccess.GetData<VotersLedgerFilterRecord, DynamicParameters>
             (StoredProcedureNames.FilterVotersLedger, param);
         return res;
     }

@@ -6,6 +6,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace DAL_Tests;
 
+/// <summary>
+/// A collection of tests for <see cref="IEventsService"/> and its implementation <see cref="EventsService"/>.<br/>
+/// The tests are executed in a sequential order, as defined by the <see cref="PriorityOrderer"/>,
+/// using the <see cref="TestPriorityAttribute"/> attribute.
+/// </summary>
 [Collection("sequential")]
 [TestCaseOrderer("DAL_Tests.PriorityOrderer", "DAL_Tests")]
 public class EventServiceTests
@@ -279,10 +284,10 @@ public class EventServiceTests
     public void AddWatcherForEventShouldFailForDuplicateKey()
     {
         // Arrange
-        
+
         // Act
         var res = _eventsService.AddEventWatcher(testUser.UserId, testCustomEvent.EventGuid.Value).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.DuplicateKey, res);
     }
@@ -311,22 +316,22 @@ public class EventServiceTests
     public void RemoveEventWatcherShouldWork()
     {
         // Arrange
-        
+
         // Act
         var res = _eventsService.RemoveEventWatcher(testUser.UserId, testCustomEvent.EventGuid.Value).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.Ok, res);
     }
-    
+
     [Fact, TestPriority(5)]
     public void RemoveEventWatcherShouldFailForWrongEventGuid()
     {
         // Arrange
-        
+
         // Act
         var res = _eventsService.RemoveEventWatcher(testUser.UserId, Guid.Empty).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.EventNotFound, res);
     }
@@ -488,7 +493,7 @@ public class EventServiceTests
     public void GetCampaignEventsShouldReturnOneWithNumAttendingEqualOne()
     {
         // Arrange
-        
+
         // Act
         var events = _eventsService.GetCampaignEvents(testCampaign.CampaignGuid.Value).Result;
         // Due to a slight "whoops" in the database, we need to filter out the "DO NOT DELETE" event.
@@ -496,21 +501,21 @@ public class EventServiceTests
         // It was done when I forgot that it could affect tests here, so I prefer to slightly modify these 2 tests
         // rather than change whatever else it may impact to remove it.
         var eventsList = events.Where(x => !x.EventDescription.Contains("DO NOT DELETE")).ToList();
-        
+
         // Assert
         Assert.NotNull(events);
         Assert.NotEmpty(events);
         Assert.Equal(1, eventsList[0].NumAttending);
     }
-    
+
     [Fact, TestPriority(9)]
     public void RemoveEventParticipantShouldWork()
     {
         // Arrange
-        
+
         // Act
         var res = _eventsService.RemoveEventParticipant(testCustomEvent.EventGuid.Value, testUser.UserId).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.Ok, res);
     }
@@ -519,23 +524,23 @@ public class EventServiceTests
     public void GetEventsForUserShouldReturnEmptyAfterDelete()
     {
         // Arrange
-        
+
         // Act
         var events = _eventsService.GetUserEvents(testUser.UserId).Result.ToList();
-        
+
         // Assert
         Assert.NotNull(events);
         Assert.Empty(events);
     }
-    
+
     [Fact, TestPriority(10)]
     public void RemoveEventParticipantShouldFailForWrongEventGuid()
     {
         // Arrange
-        
+
         // Act
         var res = _eventsService.RemoveEventParticipant(Guid.Empty, testUser.UserId).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.EventNotFound, res);
     }
@@ -544,61 +549,62 @@ public class EventServiceTests
     public void RemoveEventParticipantShouldFailForEmptyUserIdAndEmail()
     {
         // Arrange
-        
+
         // Act
         var res = _eventsService.RemoveEventParticipant(testCustomEvent.EventGuid.Value).Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.ParameterMustNotBeNullOrEmpty, res);
     }
-    
+
     [Fact, TestPriority(10)]
     public void RemoveEventParticipantShouldFailForProvidingBothUserIdAndEmail()
     {
         // Arrange
-        
+
         // Act
         var res = _eventsService.RemoveEventParticipant(testCustomEvent.EventGuid.Value,
             userId: 0, userEmail: "wrongEmail").Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.TooManyValuesProvided, res);
     }
-    
+
     [Fact, TestPriority(10)]
     public void RemoveEventParticipantShouldFailForWrongEmail()
     {
         // Arrange
-        
+
         // Act
         var res = _eventsService.RemoveEventParticipant(testCustomEvent.EventGuid.Value,
             userEmail: "Wrong email").Result;
-        
+
         // Assert
         Assert.Equal(CustomStatusCode.UserNotFound, res);
     }
-    
+
     [Fact, TestPriority(10)]
     public void RemoveEventParticipantShouldFailForWrongUserId()
     {
         // Arrange
-        
+
         // Act
 
         // Assert
-        Assert.Throws<System.AggregateException>(() => _eventsService.AddEventParticipant(testCustomEvent.EventGuid.Value,
+        Assert.Throws<System.AggregateException>(() => _eventsService.AddEventParticipant(
+            testCustomEvent.EventGuid.Value,
             userId: 0).Result);
     }
-    
+
     [Fact, TestPriority(10)]
     public void GetCampaignEventsShouldReturnOneWithNumAttendingEqualZero()
     {
         // Arrange
-        
+
         // Act
         var events = _eventsService.GetCampaignEvents(testCampaign.CampaignGuid.Value).Result;
         var eventsList = events.ToList();
-        
+
         // Assert
         Assert.NotNull(events);
         Assert.NotEmpty(events);

@@ -3,6 +3,11 @@ using Ganss.Xss;
 
 namespace API.Middleware;
 
+/// <summary>
+/// A middleware for detecting XSS attacks.<br/>
+/// This middleware will throw an exception if it detects any XSS attacks, which will cause the request to be denied.<br/>
+/// Taken from https://www.codeproject.com/Articles/5313718/Preventing-XSS-in-NET-Core-Web-APIs<br/>
+/// </summary>
 public class AntiXssMiddleware
 {
     private readonly RequestDelegate _next;

@@ -1,11 +1,12 @@
 ﻿namespace DAL.Models;
 
-public class NotificationUponPublishSettingsForUser
+/// <summary>
+/// An extension of <see cref="NotificationUponPublishSettings"/>, meant to be used when getting the notification settings
+/// of a specific user.<br/>
+/// </summary>
+public class NotificationUponPublishSettingsForUser: NotificationUponPublishSettings
 {
-    public bool? ViaSms { get; set; }
-    public bool? ViaEmail { get; set; }
     public string? CampaignName { get; set; }
-    public Guid? CampaignGuid { get; set; }
     public string? CampaignDescription { get; set; }
     public string? CampaignLogoUrl { get; set; }
 }

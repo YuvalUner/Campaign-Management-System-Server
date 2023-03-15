@@ -8,6 +8,10 @@ using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
+/// <summary>
+/// A controller for the public board.
+/// Provides a web API and service policy for <see cref="IPublicBoardService"/>.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
@@ -22,6 +26,13 @@ public class PublicBoardController: Controller
         _logger = logger;
     }
     
+    /// <summary>
+    /// Gets a personalized public board - events and announcements - for the user.
+    /// </summary>
+    /// <param name="limit">How many to get of each.</param>
+    /// <param name="offset">In case this is not the first request in the session, send a value greater than 0
+    /// to get the next x results.</param>
+    /// <returns></returns>
     [HttpGet("public-board")]
     public async Task<IActionResult> GetPersonalizedPublicBoard([FromQuery] int? limit, [FromQuery] int? offset)
     {

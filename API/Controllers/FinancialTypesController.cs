@@ -6,8 +6,18 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static API.Utils.ErrorMessages;
 
+// Disable warning CS8509: The switch expression does not handle all possible values of its input type (it is not exhaustive).
+// This is due to switches not including the Ok case - this is intentional, as the code with the switch in it is only ever 
+// reached if the result is not Ok, so the Ok case is not needed.
+#pragma warning disable CS8509
+
 namespace API.Controllers;
 
+/// <summary>
+/// Controller for financial types.<br/>
+/// Generally, provides a web API and service policy for <see cref="IFinancialTypesService"/>,
+/// allowing the client to perform CRUD operations on financial types.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -25,6 +35,12 @@ public class FinancialTypesController : Controller
         _logger = logger;
     }
 
+    /// <summary>
+    /// Gets the list of financial types for a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">The Guid of the campaign.</param>
+    /// <returns>Unauthorized if the user does not have permission to view the campaign's financial info,
+    /// Ok with the list of <see cref="FinancialType"/> otherwise.</returns>
     [HttpGet("get-for-campaign/{campaignGuid:guid}")]
     public async Task<IActionResult> GetFinancialTypesForCampaign(Guid campaignGuid)
     {
@@ -52,6 +68,14 @@ public class FinancialTypesController : Controller
         }
     }
 
+    /// <summary>
+    /// Creates a new financial type for a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">The campaign's Guid</param>
+    /// <param name="financialType">A <see cref="FinancialType"/> object with at-least the name filled in.</param>
+    /// <returns>Unauthorized if the user does not have permission to edit the campaign's financial info,
+    /// BadRequest if there is an issue with the info in the financialType parameter, NotFound if the campaign
+    /// could not be found, Ok with the Guid of the new financial type on success.</returns>
     [HttpPost("create/{campaignGuid:guid}")]
     public async Task<IActionResult> CreateFinancialType(Guid campaignGuid, FinancialType financialType)
     {
@@ -67,7 +91,7 @@ public class FinancialTypesController : Controller
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
-            
+
             // Validate the user input
             var validationFailureCode = financialType.VerifyLegalValues();
             if (validationFailureCode != FinancialType.ValidationFailureCodes.Ok)
@@ -96,6 +120,15 @@ public class FinancialTypesController : Controller
         }
     }
 
+    /// <summary>
+    /// Updates an existing financial type.
+    /// </summary>
+    /// <param name="campaignGuid">The Guid of the campaign.</param>
+    /// <param name="financialType">A <see cref="FinancialType"/> object with at-least TypeGuid filled in, and any field
+    /// that the user wishes to change also filled in.</param>
+    /// <returns>Unauthorized if the user does not have permission to edit the campaign's financial info,
+    /// BadRequest if there is an issue with the info in the financialType parameter, NotFound if the financial type
+    /// could not be found, Ok otherwise.</returns>
     [HttpPut("update/{campaignGuid:guid}")]
     public async Task<IActionResult> UpdateFinancialType(Guid campaignGuid, FinancialType financialType)
     {
@@ -111,7 +144,7 @@ public class FinancialTypesController : Controller
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
-            
+
             var validationFailureCode = financialType.VerifyLegalValues(isCreation: false);
             if (validationFailureCode != FinancialType.ValidationFailureCodes.Ok)
             {
@@ -128,7 +161,7 @@ public class FinancialTypesController : Controller
             {
                 CustomStatusCode.FinancialTypeNotFound => NotFound(
                     FormatErrorMessage(FinancialTypeNotFound, statusCode)),
-                CustomStatusCode.SqlIllegalValue => NotFound(FormatErrorMessage(CanNotModifyThisType, statusCode)),
+                CustomStatusCode.SqlIllegalValue => BadRequest(FormatErrorMessage(CanNotModifyThisType, statusCode)),
                 _ => Ok()
             };
         }
@@ -139,6 +172,14 @@ public class FinancialTypesController : Controller
         }
     }
 
+    /// <summary>
+    /// Deletes an existing financial type from a campaign.
+    /// </summary>
+    /// <param name="campaignGuid">The Guid of the campaign.</param>
+    /// <param name="typeGuid">The Guid of the financial type.</param>
+    /// <returns>Unauthorized if the user does not have permission to edit the campaign's financial info,
+    /// BadRequest if the Guid is of a built in type, NotFound if the financial type
+    /// could not be found, Ok otherwise.</returns>
     [HttpDelete("delete/{campaignGuid:guid}/{typeGuid:guid}")]
     public async Task<IActionResult> DeleteFinancialType(Guid campaignGuid, Guid typeGuid)
     {
@@ -161,7 +202,7 @@ public class FinancialTypesController : Controller
             {
                 CustomStatusCode.FinancialTypeNotFound => NotFound(
                     FormatErrorMessage(FinancialTypeNotFound, statusCode)),
-                CustomStatusCode.SqlIllegalValue => NotFound(FormatErrorMessage(CanNotModifyThisType, statusCode)),
+                CustomStatusCode.SqlIllegalValue => BadRequest(FormatErrorMessage(CanNotModifyThisType, statusCode)),
                 _ => Ok()
             };
         }
