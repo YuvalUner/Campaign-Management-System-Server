@@ -78,6 +78,8 @@ public class TokenController : Controller
 
             // Get user from DB. If user doesn't exist, create a new one
             var user = await _usersService.GetUserByEmail(payload.Email);
+            
+            bool created = false;
 
             if (user == null)
             {
@@ -100,6 +102,7 @@ public class TokenController : Controller
                 }
 
                 user.UserId = userId;
+                created = true;
                 _logger.LogInformation("Created new user with email {Email}", payload.Email);
             }
 
@@ -139,6 +142,11 @@ public class TokenController : Controller
             HttpContext.Session.SetInt32(Constants.UserAuthenticationStatus, user.Authenticated ? 1 : 0);
             // Store the user's allowed campaigns (campaigns they are a part of), to avoid many unnecessary DB calls
             HttpContext.Session.Set(Constants.AllowedCampaigns, allowedCampaignGuids);
+
+            if (created)
+            {
+                return Created("", new {});
+            }
             return Ok();
         }
         catch (Exception ex)
