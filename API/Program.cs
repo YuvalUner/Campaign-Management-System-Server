@@ -47,7 +47,15 @@ builder.Services.AddCors(options => {
         optionsBuilder.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
             //.WithOrigins(builder.Configuration["AllowedOrigins:React"],
             //builder.Configuration["AllowedOrigins:WebApi"], builder.Configuration["AllowedOrigins:WebServer"])
-            .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost");
+            .SetIsOriginAllowed(origin =>
+            {
+                if (string.IsNullOrWhiteSpace(origin)) return false;
+                // Only add this to allow testing with localhost, remove this line in production!
+                if (origin.ToLower().StartsWith("http://localhost")) return true;
+                // Insert your production domain here.
+                if (origin.ToLower().StartsWith("https://dev.mydomain.com")) return true;
+                return false;
+            });
     });
 });
 
@@ -61,6 +69,7 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromHours(2);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.None;
 });
 
 builder.Services.AddAuthentication(options =>
@@ -68,24 +77,30 @@ builder.Services.AddAuthentication(options =>
         options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     })
-    .AddCookie(options =>
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
         options.ExpireTimeSpan = TimeSpan.FromHours(2);
         options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true;
         options.Cookie.IsEssential = true;
+        options.Events.OnRedirectToLogin = (context) =>
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        };
         // Horrible workaround for making the server return 401 when user is not authorized, instead of 404.
         options.LoginPath = "/api/AccessDenied";
+        options.Cookie.SameSite = SameSiteMode.None;
     });
 
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.Events.OnRedirectToLogin = context =>
-    {
-        context.Response.StatusCode = 401;
-        return Task.CompletedTask;
-    };
-});
+// builder.Services.ConfigureApplicationCookie(options =>
+// {
+//     options.Events.OnRedirectToLogin = context =>
+//     {
+//         context.Response.StatusCode = 401;
+//         return Task.CompletedTask;
+//     };
+// });
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -116,7 +131,7 @@ app.UseAuthorization();
 
 app.UseCookiePolicy(new CookiePolicyOptions
 {
-    MinimumSameSitePolicy = SameSiteMode.Strict,
+    Secure = CookieSecurePolicy.Always,
 });
 
 app.UseCors("AllowAll");

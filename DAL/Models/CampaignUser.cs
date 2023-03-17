@@ -11,6 +11,10 @@ public class CampaignUser
 {
     public int? UserId { get; set; }
     public int? CampaignId { get; set; }
+    
+    public string? CampaignLogoUrl { get; set; }
+    
+    public string? CampaignDescription { get; set; }
     public string? CampaignName { get; set; }
     public Guid? CampaignGuid { get; set; }
     public int? RoleId { get; set; }
