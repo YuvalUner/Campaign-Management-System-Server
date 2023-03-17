@@ -46,11 +46,11 @@ public class UsersController : Controller
         {
             int? userId = HttpContext.Session.GetInt32(Constants.UserId);
             List<CampaignUser> campaigns = await _usersService.GetUserCampaigns(userId);
-            // The CampaignUser model also holds fields that should not be getting out, such as SenderId, CampaignId, RoleId.
+            // The CampaignUser model also holds fields that should not be getting out, such as UserId, CampaignId, RoleId.
             // Hence, it needs to be cleaned up first.
             var campaignsCensored = campaigns.Select(x => new
             {
-                x.CampaignGuid, x.CampaignName, x.RoleName
+                x.CampaignGuid, x.CampaignName, x.RoleName, x.CampaignLogoUrl, x.CampaignDescription
             });
             User? user = await _usersService.GetUserPublicInfo(userId);
             // Same goes for the User model - needs to be cleaned up first before sending it out.
