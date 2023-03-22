@@ -45,6 +45,8 @@ public class PublicBoardController: Controller
                 offset = 0;
             }
             
+            limit = Int32.MaxValue;
+
             var events = await _publicBoardService.GetEventsForUser(userId, limit, offset);
             var announcements = await _publicBoardService.GetAnnouncementsForUser(userId, limit, offset);
             
