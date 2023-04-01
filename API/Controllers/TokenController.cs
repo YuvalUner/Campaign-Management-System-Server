@@ -139,7 +139,7 @@ public class TokenController : Controller
             // Keep the user id in the session for future use, as it should not be exposed to the client via claims
             HttpContext.Session.SetInt32(Constants.UserId, user.UserId);
             // Store whether the user is authenticated or not, to avoid unnecessary DB calls
-            HttpContext.Session.SetInt32(Constants.UserAuthenticationStatus, user.Authenticated ? 1 : 0);
+            HttpContext.Session.Set(Constants.UserAuthenticationStatus, user.Authenticated);
             // Store the user's allowed campaigns (campaigns they are a part of), to avoid many unnecessary DB calls
             HttpContext.Session.Set(Constants.AllowedCampaigns, allowedCampaignGuids);
 
