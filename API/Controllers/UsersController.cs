@@ -201,4 +201,19 @@ public class UsersController : Controller
             return StatusCode(500);
         }
     }
+    
+    [HttpGet("get-verified-status")]
+    public async Task<IActionResult> GetVerifiedStatus()
+    {
+        try
+        {
+            var userIsAuthenticated = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);
+            return Ok(new {IsVerified = userIsAuthenticated});
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error in GetVerifiedStatus");
+            return StatusCode(500);
+        }
+    }
 }
