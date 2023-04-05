@@ -40,6 +40,7 @@ builder.Services.AddScoped<IPublicBoardService, PublicBoardService>();
 builder.Services.AddScoped<IFinancialTypesService, FinancialTypesService>();
 builder.Services.AddScoped<IFinancialDataService, FinancialDataService>();
 builder.Services.AddScoped<IElectionDayService, ElectionDayService>();
+builder.Services.AddScoped<ICitiesService, CitiesService>();
 
 // CORS policy - for now, just allow all. Change as needed
 builder.Services.AddCors(options => {
