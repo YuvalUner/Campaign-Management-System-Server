@@ -843,4 +843,9 @@ public static class StoredProcedureNames
     /// Params: userId (int).<br/>
     /// </summary>
     public const string GetBallotForUser = "usp_BallotGetForUser";
+    
+    /// <summary>
+    /// Gets the list of all the cities in the database.<br/>
+    /// </summary>
+    public const string GetAllCities = "usp_CitiesGetAll";
 }
