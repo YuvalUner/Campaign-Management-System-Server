@@ -80,4 +80,11 @@ public interface ICampaignsService
     /// <param name="campaignGuid">Guid of the campaign.</param>
     /// <returns>A <see cref="Campaign"/> object containing the specified values, if the campaign exists.</returns>
     Task<Campaign?> GetCampaignBasicInfo(Guid? campaignGuid);
+    
+    /// <summary>
+    /// Like <see cref="GetCampaignBasicInfo"/>, but gets the campaign by its invite guid instead of its own Guid.
+    /// </summary>
+    /// <param name="campaignInviteGuid">Invite guid of the campaign.</param>
+    /// <returns></returns>
+    Task<Campaign?> GetCampaignBasicInfoByInviteGuid(Guid? campaignInviteGuid);
 }
