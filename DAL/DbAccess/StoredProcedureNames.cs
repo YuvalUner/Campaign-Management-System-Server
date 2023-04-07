@@ -848,4 +848,9 @@ public static class StoredProcedureNames
     /// Gets the list of all the cities in the database.<br/>
     /// </summary>
     public const string GetAllCities = "usp_CitiesGetAll";
+    
+    /// <summary>
+    /// Gets basic info about a campaign, by the campaign's invite guid.<br/>
+    /// </summary>
+    public const string GetCampaignInfoByInviteGuid = "usp_CampaignInfoGetByInviteGuid";
 }

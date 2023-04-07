@@ -126,4 +126,16 @@ public class CampaignsService : ICampaignsService
             (StoredProcedureNames.GetCampaignBasicInfo, param);
         return res.FirstOrDefault();
     }
+
+    public async Task<Campaign?> GetCampaignBasicInfoByInviteGuid(Guid? campaignInviteGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignInviteGuid
+        });
+        
+        var res = await _dbAccess.GetData<Campaign, DynamicParameters>
+            (StoredProcedureNames.GetCampaignByInviteGuid, param);
+        return res.FirstOrDefault();
+    }
 }
