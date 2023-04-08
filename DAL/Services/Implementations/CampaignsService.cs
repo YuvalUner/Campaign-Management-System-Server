@@ -135,7 +135,7 @@ public class CampaignsService : ICampaignsService
         });
         
         var res = await _dbAccess.GetData<Campaign, DynamicParameters>
-            (StoredProcedureNames.GetCampaignByInviteGuid, param);
+            (StoredProcedureNames.GetCampaignInfoByInviteGuid, param);
         return res.FirstOrDefault();
     }
 }
