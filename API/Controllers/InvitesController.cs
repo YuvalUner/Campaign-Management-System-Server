@@ -52,7 +52,7 @@ public class InvitesController : Controller
     /// <returns>Unauthorized if the user does not have permission to view campaign settings, NotFound if the invite
     /// does not exist, Ok with the invite guid otherwise.</returns>
     [Authorize]
-    [HttpGet("/GetInvite/{campaignGuid:guid}")]
+    [HttpGet("GetInvite/{campaignGuid:guid}")]
     public async Task<IActionResult> GetInvite(Guid campaignGuid)
     {
         try
@@ -90,7 +90,7 @@ public class InvitesController : Controller
     /// <returns>Unauthorized if the user does not have permission to edit campaign settings,
     /// Ok otherwise. Use the get method again to get the new invite.</returns>
     [Authorize]
-    [HttpPut("/UpdateInvite/{campaignGuid:guid}")]
+    [HttpPut("UpdateInvite/{campaignGuid:guid}")]
     public async Task<IActionResult> UpdateInvite(Guid campaignGuid)
     {
         if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
@@ -115,7 +115,7 @@ public class InvitesController : Controller
     /// <returns>Unauthorized if the user does not have permission to edit campaign settings,
     /// Ok otherwise. Use the get method again to get the new invite.</returns>
     [Authorize]
-    [HttpDelete("/RevokeInvite/{campaignGuid:guid}")]
+    [HttpDelete("RevokeInvite/{campaignGuid:guid}")]
     public async Task<IActionResult> RevokeInvite(Guid campaignGuid)
     {
         try
@@ -149,7 +149,7 @@ public class InvitesController : Controller
     /// <returns>Not found if the invite matches no campaign, Unauthorized if the user did not verify their information,
     /// BadRequest if user is already a member of the campaign, Ok otherwise.</returns>
     [Authorize]
-    [HttpPost("/AcceptInvite/{campaignInviteGuid:guid}")]
+    [HttpPost("AcceptInvite/{campaignInviteGuid:guid}")]
     public async Task<IActionResult> AcceptInvite(Guid campaignInviteGuid)
     {
         try
@@ -206,7 +206,7 @@ public class InvitesController : Controller
                 return Ok(new { CampaignGuid = campaign });
             }
 
-            return BadRequest();
+            return BadRequest(FormatErrorMessage(AlreadyAMember, CustomStatusCode.DuplicateKey));
         }
         catch (Exception e)
         {

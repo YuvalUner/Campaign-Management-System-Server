@@ -1,9 +1,7 @@
 ﻿using System.Security.Claims;
-using System.Text;
 using API.SessionExtensions;
 using API.Utils;
 using DAL.Models;
-using DAL.Services.Implementations;
 using DAL.Services.Interfaces;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authentication;

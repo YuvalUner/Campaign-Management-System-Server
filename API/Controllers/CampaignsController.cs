@@ -16,7 +16,6 @@ namespace API.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class CampaignsController : Controller
 {
     private readonly ILogger<CampaignsController> _logger;
@@ -40,6 +39,7 @@ public class CampaignsController : Controller
     /// </summary>
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
+    [Authorize]
     [HttpPost("/enter/{campaignGuid:guid}")]
     public async Task<IActionResult> EnterCampaign(Guid campaignGuid)
     {
@@ -73,6 +73,7 @@ public class CampaignsController : Controller
     /// IsMunicipal, IsSubCampaign, CityName fields filled in.</param>
     /// <returns>Ok with the Guid of the newly created campaign on success, Unauthorized or BadRequest
     /// with an error message otherwise.</returns>
+    [Authorize]
     [HttpPost("create")]
     public async Task<IActionResult> CreateCampaign([FromBody] Campaign campaign)
     {
@@ -136,6 +137,7 @@ public class CampaignsController : Controller
     /// <param name="campaign">A <see cref="Campaign"/> object, with the fields to be updated set to not null.
     /// Specifically, the fields that can be updated are CampaignDescription and CampaignLogoUrl.</param>
     /// <returns></returns>
+    [Authorize]
     [HttpPut("update/{campaignGuid:guid}")]
     public async Task<IActionResult> UpdateCampaign(Guid campaignGuid, [FromBody] Campaign campaign)
     {
@@ -170,6 +172,7 @@ public class CampaignsController : Controller
     /// <param name="campaignGuid">The Guid of the campaign.</param>
     /// <returns>Unauthorized if the user does not have permission to get this list in the given campaign, Ok with the
     /// list otherwise.</returns>
+    [Authorize]
     [HttpGet("getUsers/{campaignGuid:guid}")]
     public async Task<IActionResult> GetCampaignUsers(Guid campaignGuid)
     {
@@ -247,6 +250,11 @@ public class CampaignsController : Controller
         }
     }
     
+    /// <summary>
+    /// Like <see cref="GetCampaignBasicInfo"/>, but gets the basic info of a campaign by its invite guid.
+    /// </summary>
+    /// <param name="inviteGuid"></param>
+    /// <returns></returns>
     [HttpGet("info-by-invite-guid/{inviteGuid:guid}")]
     public async Task<IActionResult> GetCampaignInfoByInviteGuid(Guid inviteGuid)
     {
