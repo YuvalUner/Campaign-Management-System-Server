@@ -38,7 +38,7 @@ public class VotersLedgerController : Controller
     /// <returns>Unauthorized if the user does not have permission to view the voters ledger,
     /// BadRequest if the campaign type is national and no city name, first name, last name or id number was given,
     /// Ok with a list of <see cref="VotersLedgerFilterRecord"/> otherwise.</returns>
-    [HttpPost("/filter/{campaignGuid:guid}")]
+    [HttpPost("filter/{campaignGuid:guid}")]
     public async Task<IActionResult> FilterVotersLedger(Guid campaignGuid, [FromBody] VotersLedgerFilter filter)
     {
         try
@@ -88,7 +88,7 @@ public class VotersLedgerController : Controller
     /// <param name="updateParams">An instance of <see cref="UpdateSupportStatusParams"/> with all the required info.</param>
     /// <returns>Unauthorized if the user does not have permission to edit the voters ledger,
     /// BadRequest if the voter could not be found in that city, Ok otherwise.</returns>
-    [HttpPut("/updateSupportStatus/{campaignGuid:guid}")]
+    [HttpPut("updateSupportStatus/{campaignGuid:guid}")]
     public async Task<IActionResult> UpdateSupportStatus(Guid campaignGuid,
         [FromBody] UpdateSupportStatusParams updateParams)
     {

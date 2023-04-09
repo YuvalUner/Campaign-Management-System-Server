@@ -35,7 +35,7 @@ public class SmsController : Controller
     /// <param name="smsSendingParams">An instance of <see cref="SmsSendingParams"/> with all the required info.</param>
     /// <returns>Unauthorized if user does not have an edit sms permission, BadRequest if the sms contents or the list
     /// of phone numbers to send to are empty, Ok with the Guid of the message in the logs otherwise.</returns>
-    [HttpPost("/send/{campaignGuid:guid}")]
+    [HttpPost("send/{campaignGuid:guid}")]
     public async Task<IActionResult> SendSmsMessages(Guid campaignGuid, [FromBody] SmsSendingParams smsSendingParams)
     {
         try
@@ -92,7 +92,7 @@ public class SmsController : Controller
     /// <param name="campaignGuid">Guid of the campaign.</param>
     /// <returns>Unauthorized if the user does not have permission to view sms logs,
     /// Ok with a list of <see cref="SmsLogResult"/> otherwise.</returns>
-    [HttpGet("/logs/{campaignGuid:guid}")]
+    [HttpGet("logs/{campaignGuid:guid}")]
     public async Task<IActionResult> GetSmsLogs(Guid campaignGuid)
     {
         try
@@ -126,7 +126,7 @@ public class SmsController : Controller
     /// <param name="messageGuid">Guid of the specific message.</param>
     /// <returns>Unauthorized if the user does not have permission to view the sms logs,
     /// Ok with a list of <see cref="SmsDetailsLogResult"/> otherwise.</returns>
-    [HttpGet("/logs/details/{campaignGuid:guid}/{messageGuid:guid}")]
+    [HttpGet("logs/details/{campaignGuid:guid}/{messageGuid:guid}")]
     public async Task<IActionResult> GetSmsDetailsLog(Guid campaignGuid, Guid messageGuid)
     {
         try
