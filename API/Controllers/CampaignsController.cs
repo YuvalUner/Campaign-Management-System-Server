@@ -40,7 +40,7 @@ public class CampaignsController : Controller
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
     [Authorize]
-    [HttpPost("/enter/{campaignGuid:guid}")]
+    [HttpPost("enter/{campaignGuid:guid}")]
     public async Task<IActionResult> EnterCampaign(Guid campaignGuid)
     {
         try
