@@ -216,4 +216,21 @@ public class UsersController : Controller
             return StatusCode(500);
         }
     }
+
+    [Authorize]
+    [HttpGet("get-profile-page-info")]
+    public async Task<IActionResult> GetProfilePageInfo()
+    {
+        try
+        {
+            var userId = HttpContext.Session.GetInt32(Constants.UserId);
+            var userProfilePageInfo = await _usersService.GetUserProfilePageInfo(userId);
+            return Ok(userProfilePageInfo);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error in GetProfilePageInfo");
+            return StatusCode(500);
+        }
+    }
 }
