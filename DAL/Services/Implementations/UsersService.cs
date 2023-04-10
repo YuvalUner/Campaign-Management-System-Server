@@ -138,4 +138,16 @@ public class UsersService : IUsersService
         });
         await _dbAccess.ModifyData(StoredProcedureNames.RemoveUserPhoneNumber, param);
     }
+
+    public async Task<UserProfilePageInfo?> GetUserProfilePageInfo(int? userId)
+    {
+        var param = new DynamicParameters(new
+        {
+            userId
+        });
+        var res = await _dbAccess.GetData<UserProfilePageInfo, DynamicParameters>
+            (StoredProcedureNames.GetUserProfilePageInfo, param);
+
+        return res.FirstOrDefault();
+    }
 }
