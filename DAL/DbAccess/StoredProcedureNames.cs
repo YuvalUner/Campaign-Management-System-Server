@@ -853,4 +853,9 @@ public static class StoredProcedureNames
     /// Gets basic info about a campaign, by the campaign's invite guid.<br/>
     /// </summary>
     public const string GetCampaignInfoByInviteGuid = "usp_CampaignInfoGetByInviteGuid";
+    
+    /// <summary>
+    /// Gets the full name, city and contact info of a user.<br/>
+    /// </summary>
+    public const string GetUserProfilePageInfo = "usp_UserProfilePageInfoGet";
 }

@@ -87,4 +87,11 @@ public interface IUsersService
     /// <param name="userId">The user id of the user to remove the phone number from.</param>
     /// <returns></returns>
     Task RemovePhoneNumber(int? userId);
+
+    /// <summary>
+    /// Gets the info needed to be displayed on the profile page of the user.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    Task<UserProfilePageInfo?> GetUserProfilePageInfo(int? userId);
 }
