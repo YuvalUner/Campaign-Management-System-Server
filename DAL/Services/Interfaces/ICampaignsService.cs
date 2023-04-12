@@ -87,4 +87,11 @@ public interface ICampaignsService
     /// <param name="campaignInviteGuid">Invite guid of the campaign.</param>
     /// <returns></returns>
     Task<Campaign?> GetCampaignBasicInfoByInviteGuid(Guid? campaignInviteGuid);
+
+    /// <summary>
+    /// Gets a list of the admins of a campaign, including their role info and names.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <returns></returns>
+    Task<IEnumerable<CampaignAdminUserInfo>> GetCampaignAdmins(Guid? campaignGuid);
 }

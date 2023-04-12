@@ -138,4 +138,14 @@ public class CampaignsService : ICampaignsService
             (StoredProcedureNames.GetCampaignInfoByInviteGuid, param);
         return res.FirstOrDefault();
     }
+    
+    public async Task<IEnumerable<CampaignAdminUserInfo>> GetCampaignAdmins(Guid? campaignGuid)
+    {
+        var param = new DynamicParameters(new
+        {
+            campaignGuid
+        });
+        return await _dbAccess.GetData<CampaignAdminUserInfo, DynamicParameters>
+            (StoredProcedureNames.GetCampaignAdminStaff, param);
+    }
 }
