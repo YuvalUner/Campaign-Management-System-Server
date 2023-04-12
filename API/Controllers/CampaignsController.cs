@@ -284,4 +284,20 @@ public class CampaignsController : Controller
             return StatusCode(500);
         }
     }
+
+    [Authorize]
+    [HttpGet("get-campaign-admins/{campaignGuid:guid}")]
+    public async Task<IActionResult> GetCampaignAdmins(Guid campaignGuid)
+    {
+        try
+        {
+            var campaignAdmins = await _campaignService.GetCampaignAdmins(campaignGuid);
+            return Ok(campaignAdmins);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting campaign admins");
+            return StatusCode(500, "Error getting campaign admins");
+        }
+    }
 }

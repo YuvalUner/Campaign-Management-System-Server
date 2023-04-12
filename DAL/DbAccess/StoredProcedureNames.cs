@@ -858,4 +858,9 @@ public static class StoredProcedureNames
     /// Gets the full name, city and contact info of a user.<br/>
     /// </summary>
     public const string GetUserProfilePageInfo = "usp_UserProfilePageInfoGet";
+    
+    /// <summary>
+    /// Gets a list of all the users that have administrative roles in a campaign.<br/>
+    /// </summary>
+    public const string GetCampaignAdminStaff = "usp_CampaignAdminStaffGet";
 }
