@@ -323,6 +323,32 @@ public class CampaignsServiceInvitesServiceTests
         Assert.True(users.Count > 1);
     }
 
+    [Fact, TestPriority(6)]
+    public void GetCampaignBasicInfoByInviteGuidShouldWork()
+    {
+        // Arrange
+        
+        // Act
+        var inviteGuid = _invitesService.GetInvite(TestCampaign.CampaignGuid.Value).Result;
+        var campaign = _campaignsService.GetCampaignBasicInfoByInviteGuid(inviteGuid).Result;
+        
+        // Assert
+        Assert.NotNull(campaign);
+        Assert.Equal(TestCampaign.CampaignGuid, campaign.CampaignGuid);
+    }
+    
+    [Fact, TestPriority(6)]
+    public void GetCampaignBasicInfoByInviteGuidShouldFail()
+    {
+        // Arrange
+
+        // Act
+        var campaign = _campaignsService.GetCampaignBasicInfoByInviteGuid(Guid.Empty).Result;
+
+        // Assert
+        Assert.Null(campaign);
+    }
+
     [Fact, TestPriority(7)]
     public void RevokeCampaignInviteGuidShouldWork()
     {
@@ -334,6 +360,32 @@ public class CampaignsServiceInvitesServiceTests
 
         // Assert
         Assert.Null(inviteGuid);
+    }
+    
+    [Fact, TestPriority(7)]
+    public void GetCampaignAdminStaffShouldWork()
+    {
+        // Arrange
+
+        // Act
+        var adminStaff = _campaignsService.GetCampaignAdmins(TestCampaign.CampaignGuid).Result;
+
+        // Assert
+        Assert.NotEmpty(adminStaff);
+        Assert.Contains(adminStaff, x => x.FirstNameEng == TestUser.FirstNameEng
+                                         && x.LastNameEng == TestUser.LastNameEng);
+    }
+    
+    [Fact, TestPriority(7)]
+    public void GetCampaignAdminStaffShouldFail()
+    {
+        // Arrange
+
+        // Act
+        var adminStaff = _campaignsService.GetCampaignAdmins(Guid.Empty).Result;
+
+        // Assert
+        Assert.Empty(adminStaff);
     }
 
 
