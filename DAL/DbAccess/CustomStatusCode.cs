@@ -230,4 +230,9 @@ public enum CustomStatusCode
     /// A status code for when the user tries to perform an action that requires financial data that does not exist - a case of bad input.<br/>
     /// </summary>
     FinancialDataNotFound = 50026,
+    
+    /// <summary>
+    /// A status code for when the user attempts to access a non-existent ledger.
+    /// </summary>
+    LedgerNotFound = 50027,
 }
