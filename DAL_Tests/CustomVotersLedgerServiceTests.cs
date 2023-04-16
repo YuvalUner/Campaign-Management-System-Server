@@ -20,6 +20,11 @@ public class CustomVotersLedgerServiceTests
         CampaignId = 52
     };
 
+    private static Campaign _testCampaignForErrorChecking = new Campaign()
+    {
+        CampaignGuid = Guid.Parse("050528E2-ED6A-4192-B560-2594C9ED3370")
+    };
+
     private static CustomVotersLedger _customVotersLedger = new CustomVotersLedger()
     {
         CampaignGuid = _testCampaign.CampaignGuid,
@@ -112,21 +117,21 @@ public class CustomVotersLedgerServiceTests
     }
     
     [Fact, TestPriority(4)]
-    public void EditCustomVotersLedger_ShouldReturnOk_ForValidData()
+    public void UpdateCustomVotersLedger_ShouldReturnOk_ForValidData()
     {
         // Arrange
         _customVotersLedger.LedgerName = "Test Ledger 2";
         
         // Act
         var statusCode = _customVotersLedgerService
-            .UpdateCustomVotersLedger(_customVotersLedger).Result;
+            .UpdateCustomVotersLedger(_customVotersLedger, _testCampaign.CampaignGuid.Value).Result;
         
         // Assert
         Assert.Equal(CustomStatusCode.Ok, statusCode);
     }
     
     [Fact, TestPriority(4)]
-    public void EditCustomVotersLedger_ShouldReturnError_ForNonExistingLedgerGuid()
+    public void UpdateCustomVotersLedger_ShouldReturnError_ForNonExistingLedgerGuid()
     {
         // Arrange
         var customVotersLedger = new CustomVotersLedger()
@@ -138,10 +143,36 @@ public class CustomVotersLedgerServiceTests
         
         // Act
         var statusCode = _customVotersLedgerService
-            .UpdateCustomVotersLedger(customVotersLedger).Result;
+            .UpdateCustomVotersLedger(customVotersLedger, _testCampaign.CampaignGuid.Value).Result;
         
         // Assert
         Assert.Equal(CustomStatusCode.LedgerNotFound, statusCode);
+    }
+    
+    [Fact, TestPriority(4)]
+    public void UpdateCustomVotersLedger_ShouldReturnError_ForNonExistingCampaignGuid()
+    {
+        // Arrange
+        
+        // Act
+        var statusCode = _customVotersLedgerService
+            .UpdateCustomVotersLedger(_customVotersLedger, Guid.Empty).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.CampaignNotFound, statusCode);
+    }
+
+    [Fact, TestPriority(4)]
+    public void UpdateCustomVotersLedger_ShouldReturnError_ForUpdatingForWrongCampaign()
+    {
+        // Arrange
+        
+        // Act
+        var statusCode = _customVotersLedgerService
+            .UpdateCustomVotersLedger(_customVotersLedger, _testCampaignForErrorChecking.CampaignGuid.Value).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.BoundaryViolation, statusCode);
     }
     
     [Fact, TestPriority(100)]
@@ -151,7 +182,7 @@ public class CustomVotersLedgerServiceTests
         
         // Act
         var statusCode = _customVotersLedgerService
-            .DeleteCustomVotersLedger(_customVotersLedger.LedgerGuid.Value).Result;
+            .DeleteCustomVotersLedger(_customVotersLedger.LedgerGuid.Value, _testCampaign.CampaignGuid.Value).Result;
         
         // Assert
         Assert.Equal(CustomStatusCode.Ok, statusCode);
@@ -164,10 +195,36 @@ public class CustomVotersLedgerServiceTests
         
         // Act
         var statusCode = _customVotersLedgerService
-            .DeleteCustomVotersLedger(Guid.Empty).Result;
+            .DeleteCustomVotersLedger(Guid.Empty, _testCampaign.CampaignGuid.Value).Result;
         
         // Assert
         Assert.Equal(CustomStatusCode.LedgerNotFound, statusCode);
+    }
+    
+    [Fact, TestPriority(100)]
+    public void DeleteCustomVotersLedger_ShouldReturnError_ForNonExistingCampaignGuid()
+    {
+        // Arrange
+        
+        // Act
+        var statusCode = _customVotersLedgerService
+            .DeleteCustomVotersLedger(_customVotersLedger.LedgerGuid.Value, Guid.Empty).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.CampaignNotFound, statusCode);
+    }
+    
+    [Fact, TestPriority(100)]
+    public void DeleteCustomVotersLedger_ShouldReturnError_ForDeletingFromWrongCampaign()
+    {
+        // Arrange
+        
+        // Act
+        var statusCode = _customVotersLedgerService
+            .DeleteCustomVotersLedger(_customVotersLedger.LedgerGuid.Value, _testCampaignForErrorChecking.CampaignGuid.Value).Result;
+        
+        // Assert
+        Assert.Equal(CustomStatusCode.BoundaryViolation, statusCode);
     }
     
     [Fact, TestPriority(101)]

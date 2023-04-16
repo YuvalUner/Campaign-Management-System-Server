@@ -873,15 +873,17 @@ public static class StoredProcedureNames
     
     /// <summary>
     /// Updates the name of an existing custom voters ledger.<br/>
-    /// Params: ledgerGuid (Guid), ledgerName (string).<br/>
-    /// Returns: Status code LedgerNotFound if the ledger does not exist.<br/>
+    /// Params: ledgerGuid (Guid), ledgerName (string), campaignGuid (Guid).<br/>
+    /// Returns: Status code LedgerNotFound if the ledger does not exist, CampaignNotFound if the campaign does not
+    /// exist, BoundaryViolation if the user attempts to touch a different campaign's ledger.<br/>
     /// </summary>
     public const string UpdateCustomVotersLedger = "usp_CustomVotersLedgerUpdate";
     
     /// <summary>
     /// Deletes an existing custom voters ledger.<br/>
-    /// Params: ledgerGuid (Guid).<br/>
-    /// Returns: Status code LedgerNotFound if the ledger does not exist.<br/>
+    /// Params: ledgerGuid (Guid), campaignGuid (Guid).<br/>
+    /// Returns: Status code LedgerNotFound if the ledger does not exist, CampaignNotFound if the campaign does not
+    /// exist, BoundaryViolation if the user attempts to touch a different campaign's ledger.<br/>
     /// </summary>
     public const string DeleteCustomVotersLedger = "usp_CustomVotersLedgerDelete";
     
