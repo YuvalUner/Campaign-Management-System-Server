@@ -891,4 +891,25 @@ public static class StoredProcedureNames
     /// Gets the list of all the custom voters ledgers for a campaign.<br/>
     /// </summary>
     public const string GetCampaignCustomVotersLedgers = "usp_CustomVotersLedgerGetForCampaign";
+    
+    /// <summary>
+    /// Adds a new row to a custom voters ledger.<br/>
+    /// </summary>
+    public const string AddCustomVotersLedgerRow = "usp_CustomVotersLedgerRowAdd";
+    
+    /// <summary>
+    /// Updates an existing row in a custom voters ledger.<br/>
+    /// </summary>
+    public const string UpdateCustomVotersLedgerRow = "usp_CustomVotersLedgerRowUpdate";
+    
+    /// <summary>
+    /// Deletes an existing row in a custom voters ledger.<br/>
+    /// </summary>
+    public const string DeleteCustomVotersLedgerRow = "usp_CustomVotersLedgerRowDelete";
+    
+    /// <summary>
+    /// Filters a custom ledger and returns all rows that pass the filter.<br/>
+    /// </summary>
+    public const string FilterCustomVotersLedger = "usp_CustomVotersLedgerFilter";
+
 }

@@ -39,4 +39,44 @@ public interface ICustomVotersLedgerService
     /// <param name="campaignGuid">Guid of the campaign to get the list for.</param>
     /// <returns></returns>
     Task<IEnumerable<CustomVotersLedger>> GetCustomVotersLedgersByCampaignGuid(Guid campaignGuid);
+    
+    /// <summary>
+    /// Adds a row to a custom voters ledger.
+    /// </summary>
+    /// <param name="customVotersLedgerContent">The row to add.</param>
+    /// <param name="campaignGuid">Guid of the campaign the ledger belongs to.</param>
+    /// <param name="ledgerGuid">Guid of the ledger.</param>
+    /// <returns></returns>
+    Task<CustomStatusCode> AddCustomVotersLedgerRow(CustomVotersLedgerContent customVotersLedgerContent,
+        Guid campaignGuid, Guid ledgerGuid);
+    
+    /// <summary>
+    /// Deletes a row from a custom voters ledger.
+    /// </summary>
+    /// <param name="ledgerGuid">Guid of the ledger to delete from.</param>
+    /// <param name="campaignGuid">Guid of the campaign the ledger belongs to.</param>
+    /// <param name="rowId">Id of the row to delete.</param>
+    /// <returns></returns>
+    Task<CustomStatusCode> DeleteCustomVotersLedgerRow(Guid ledgerGuid, Guid campaignGuid, int rowId);
+    
+    /// <summary>
+    /// Updates a row in a custom voters ledger.
+    /// </summary>
+    /// <param name="customVotersLedgerContent">The new values to set</param>
+    /// <param name="campaignGuid">Guid of the campaign the ledger belongs to.</param>
+    /// <param name="ledgerGuid">Guid of the ledger.</param>
+    /// <param name="rowId">Id of the row to update.</param>
+    /// <returns></returns>
+    Task<CustomStatusCode> UpdateCustomVotersLedgerRow(CustomVotersLedgerContent customVotersLedgerContent,
+        Guid campaignGuid, Guid ledgerGuid, int rowId);
+    
+    /// <summary>
+    /// Filters a custom voters ledger and returns a list of rows that match the filter.
+    /// </summary>
+    /// <param name="campaignGuid">Guid of the campaign the ledger belongs to.</param>
+    /// <param name="ledgerGuid">Guid of the ledger.</param>
+    /// <param name="filter">Filter parameters.</param>
+    /// <returns></returns>
+    Task<IEnumerable<CustomVotersLedgerContent>> FilterCustomVotersLedger(Guid campaignGuid, Guid ledgerGuid,
+        VotersLedgerFilter filter);
 }

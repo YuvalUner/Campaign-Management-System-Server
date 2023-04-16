@@ -72,4 +72,25 @@ public class CustomVotersLedgerService: ICustomVotersLedgerService
         return _dbAccess.GetData<CustomVotersLedger,
             DynamicParameters>(StoredProcedureNames.GetCampaignCustomVotersLedgers, param);
     }
+
+    public Task<CustomStatusCode> AddCustomVotersLedgerRow(CustomVotersLedgerContent customVotersLedgerContent, Guid campaignGuid, Guid ledgerGuid)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<CustomStatusCode> DeleteCustomVotersLedgerRow(Guid ledgerGuid, Guid campaignGuid, int rowId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<CustomStatusCode> UpdateCustomVotersLedgerRow(CustomVotersLedgerContent customVotersLedgerContent, Guid campaignGuid,
+        Guid ledgerGuid, int rowId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IEnumerable<CustomVotersLedgerContent>> FilterCustomVotersLedger(Guid campaignGuid, Guid ledgerGuid, VotersLedgerFilter filter)
+    {
+        throw new NotImplementedException();
+    }
 }
