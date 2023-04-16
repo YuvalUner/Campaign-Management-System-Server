@@ -110,7 +110,12 @@ public enum CustomStatusCode
     /// For example, when a user tries to assign the same user to the same job twice.
     /// </summary>
     DuplicateKey = 50001,
-    ForeignKeyViolation = 50002,
+    
+    /// <summary>
+    /// A status code for when the user tries to perform an action outside the boundaries they are allowed to.<br/>
+    /// For example, trying to update a campaign that they are not part of.
+    /// </summary>
+    BoundaryViolation = 50002,
     CannotInsertNull = 50003,
 
     /// <summary>

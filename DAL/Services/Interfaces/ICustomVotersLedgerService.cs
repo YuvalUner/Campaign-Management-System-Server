@@ -18,16 +18,20 @@ public interface ICustomVotersLedgerService
     /// Deletes a custom voters ledger entity from the database.
     /// </summary>
     /// <param name="ledgerGuid">Guid of the ledger to delete.</param>
-    /// <returns>Status code LedgerNotFound if the ledger does not exist.</returns>
-    Task<CustomStatusCode> DeleteCustomVotersLedger(Guid ledgerGuid);
+    /// <param name="campaignGuid">Guid of the campaign to delete for.</param>
+    /// <returns>Status code LedgerNotFound if the ledger does not exist, CampaignNotFound if the campaign does not
+    /// exist, BoundaryViolation if the user attempts to touch a different campaign's ledger.</returns>
+    Task<CustomStatusCode> DeleteCustomVotersLedger(Guid ledgerGuid, Guid campaignGuid);
 
     /// <summary>
     /// Updates an existing custom voters ledger entity in the database, to change its name.
     /// </summary>
     /// <param name="customVotersLedger">An instance of <see cref="CustomVotersLedger"/> with the ledgerName and
     /// ledgerGuid.</param>
-    /// <returns>Status code LedgerNotFound if the ledger does not exist.</returns>
-    Task<CustomStatusCode> UpdateCustomVotersLedger(CustomVotersLedger customVotersLedger);
+    /// <param name="campaignGuid">Guid of the campaign to update for.</param>
+    /// <returns>Status code LedgerNotFound if the ledger does not exist, CampaignNotFound if the campaign does not
+    /// exist, BoundaryViolation if the user attempts to touch a different campaign's ledger.</returns>
+    Task<CustomStatusCode> UpdateCustomVotersLedger(CustomVotersLedger customVotersLedger, Guid campaignGuid);
     
     /// <summary>
     /// Gets the list of custom voters ledgers associated to a campaign.

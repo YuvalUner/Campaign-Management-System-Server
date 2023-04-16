@@ -31,11 +31,12 @@ public class CustomVotersLedgerService: ICustomVotersLedgerService
         return (param.Get<CustomStatusCode>("returnVal"), param.Get<Guid>("newLedgerGuid"));
     }
     
-    public async Task<CustomStatusCode> DeleteCustomVotersLedger(Guid ledgerGuid)
+    public async Task<CustomStatusCode> DeleteCustomVotersLedger(Guid ledgerGuid, Guid campaignGuid)
     {
         var param = new DynamicParameters(new
         {
-            ledgerGuid
+            ledgerGuid,
+            campaignGuid
         });
         
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
@@ -45,12 +46,13 @@ public class CustomVotersLedgerService: ICustomVotersLedgerService
         return param.Get<CustomStatusCode>("returnVal");
     }
     
-    public async Task<CustomStatusCode> UpdateCustomVotersLedger(CustomVotersLedger customVotersLedger)
+    public async Task<CustomStatusCode> UpdateCustomVotersLedger(CustomVotersLedger customVotersLedger, Guid campaignGuid)
     {
         var param = new DynamicParameters(new
         {
             customVotersLedger.LedgerGuid,
-            newLedgerName = customVotersLedger.LedgerName
+            newLedgerName = customVotersLedger.LedgerName,
+            campaignGuid
         });
         
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
