@@ -16,5 +16,10 @@ public class CustomVotersLedgerContent
     public string? Entrance { get; set; } 
     public string? Appartment { get; set; } 
     public string? HouseLetter { get; set; } 
-    public int? ZipCode { get; set; } 
+    public int? ZipCode { get; set; }
+    public string? Email1 { get; set; }
+    public string? Email2 { get; set; }
+    public string? Phone1 { get; set; }
+    public string? Phone2 { get; set; }
+    public bool? SupportStatus { get; set; }
 }

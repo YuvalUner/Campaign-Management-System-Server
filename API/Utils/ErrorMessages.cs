@@ -99,6 +99,7 @@ public static class ErrorMessages
     
     public const string NotInCampaign = "You are not a member of this campaign";
     public const string VerificationCodeError = "Verification code error - please check your code and try again";
+    public const string LedgerNotFound = "The requested ledger was not found";
 
     /// <summary>
     /// Formats an error message with a custom status code, such that it can be returned to the client in a consistent way.

@@ -27,7 +27,7 @@ public interface ICustomVotersLedgerService
     /// <param name="customVotersLedger">An instance of <see cref="CustomVotersLedger"/> with the ledgerName and
     /// ledgerGuid.</param>
     /// <returns>Status code LedgerNotFound if the ledger does not exist.</returns>
-    Task<CustomStatusCode> EditCustomVotersLedger(CustomVotersLedger customVotersLedger);
+    Task<CustomStatusCode> UpdateCustomVotersLedger(CustomVotersLedger customVotersLedger);
     
     /// <summary>
     /// Gets the list of custom voters ledgers associated to a campaign.
