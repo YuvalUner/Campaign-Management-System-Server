@@ -45,7 +45,7 @@ public class CustomVotersLedgerService: ICustomVotersLedgerService
         return param.Get<CustomStatusCode>("returnVal");
     }
     
-    public async Task<CustomStatusCode> EditCustomVotersLedger(CustomVotersLedger customVotersLedger)
+    public async Task<CustomStatusCode> UpdateCustomVotersLedger(CustomVotersLedger customVotersLedger)
     {
         var param = new DynamicParameters(new
         {

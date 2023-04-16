@@ -119,7 +119,7 @@ public class CustomVotersLedgerServiceTests
         
         // Act
         var statusCode = _customVotersLedgerService
-            .EditCustomVotersLedger(_customVotersLedger).Result;
+            .UpdateCustomVotersLedger(_customVotersLedger).Result;
         
         // Assert
         Assert.Equal(CustomStatusCode.Ok, statusCode);
@@ -138,7 +138,7 @@ public class CustomVotersLedgerServiceTests
         
         // Act
         var statusCode = _customVotersLedgerService
-            .EditCustomVotersLedger(customVotersLedger).Result;
+            .UpdateCustomVotersLedger(customVotersLedger).Result;
         
         // Assert
         Assert.Equal(CustomStatusCode.LedgerNotFound, statusCode);

@@ -41,6 +41,7 @@ public static class PermissionTargets
     public const string Events = "Events";
     public const string Publishing = "Publishing";
     public const string Financial = "Financial";
+    public const string CustomVotersLedger = "Custom Voters Ledger";
 
     private static readonly string[] All =
     {
@@ -55,7 +56,8 @@ public static class PermissionTargets
         Sms,
         Events,
         Publishing,
-        Financial
+        Financial,
+        CustomVotersLedger
     };
 
     /// <summary>
