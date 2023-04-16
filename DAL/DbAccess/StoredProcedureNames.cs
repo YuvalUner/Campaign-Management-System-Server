@@ -863,4 +863,10 @@ public static class StoredProcedureNames
     /// Gets a list of all the users that have administrative roles in a campaign.<br/>
     /// </summary>
     public const string GetCampaignAdminStaff = "usp_CampaignAdminStaffGet";
+    
+    /// <summary>
+    /// Adds a new custom voters ledger (Without content - only the ledger's name) to the database.<br/>
+    /// Params: campaignGuid (Guid), ledgerName (string), newLedgerGuid (Guid) - the guid of the new ledger, output.
+    /// </summary>
+    public const string AddCustomVotersLedger = "usp_CustomVotersLedgerAdd";
 }
