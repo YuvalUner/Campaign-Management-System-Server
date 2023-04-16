@@ -866,7 +866,27 @@ public static class StoredProcedureNames
     
     /// <summary>
     /// Adds a new custom voters ledger (Without content - only the ledger's name) to the database.<br/>
-    /// Params: campaignGuid (Guid), ledgerName (string), newLedgerGuid (Guid) - the guid of the new ledger, output.
+    /// Params: campaignGuid (Guid), ledgerName (string), newLedgerGuid (Guid) - the guid of the new ledger, output.<br/>
+    /// Returns: Status code CampaignNotFound if the campaign does not exist.<br/>
     /// </summary>
     public const string AddCustomVotersLedger = "usp_CustomVotersLedgerAdd";
+    
+    /// <summary>
+    /// Updates the name of an existing custom voters ledger.<br/>
+    /// Params: ledgerGuid (Guid), ledgerName (string).<br/>
+    /// Returns: Status code LedgerNotFound if the ledger does not exist.<br/>
+    /// </summary>
+    public const string UpdateCustomVotersLedger = "usp_CustomVotersLedgerUpdate";
+    
+    /// <summary>
+    /// Deletes an existing custom voters ledger.<br/>
+    /// Params: ledgerGuid (Guid).<br/>
+    /// Returns: Status code LedgerNotFound if the ledger does not exist.<br/>
+    /// </summary>
+    public const string DeleteCustomVotersLedger = "usp_CustomVotersLedgerDelete";
+    
+    /// <summary>
+    /// Gets the list of all the custom voters ledgers for a campaign.<br/>
+    /// </summary>
+    public const string GetCampaignCustomVotersLedgers = "usp_CustomVotersLedgerGetForCampaign";
 }
