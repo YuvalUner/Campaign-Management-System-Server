@@ -188,7 +188,7 @@ public class CustomVotersLedgerController : Controller
 
     [HttpPost("add-row/{campaignGuid:guid}/{ledgerGuid:guid}")]
     public async Task<IActionResult> AddRowToCustomLedger(Guid campaignGuid, Guid ledgerGuid,
-        CustomVotersLedgerContent content)
+        [FromBody] CustomVotersLedgerContent content)
     {
         try
         {
@@ -263,7 +263,7 @@ public class CustomVotersLedgerController : Controller
     
     [HttpPut("update-row/{campaignGuid:guid}/{ledgerGuid:guid}")]
     public async Task<IActionResult> UpdateRowInCustomLedger(Guid campaignGuid, Guid ledgerGuid,
-        CustomVotersLedgerContent content)
+        [FromBody] CustomVotersLedgerContent content)
     {
         try
         {
@@ -301,7 +301,7 @@ public class CustomVotersLedgerController : Controller
 
     [HttpGet("filter/{campaignGuid:guid}/{ledgerGuid:guid}")]
     public async Task<IActionResult> FilterCustomLedger(Guid campaignGuid, Guid ledgerGuid,
-        CustomLedgerFilterParams filter)
+        [FromQuery] CustomLedgerFilterParams filter)
     {
         try
         {
