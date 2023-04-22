@@ -240,4 +240,10 @@ public enum CustomStatusCode
     /// A status code for when the user attempts to access a non-existent ledger.
     /// </summary>
     LedgerNotFound = 50027,
+    
+    /// <summary>
+    /// A status code for when the user attempts to access a non-existent ledger row,
+    /// via a ledger row id that does not exist.
+    /// </summary>
+    LedgerRowNotFound = 50028,
 }
