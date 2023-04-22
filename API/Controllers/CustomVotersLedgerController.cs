@@ -25,6 +25,9 @@ public class CustomVotersLedgerController : Controller
         _logger = logger;
     }
 
+    #region Custom Voters Ledgers
+    
+    
     /// <summary>
     /// Creates a new custom voters ledger for the given campaign.
     /// </summary>
@@ -178,5 +181,152 @@ public class CustomVotersLedgerController : Controller
             return StatusCode(500, "Error while trying to update custom ledger");
         }
     }
+    
+    #endregion
+    
+    #region Custom Voters Ledger Rows
+
+    [HttpPost("add-row/{campaignGuid:guid}/{ledgerGuid:guid}")]
+    public async Task<IActionResult> AddRowToCustomLedger(Guid campaignGuid, Guid ledgerGuid,
+        CustomVotersLedgerContent content)
+    {
+        try
+        {
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.VotersLedger,
+                        PermissionType = PermissionTypes.Edit
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            if (content.Identifier == null)
+            {
+                return BadRequest(FormatErrorMessage(IdentifierMissing, CustomStatusCode.ValueCanNotBeNull));
+            }
+            
+            var statusCode = await _customVotersLedgerService.AddCustomVotersLedgerRow(content, ledgerGuid);
+            
+            return statusCode switch
+            {
+                CustomStatusCode.LedgerNotFound => NotFound(FormatErrorMessage(LedgerNotFound, statusCode)),
+                CustomStatusCode.DuplicateKey => BadRequest(FormatErrorMessage(RowAlreadyExists, statusCode)),
+                _ => Ok()
+            };
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while trying to add row to custom ledger");
+            return StatusCode(500, "Error while trying to add row to custom ledger");
+        }
+    }
+    
+    [HttpDelete("delete-row/{campaignGuid:guid}/{ledgerGuid:guid}")]
+    public async Task<IActionResult> DeleteRowFromCustomLedger(Guid campaignGuid, Guid ledgerGuid, [FromQuery] int? rowId)
+    {
+        try
+        {
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.VotersLedger,
+                        PermissionType = PermissionTypes.Edit
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            if (rowId == null)
+            {
+                return BadRequest(FormatErrorMessage(IdentifierMissing, CustomStatusCode.ValueCanNotBeNull));
+            }
+
+            var statusCode = await _customVotersLedgerService.DeleteCustomVotersLedgerRow(ledgerGuid, rowId.Value);
+            
+            return statusCode switch
+            {
+                CustomStatusCode.LedgerNotFound => NotFound(FormatErrorMessage(LedgerNotFound, statusCode)),
+                CustomStatusCode.LedgerRowNotFound => NotFound(FormatErrorMessage(LedgerRowNotFound, statusCode)),
+                _ => Ok()
+            };
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while trying to delete row from custom ledger");
+            return StatusCode(500, "Error while trying to delete row from custom ledger");
+        }
+    }
+    
+    [HttpPut("update-row/{campaignGuid:guid}/{ledgerGuid:guid}")]
+    public async Task<IActionResult> UpdateRowInCustomLedger(Guid campaignGuid, Guid ledgerGuid,
+        CustomVotersLedgerContent content)
+    {
+        try
+        {
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.VotersLedger,
+                        PermissionType = PermissionTypes.Edit
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            if (content.Identifier == null)
+            {
+                return BadRequest(FormatErrorMessage(IdentifierMissing, CustomStatusCode.ValueCanNotBeNull));
+            }
+            
+            var statusCode = await _customVotersLedgerService.UpdateCustomVotersLedgerRow(content, ledgerGuid);
+            
+            return statusCode switch
+            {
+                CustomStatusCode.LedgerNotFound => NotFound(FormatErrorMessage(LedgerNotFound, statusCode)),
+                CustomStatusCode.LedgerRowNotFound => NotFound(FormatErrorMessage(LedgerRowNotFound, statusCode)),
+                _ => Ok()
+            };
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while trying to update row in custom ledger");
+            return StatusCode(500, "Error while trying to update row in custom ledger");
+        }
+    }
+
+    [HttpGet("filter/{campaignGuid:guid}/{ledgerGuid:guid}")]
+    public async Task<IActionResult> FilterCustomLedger(Guid campaignGuid, Guid ledgerGuid,
+        CustomLedgerFilterParams filter)
+    {
+        try
+        {
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.VotersLedger,
+                        PermissionType = PermissionTypes.View
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            var res = await _customVotersLedgerService.FilterCustomVotersLedger(ledgerGuid, filter);
+
+            return Ok(res);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while trying to filter custom ledger");
+            return StatusCode(500, "Error while trying to filter custom ledger");
+        }
+    }
+    
+    #endregion
     
 }
