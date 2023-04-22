@@ -6,6 +6,8 @@
 /// </summary>
 public enum CustomStatusCode
 {
+    
+    #region Server Errors
     ///<summary>
     /// 0 is the default return value for stored procedures, so we use it for success.<br/>
     /// Outside of tests, this should never be used.<br/>
@@ -99,6 +101,10 @@ public enum CustomStatusCode
     /// For example, when the user tries to verify their phone number, but the code they entered does not match the one sent to them.
     /// </summary>
     NoMatch = 16,
+    
+    #endregion
+    
+    #region SQL Errors
 
     // 50000 and above are SQL errors, meant to match requirement of throwing between 50000 and 2147483647
     // These are for errors that would have been thrown by the database if not caught by the stored procedure
@@ -246,4 +252,6 @@ public enum CustomStatusCode
     /// via a ledger row id that does not exist.
     /// </summary>
     LedgerRowNotFound = 50028,
+    
+    #endregion
 }
