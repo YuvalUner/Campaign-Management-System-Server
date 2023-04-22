@@ -102,6 +102,11 @@ public enum CustomStatusCode
     /// </summary>
     NoMatch = 16,
     
+    /// <summary>
+    /// A status code for when the user submits a file that is not valid, for whatever reason.<br/>
+    /// </summary>
+    InvalidFile = 17,
+    
     #endregion
     
     #region SQL Errors

@@ -1,7 +1,9 @@
-﻿using API.Utils;
+﻿using System.Data;
+using API.Utils;
 using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Interfaces;
+using ExcelDataReader;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static API.Utils.ErrorMessages;
@@ -331,6 +333,97 @@ public class CustomVotersLedgerController : Controller
         }
     }
     
+    #endregion
+
+    #region Custom Voters Ledger Import
+
+    private (bool, DataTable?) CheckFileValidity(IFormFile file, List<ColumnMapping> columnMappings)
+    {
+        IExcelDataReader excelReader;
+        // Create a new ExcelReader based on the file type, or return false if the file type is not supported
+        if (file.FileName.EndsWith(".xls"))
+        {
+            excelReader = ExcelReaderFactory.CreateBinaryReader(file.OpenReadStream());
+        }
+        else if (file.FileName.EndsWith(".xlsx"))
+        {
+            excelReader = ExcelReaderFactory.CreateOpenXmlReader(file.OpenReadStream());
+        }
+        else
+        {
+            return (false, null);
+        }
+
+        // Read the first sheet of the file
+        var ledger = excelReader.AsDataSet();
+        if (ledger == null)
+        {
+            return (false, null);
+        }
+        excelReader.Close();
+        DataTable table = ledger.Tables[0];
+        
+        // Check if the file contains the identifier column
+        string? IdColumnName = columnMappings.FirstOrDefault(x => x.PropertyName == PropertyNames.Identifier)?.ColumnName;
+        if (IdColumnName == null)
+        {
+            return (false, null);
+        }
+        if (!table.Columns.Contains(IdColumnName))
+        {
+            return (false, null);
+        }
+        
+        // If the file contains the identifier column, check that all rows have a value in it
+        foreach (DataRow row in table.Rows)
+        {
+            if (String.IsNullOrWhiteSpace(row[IdColumnName].ToString()))
+            {
+                return (false, null);
+            }
+        }
+        
+        return (true, table);
+    }
+
+    [HttpPost("import/{campaignGuid:guid}/{ledgerGuid:guid}")]
+    public async Task<IActionResult> ImportLedger(Guid campaignGuid, Guid ledgerGuid,
+        [FromBody] List<ColumnMapping> columnMappings)
+    {
+        try
+        {
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.CustomVotersLedger,
+                        PermissionType = PermissionTypes.Edit
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            if (HttpContext.Request.Form.Files.Count < 1)
+            {
+                return BadRequest(FormatErrorMessage(NoFileProvided, CustomStatusCode.ValueNullOrEmpty));
+            }
+            
+            var file = HttpContext.Request.Form.Files[0];
+            var (isValid, table) = CheckFileValidity(file, columnMappings);
+            if (!isValid)
+            {
+                return BadRequest(FormatErrorMessage(InvalidFile, CustomStatusCode.InvalidFile));
+            }
+            throw new NotImplementedException();
+
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while trying to import custom ledger");
+            return StatusCode(500, "Error while trying to import custom ledger");
+        }
+    }
+
     #endregion
     
 }
