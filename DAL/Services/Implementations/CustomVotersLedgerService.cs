@@ -73,24 +73,87 @@ public class CustomVotersLedgerService: ICustomVotersLedgerService
             DynamicParameters>(StoredProcedureNames.GetCampaignCustomVotersLedgers, param);
     }
 
-    public Task<CustomStatusCode> AddCustomVotersLedgerRow(CustomVotersLedgerContent customVotersLedgerContent, Guid campaignGuid, Guid ledgerGuid)
+    public async Task<CustomStatusCode> AddCustomVotersLedgerRow(CustomVotersLedgerContent customVotersLedgerContent, 
+        Guid ledgerGuid)
     {
-        throw new NotImplementedException();
+        var param = new DynamicParameters(new
+        {
+            customVotersLedgerContent.Identifier,
+            ledgerGuid,
+            customVotersLedgerContent.FirstName,
+            customVotersLedgerContent.LastName,
+            customVotersLedgerContent.CityName,
+            customVotersLedgerContent.BallotId,
+            customVotersLedgerContent.StreetName,
+            customVotersLedgerContent.HouseNumber,
+            customVotersLedgerContent.ZipCode,
+            customVotersLedgerContent.Entrance,
+            customVotersLedgerContent.Appartment,
+            customVotersLedgerContent.HouseLetter,
+            customVotersLedgerContent.Email1,
+            customVotersLedgerContent.Email2,
+            customVotersLedgerContent.Phone1,
+            customVotersLedgerContent.Phone2,
+            customVotersLedgerContent.SupportStatus
+        });
+        
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        
+        await _dbAccess.ModifyData(StoredProcedureNames.AddCustomVotersLedgerRow, param);
+        
+        return param.Get<CustomStatusCode>("returnVal");
     }
 
-    public Task<CustomStatusCode> DeleteCustomVotersLedgerRow(Guid ledgerGuid, Guid campaignGuid, int rowId)
+    public async Task<CustomStatusCode> DeleteCustomVotersLedgerRow(Guid ledgerGuid, int rowId)
     {
-        throw new NotImplementedException();
+        var param = new DynamicParameters(new
+        {
+            ledgerGuid,
+            identifier = rowId
+        });
+        
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        
+        await _dbAccess.ModifyData(StoredProcedureNames.DeleteCustomVotersLedgerRow, param);
+
+        return param.Get<CustomStatusCode>("returnVal");
     }
 
-    public Task<CustomStatusCode> UpdateCustomVotersLedgerRow(CustomVotersLedgerContent customVotersLedgerContent, Guid campaignGuid,
-        Guid ledgerGuid, int rowId)
+    public async Task<CustomStatusCode> UpdateCustomVotersLedgerRow(CustomVotersLedgerContent customVotersLedgerContent, 
+        Guid ledgerGuid)
     {
-        throw new NotImplementedException();
+        var param = new DynamicParameters(new
+        {
+            customVotersLedgerContent.Identifier,
+            ledgerGuid,
+            customVotersLedgerContent.FirstName,
+            customVotersLedgerContent.LastName,
+            customVotersLedgerContent.CityName,
+            customVotersLedgerContent.BallotId,
+            customVotersLedgerContent.StreetName,
+            customVotersLedgerContent.HouseNumber,
+            customVotersLedgerContent.ZipCode,
+            customVotersLedgerContent.Entrance,
+            customVotersLedgerContent.Appartment,
+            customVotersLedgerContent.HouseLetter,
+            customVotersLedgerContent.Email1,
+            customVotersLedgerContent.Email2,
+            customVotersLedgerContent.Phone1,
+            customVotersLedgerContent.Phone2,
+            customVotersLedgerContent.SupportStatus
+        });
+        
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        
+        await _dbAccess.ModifyData(StoredProcedureNames.UpdateCustomVotersLedgerRow, param);
+        
+        return param.Get<CustomStatusCode>("returnVal");
     }
 
-    public Task<IEnumerable<CustomVotersLedgerContent>> FilterCustomVotersLedger(Guid campaignGuid, Guid ledgerGuid, VotersLedgerFilter filter)
+    public async Task<IEnumerable<CustomVotersLedgerContent>> FilterCustomVotersLedger(Guid ledgerGuid, 
+        CustomLedgerFilterParams filter)
     {
-        throw new NotImplementedException();
+        return await _dbAccess.GetData<CustomVotersLedgerContent, CustomLedgerFilterParams>
+            (StoredProcedureNames.FilterCustomVotersLedger, filter);
     }
 }
