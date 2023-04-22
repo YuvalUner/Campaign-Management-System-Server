@@ -2,8 +2,7 @@
 
 public class CustomVotersLedgerContent
 {
-    public int? Identifier { get; set; } 
-    public int? LedgerId { get; set; } 
+    public int? Identifier { get; set; }
     public string? LastName { get; set; } 
     public string? FirstName { get; set; }
     public string? CityName { get; set; } 
