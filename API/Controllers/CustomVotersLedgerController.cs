@@ -15,6 +15,8 @@ namespace API.Controllers;
 [Authorize]
 public class CustomVotersLedgerController : Controller
 {
+    #region Private fields and constructor
+
     private readonly ICustomVotersLedgerService _customVotersLedgerService;
     private readonly ILogger<CustomVotersLedgerController> _logger;
 
@@ -24,6 +26,8 @@ public class CustomVotersLedgerController : Controller
         _customVotersLedgerService = customVotersLedgerService;
         _logger = logger;
     }
+    
+    #endregion
 
     #region Custom Voters Ledgers
     
