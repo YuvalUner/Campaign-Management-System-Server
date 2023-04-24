@@ -10,6 +10,16 @@ using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
 
+#region File Upload model
+
+public class FileUploadParams
+{
+    public List<ColumnMapping> ColumnMappings { get; set; }
+    public IFormFile File { get; set; }
+}
+
+#endregion
+
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
@@ -337,9 +347,16 @@ public class CustomVotersLedgerController : Controller
 
     #region Custom Voters Ledger Import
 
-    private (bool, DataTable?) CheckFileValidity(IFormFile file, List<ColumnMapping> columnMappings)
+    /// <summary>
+    /// This function handles checking the validity of the file uploaded by the user.
+    /// </summary>
+    /// <param name="fileUploadParams"></param>
+    /// <returns>True and a DataTable if the file is of a valid format, false and null otherwise.</returns>
+    private (bool, DataTable?) CheckFormatValidity(FileUploadParams fileUploadParams)
     {
         IExcelDataReader excelReader;
+        var file = fileUploadParams.File;
+        var columnMappings = fileUploadParams.ColumnMappings;
         // Create a new ExcelReader based on the file type, or return false if the file type is not supported
         if (file.FileName.EndsWith(".xls"))
         {
@@ -374,21 +391,66 @@ public class CustomVotersLedgerController : Controller
             return (false, null);
         }
         
-        // If the file contains the identifier column, check that all rows have a value in it
-        foreach (DataRow row in table.Rows)
+        // Check that the file contains at least one row
+        if (table.Rows.Count == 0)
         {
-            if (String.IsNullOrWhiteSpace(row[IdColumnName].ToString()))
+            return (false, null);
+        }
+        
+        // Check that the file contains all the columns specified in the column mappings
+        foreach (var mapping in columnMappings)
+        {
+            if (string.IsNullOrWhiteSpace(mapping.ColumnName)
+                || string.IsNullOrWhiteSpace(mapping.PropertyName)
+                || !table.Columns.Contains(mapping.ColumnName))
             {
                 return (false, null);
             }
         }
-        
+
+
         return (true, table);
+    }
+
+    /// <summary>
+    /// This function performs the mapping of each row of the excel file to the CustomVotersLedgerContent model
+    /// </summary>
+    /// <param name="columnMappings">A list of column mappings, telling the function which column in the table
+    /// to map to each property.</param>
+    /// <param name="table">The table to adapt to models.</param>
+    /// <returns>true and a list of <see cref="CustomVotersLedgerContent"/> if the table itself is entirely valid,
+    /// false and null otherwise.</returns>
+    private (bool, List<CustomVotersLedgerContent>?) excelToModel(List<ColumnMapping> columnMappings, DataTable table)
+    {
+        var res = new List<CustomVotersLedgerContent>();
+        // Go over the rows of the table and map each row to a CustomVotersLedgerContent model
+        foreach (DataRow row in table.Rows)
+        {
+            var content = new CustomVotersLedgerContent();
+            foreach (var mapping in columnMappings)
+            {
+                content.SetProperty(mapping.PropertyName, row[mapping.ColumnName].ToString());
+            }
+            if (content.Identifier == null)
+            {
+                return (false, null);
+            }
+            res.Add(content);
+        }
+        
+        // After doing the mapping, check that no two rows have the same identifier
+        var identifiers = res.Select(x => x.Identifier).ToList();
+        if (identifiers.Count != identifiers.Distinct().Count())
+        {
+            return (false, null);
+        }
+
+        return (true, res);
     }
 
     [HttpPost("import/{campaignGuid:guid}/{ledgerGuid:guid}")]
     public async Task<IActionResult> ImportLedger(Guid campaignGuid, Guid ledgerGuid,
-        [FromBody] List<ColumnMapping> columnMappings)
+        [FromBody] FileUploadParams fileUploadParams)
     {
         try
         {
@@ -408,14 +470,30 @@ public class CustomVotersLedgerController : Controller
                 return BadRequest(FormatErrorMessage(NoFileProvided, CustomStatusCode.ValueNullOrEmpty));
             }
             
-            var file = HttpContext.Request.Form.Files[0];
-            var (isValid, table) = CheckFileValidity(file, columnMappings);
-            if (!isValid)
+            var (formatValid, table) = CheckFormatValidity(fileUploadParams);
+            if (!formatValid || table == null)
             {
                 return BadRequest(FormatErrorMessage(InvalidFile, CustomStatusCode.InvalidFile));
             }
-            throw new NotImplementedException();
+            var (tableValid, contentList) = excelToModel(fileUploadParams.ColumnMappings, table);
+            if (!tableValid || contentList == null)
+            {
+                return BadRequest(FormatErrorMessage(InvalidFile, CustomStatusCode.InvalidFile));
+            }
+            
+            var ledgers = await _customVotersLedgerService.GetCustomVotersLedgersByCampaignGuid(campaignGuid);
+            if (ledgers.All(x => x.LedgerGuid != ledgerGuid))
+            {
+                return NotFound(FormatErrorMessage(LedgerNotFound, CustomStatusCode.LedgerNotFound));
+            }
 
+            foreach (var content in contentList)
+            {
+                // Add each row to the ledger
+                 await _customVotersLedgerService.AddCustomVotersLedgerRow(content, ledgerGuid);
+            }
+            
+            return Ok();
         }
         catch (Exception e)
         {
