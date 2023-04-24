@@ -2,22 +2,22 @@
 
 public static class PropertyNames
 {
-    public const string Identifier = "identifier";
-    public const string LastName = "lastName";
-    public const string FirstName = "firstName";
-    public const string CityName = "cityName";
-    public const string BallotId = "ballotId";
-    public const string StreetName = "streetName";
-    public const string HouseNumber = "houseNumber";
-    public const string Entrance = "entrance";
-    public const string Appartment = "appartment";
-    public const string HouseLetter = "houseLetter";
-    public const string ZipCode = "zipCode";
-    public const string Email1 = "email1";
-    public const string Email2 = "email2";
-    public const string Phone1 = "phone1";
-    public const string Phone2 = "phone2";
-    public const string SupportStatus = "supportStatus";
+    public const string Identifier = "Identifier";
+    public const string LastName = "LastName";
+    public const string FirstName = "FirstName";
+    public const string CityName = "CityName";
+    public const string BallotId = "BallotId";
+    public const string StreetName = "StreetName";
+    public const string HouseNumber = "HouseNumber";
+    public const string Entrance = "Entrance";
+    public const string Appartment = "Appartment";
+    public const string HouseLetter = "HouseLetter";
+    public const string ZipCode = "ZipCode";
+    public const string Email1 = "Email1";
+    public const string Email2 = "Email2";
+    public const string Phone1 = "Phone1";
+    public const string Phone2 = "Phone2";
+    public const string SupportStatus = "SupportStatus";
 
     private static readonly string[] All = new[]
     {

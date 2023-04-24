@@ -6,7 +6,7 @@ public class CustomVotersLedgerContent
     public string? LastName { get; set; } 
     public string? FirstName { get; set; }
     public string? CityName { get; set; } 
-    public int? BallotId { get; set; }
+    public Decimal? BallotId { get; set; }
     public string? StreetName { get; set; } 
     public int? HouseNumber { get; set; } 
     public string? Entrance { get; set; } 
@@ -18,4 +18,50 @@ public class CustomVotersLedgerContent
     public string? Phone1 { get; set; }
     public string? Phone2 { get; set; }
     public bool? SupportStatus { get; set; }
+
+    
+    private bool? convertToBool(string val)
+    {
+        val = val.ToLower();
+        if (val == "supporting" || val == "true")
+        {
+            return true;
+        }
+        else if (val == "opposing" || val == "false")
+        {
+            return false;
+        }
+
+        return null;
+    }
+
+    private object? ConvertTo(string propertyName, string value)
+    {
+        try
+        {
+            return propertyName switch
+            {
+                "Identifier" => Int32.Parse(value),
+                "BallotId" => Decimal.Parse(value),
+                "HouseNumber" => Int32.Parse(value),
+                "ZipCode" => Int32.Parse(value),
+                "SupportStatus" => convertToBool(value),
+                _ => value
+            };
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+    
+    public void SetProperty(string propertyName, string value)
+    {
+        var property = this.GetType().GetProperty(propertyName);
+        if (property != null)
+        {
+            property.SetValue(this, ConvertTo(propertyName, value));
+        }
+    }
+    
 }

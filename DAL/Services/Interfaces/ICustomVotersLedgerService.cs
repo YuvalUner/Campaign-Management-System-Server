@@ -45,7 +45,8 @@ public interface ICustomVotersLedgerService
     /// </summary>
     /// <param name="customVotersLedgerContent">The row to add.</param>
     /// <param name="ledgerGuid">Guid of the ledger.</param>
-    /// <returns></returns>
+    /// <returns>LedgerNotFound if the ledger does not exist, DuplicateKey if the identifier already exists in the
+    /// ledger.</returns>
     Task<CustomStatusCode> AddCustomVotersLedgerRow(CustomVotersLedgerContent customVotersLedgerContent, Guid ledgerGuid);
     
     /// <summary>
@@ -53,7 +54,8 @@ public interface ICustomVotersLedgerService
     /// </summary>
     /// <param name="ledgerGuid">Guid of the ledger to delete from.</param>
     /// <param name="rowId">Id of the row to delete.</param>
-    /// <returns></returns>
+    /// <returns>LedgerNotFound if the ledger does not exist, LedgerRowNotFound if row with that identifier was
+    /// not found within the specified ledger.</returns>
     Task<CustomStatusCode> DeleteCustomVotersLedgerRow(Guid ledgerGuid, int rowId);
     
     /// <summary>
@@ -61,8 +63,8 @@ public interface ICustomVotersLedgerService
     /// </summary>
     /// <param name="customVotersLedgerContent">The new values to set</param>
     /// <param name="ledgerGuid">Guid of the ledger.</param>
-    /// <param name="rowId">Id of the row to update.</param>
-    /// <returns></returns>
+    /// <returns>LedgerNotFound if the ledger does not exist, LedgerRowNotFound if row with that identifier was
+    /// not found within the specified ledger</returns>
     Task<CustomStatusCode> UpdateCustomVotersLedgerRow(CustomVotersLedgerContent customVotersLedgerContent, 
         Guid ledgerGuid);
     
