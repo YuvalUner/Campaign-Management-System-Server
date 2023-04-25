@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Data;
+using System.Text;
 using System.Text.Json.Serialization;
 using API.Utils;
 using DAL.DbAccess;
@@ -8,6 +9,7 @@ using DAL.Services.Interfaces;
 using ExcelDataReader;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using static API.Utils.ErrorMessages;
 
 namespace API.Controllers;
@@ -358,29 +360,51 @@ public class CustomVotersLedgerController : Controller
     /// <returns>True and a DataTable if the file is of a valid format, false and null otherwise.</returns>
     private (bool, DataTable?) CheckFormatValidity(IEnumerable<ColumnMapping> columnMappings, IFormFile file)
     {
+        #region Creating a reader for the file
+        
         IExcelDataReader excelReader;
         // Create a new ExcelReader based on the file type, or return false if the file type is not supported
         if (file.FileName.EndsWith(".xls"))
         {
-            excelReader = ExcelReaderFactory.CreateBinaryReader(file.OpenReadStream());
+            excelReader = ExcelReaderFactory.CreateBinaryReader(file.OpenReadStream(), new ExcelReaderConfiguration()
+            {
+                FallbackEncoding = Encoding.UTF8
+            });
         }
         else if (file.FileName.EndsWith(".xlsx"))
         {
-            excelReader = ExcelReaderFactory.CreateOpenXmlReader(file.OpenReadStream());
+            excelReader = ExcelReaderFactory.CreateOpenXmlReader(file.OpenReadStream(), new ExcelReaderConfiguration()
+            {
+                FallbackEncoding = Encoding.UTF8
+            });
         }
         else
         {
             return (false, null);
         }
+        
+        #endregion
 
+        #region Creating a DataTable from the file
+        
         // Read the first sheet of the file
-        var ledger = excelReader.AsDataSet();
+        var ledger = excelReader.AsDataSet(new ExcelDataSetConfiguration()
+        {
+            ConfigureDataTable = (_) => new ExcelDataTableConfiguration()
+            {
+                UseHeaderRow = true
+            }
+        });
         if (ledger == null)
         {
             return (false, null);
         }
         excelReader.Close();
         DataTable table = ledger.Tables[0];
+        
+        #endregion
+
+        #region Verifying column validity
         
         // Check if the file contains the identifier column
         string? IdColumnName = columnMappings.FirstOrDefault(x => x.PropertyName == PropertyNames.Identifier)?.ColumnName;
@@ -398,7 +422,7 @@ public class CustomVotersLedgerController : Controller
         {
             return (false, null);
         }
-        
+
         // Check that the file contains all the columns specified in the column mappings
         foreach (var mapping in columnMappings)
         {
@@ -409,8 +433,9 @@ public class CustomVotersLedgerController : Controller
                 return (false, null);
             }
         }
-
-
+        
+        #endregion
+        
         return (true, table);
     }
 
@@ -479,6 +504,12 @@ public class CustomVotersLedgerController : Controller
             {
                 return BadRequest(FormatErrorMessage(InvalidFile, CustomStatusCode.InvalidFile));
             }
+            
+            var ledgers = await _customVotersLedgerService.GetCustomVotersLedgersByCampaignGuid(campaignGuid);
+            if (ledgers.All(x => x.LedgerGuid != ledgerGuid))
+            {
+                return NotFound(FormatErrorMessage(LedgerNotFound, CustomStatusCode.LedgerNotFound));
+            }
 
             var file = fileUploadParams.File;
             var columnMappings = new List<ColumnMapping>();
@@ -503,18 +534,18 @@ public class CustomVotersLedgerController : Controller
                 return BadRequest(FormatErrorMessage(InvalidFile, CustomStatusCode.InvalidFile));
             }
             
-            var ledgers = await _customVotersLedgerService.GetCustomVotersLedgersByCampaignGuid(campaignGuid);
-            if (ledgers.All(x => x.LedgerGuid != ledgerGuid))
-            {
-                return NotFound(FormatErrorMessage(LedgerNotFound, CustomStatusCode.LedgerNotFound));
-            }
+            var contentListArray = contentList.ToArray();
             
-            foreach (var content in contentList)
+            // Split the content list into chunks of 1000 elements each, and import each chunk separately
+            // This is done to avoid sending a request with a body that is too large, as these files can
+            // be massive.
+            int chunkSize = 1000;
+            var chunks = contentList.Chunk(chunkSize);
+            foreach (var chunk in chunks)
             {
-                // Add each row to the ledger
-                 await _customVotersLedgerService.AddCustomVotersLedgerRow(content, ledgerGuid);
+                await _customVotersLedgerService.ImportLedger(ledgerGuid, JsonConvert.SerializeObject(chunk));
             }
-            
+
             return Ok();
         }
         catch (Exception e)

@@ -156,4 +156,20 @@ public class CustomVotersLedgerService: ICustomVotersLedgerService
         return await _dbAccess.GetData<CustomVotersLedgerContent, CustomLedgerFilterParams>
             (StoredProcedureNames.FilterCustomVotersLedger, filter);
     }
+    
+
+    public async Task<CustomStatusCode> ImportLedger(Guid ledgerGuid, string jsonLedger)
+    {
+        var param = new DynamicParameters(new
+        {
+            ledgerGuid,
+            jsonLedger
+        });
+        
+        param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+        
+        await _dbAccess.ModifyData(StoredProcedureNames.ImportLedger, param);
+        
+        return param.Get<CustomStatusCode>("returnVal");
+    }
 }

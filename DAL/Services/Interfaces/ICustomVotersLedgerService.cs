@@ -76,4 +76,12 @@ public interface ICustomVotersLedgerService
     /// <returns></returns>
     Task<IEnumerable<CustomVotersLedgerContent>> FilterCustomVotersLedger(Guid ledgerGuid,
         CustomLedgerFilterParams filter);
+
+    /// <summary>
+    /// Imports a custom voters ledger from a JSON string.
+    /// </summary>
+    /// <param name="ledgerGuid">Guid of the ledger to import into.</param>
+    /// <param name="jsonLedger">A JSON object containing the ledger to import.</param>
+    /// <returns></returns>
+    Task<CustomStatusCode> ImportLedger(Guid ledgerGuid, string jsonLedger);
 }

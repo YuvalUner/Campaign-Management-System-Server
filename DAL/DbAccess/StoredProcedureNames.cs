@@ -955,4 +955,11 @@ public static class StoredProcedureNames
     /// </summary>
     public const string FilterCustomVotersLedger = "usp_CustomVotersLedgerFilter";
 
+    /// <summary>
+    /// Imports a custom voters ledger from a JSON string of the file.<br/>
+    /// Params: ledgerGuid (Guid), ledgerJson (string), shouldDeleteOnUnmatch (bool) - optional, default false. If true,
+    /// will delete any rows that are not matched in the import file.<br/>
+    /// </summary>
+    public const string ImportLedger = "usp_CustomVotersLedgerImport";
+
 }
