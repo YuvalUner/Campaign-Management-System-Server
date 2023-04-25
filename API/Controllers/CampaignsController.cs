@@ -18,6 +18,8 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class CampaignsController : Controller
 {
+    #region Private fields and constructor
+    
     private readonly ILogger<CampaignsController> _logger;
     private readonly ICampaignsService _campaignService;
     private readonly IPermissionsService _permissionsService;
@@ -32,6 +34,8 @@ public class CampaignsController : Controller
         _permissionsService = permissionsService;
         _rolesService = rolesService;
     }
+    
+    #endregion
 
     /// <summary>
     /// An action the client is expected to perform each time they load a campaign page.

@@ -1,5 +1,6 @@
 using API.Middleware;
 using DAL.DbAccess;
+using DAL.Models;
 using DAL.Services.Implementations;
 using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -41,6 +42,7 @@ builder.Services.AddScoped<IFinancialTypesService, FinancialTypesService>();
 builder.Services.AddScoped<IFinancialDataService, FinancialDataService>();
 builder.Services.AddScoped<IElectionDayService, ElectionDayService>();
 builder.Services.AddScoped<ICitiesService, CitiesService>();
+builder.Services.AddScoped<ICustomVotersLedgerService, CustomVotersLedgerService>();
 
 // CORS policy - for now, just allow all. Change as needed
 builder.Services.AddCors(options => {
@@ -115,8 +117,8 @@ builder.Logging.AddSerilog(new LoggerConfiguration()
 
 var app = builder.Build();
 
-// Anti-XSS middleware to prevent XSS attacks
-app.UseMiddleware<AntiXssMiddleware>();
+// // Anti-XSS middleware to prevent XSS attacks
+// app.UseMiddleware<AntiXssMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -140,5 +142,15 @@ app.UseCors("AllowAll");
 app.MapControllers();
 
 app.UseSession();
+
+// Exclude the import endpoint from the anti-xss middleware, as it is used to import data from a file and 
+// the middleware will prevent that from happening.
+app.UseWhen(
+    context => !context.Request.Path.StartsWithSegments("/api/CustomVotersLedger/import"),
+    appBuilder =>
+    {
+        appBuilder.UseMiddleware<AntiXssMiddleware>();
+    }
+);
 
 app.Run();

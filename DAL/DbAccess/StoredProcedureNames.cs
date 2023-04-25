@@ -863,4 +863,103 @@ public static class StoredProcedureNames
     /// Gets a list of all the users that have administrative roles in a campaign.<br/>
     /// </summary>
     public const string GetCampaignAdminStaff = "usp_CampaignAdminStaffGet";
+    
+    /// <summary>
+    /// Adds a new custom voters ledger (Without content - only the ledger's name) to the database.<br/>
+    /// Params: campaignGuid (Guid), ledgerName (string), newLedgerGuid (Guid) - the guid of the new ledger, output.<br/>
+    /// Returns: Status code CampaignNotFound if the campaign does not exist.<br/>
+    /// </summary>
+    public const string AddCustomVotersLedger = "usp_CustomVotersLedgerAdd";
+    
+    /// <summary>
+    /// Updates the name of an existing custom voters ledger.<br/>
+    /// Params: ledgerGuid (Guid), ledgerName (string), campaignGuid (Guid).<br/>
+    /// Returns: Status code LedgerNotFound if the ledger does not exist, CampaignNotFound if the campaign does not
+    /// exist, BoundaryViolation if the user attempts to touch a different campaign's ledger.<br/>
+    /// </summary>
+    public const string UpdateCustomVotersLedger = "usp_CustomVotersLedgerUpdate";
+    
+    /// <summary>
+    /// Deletes an existing custom voters ledger.<br/>
+    /// Params: ledgerGuid (Guid), campaignGuid (Guid).<br/>
+    /// Returns: Status code LedgerNotFound if the ledger does not exist, CampaignNotFound if the campaign does not
+    /// exist, BoundaryViolation if the user attempts to touch a different campaign's ledger.<br/>
+    /// </summary>
+    public const string DeleteCustomVotersLedger = "usp_CustomVotersLedgerDelete";
+    
+    /// <summary>
+    /// Gets the list of all the custom voters ledgers for a campaign.<br/>
+    /// </summary>
+    public const string GetCampaignCustomVotersLedgers = "usp_CustomVotersLedgerGetForCampaign";
+    
+    /// <summary>
+    /// Adds a new row to a custom voters ledger.<br/>
+    /// Params: @ledgerGuid uniqueidentifier,
+    /// @identifier int,
+    /// @lastName nvarchar(50) = NULL,
+    /// @firstName nvarchar(50) = NULL,
+    /// @cityName nvarchar(50) = NULL,
+    /// @ballotId float = NULL,
+    /// @streetName nvarchar(50) = NULL,
+    /// @houseNumber int = NULL,
+    /// @entrance nvarchar(10) = NULL,
+    /// @appartment nvarchar(10) = NULL,
+    /// @houseLetter nvarchar(5) = NULL,
+    /// @zipCode int = NULL,
+    /// @email1 nvarchar(200) = NULL,
+    /// @email2 nvarchar(200) = NULL,
+    /// @phone1 nvarchar(200) = NULL,
+    /// @phone2 nvarchar(200) = NULL,
+    /// @supportStatus bit = NULL <br/>
+    /// Returns: LedgerNotFound if the ledger does not exist, DuplicateKey if the identifier already exists in the
+    /// ledger.<br/>
+    /// </summary>
+    public const string AddCustomVotersLedgerRow = "usp_CustomVotersLedgerRowAdd";
+    
+    /// <summary>
+    /// Updates an existing row in a custom voters ledger.<br/>
+    /// Params: @ledgerGuid uniqueidentifier,
+    /// @identifier int,
+    /// @lastName nvarchar(50) = NULL,
+    /// @firstName nvarchar(50) = NULL,
+    /// @cityName nvarchar(50) = NULL,
+    /// @ballotId float = NULL,
+    /// @streetName nvarchar(50) = NULL,
+    /// @houseNumber int = NULL,
+    /// @entrance nvarchar(10) = NULL,
+    /// @appartment nvarchar(10) = NULL,
+    /// @houseLetter nvarchar(5) = NULL,
+    /// @zipCode int = NULL,
+    /// @email1 nvarchar(200) = NULL,
+    /// @email2 nvarchar(200) = NULL,
+    /// @phone1 nvarchar(200) = NULL,
+    /// @phone2 nvarchar(200) = NULL,
+    /// @supportStatus bit = NULL <br/>
+    /// Returns: LedgerNotFound if the ledger does not exist, LedgerRowNotFound if row with that identifier was
+    /// not found within the specified ledger.<br/>
+    /// </summary>
+    public const string UpdateCustomVotersLedgerRow = "usp_CustomVotersLedgerRowUpdate";
+    
+    /// <summary>
+    /// Deletes an existing row in a custom voters ledger.<br/>
+    /// Params: ledgerGuid (Guid), identifier (int).<br/>
+    /// Returns: LedgerNotFound if the ledger does not exist, LedgerRowNotFound if row with that identifier was
+    /// not found within the specified ledger.<br/>
+    /// </summary>
+    public const string DeleteCustomVotersLedgerRow = "usp_CustomVotersLedgerRowDelete";
+    
+    /// <summary>
+    /// Filters a custom ledger and returns all rows that pass the filter.<br/>
+    /// Params: ledgerGuid (Guid), identifier (int), lastName (string), firstName (string), cityName (string),
+    /// streetName (string), ballotId (float), supportStatus (bool).<br/>
+    /// </summary>
+    public const string FilterCustomVotersLedger = "usp_CustomVotersLedgerFilter";
+
+    /// <summary>
+    /// Imports a custom voters ledger from a JSON string of the file.<br/>
+    /// Params: ledgerGuid (Guid), ledgerJson (string), shouldDeleteOnUnmatch (bool) - optional, default false. If true,
+    /// will delete any rows that are not matched in the import file.<br/>
+    /// </summary>
+    public const string ImportLedger = "usp_CustomVotersLedgerImport";
+
 }

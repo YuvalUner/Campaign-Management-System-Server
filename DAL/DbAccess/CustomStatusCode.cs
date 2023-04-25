@@ -6,6 +6,8 @@
 /// </summary>
 public enum CustomStatusCode
 {
+    
+    #region Server Errors
     ///<summary>
     /// 0 is the default return value for stored procedures, so we use it for success.<br/>
     /// Outside of tests, this should never be used.<br/>
@@ -99,6 +101,15 @@ public enum CustomStatusCode
     /// For example, when the user tries to verify their phone number, but the code they entered does not match the one sent to them.
     /// </summary>
     NoMatch = 16,
+    
+    /// <summary>
+    /// A status code for when the user submits a file that is not valid, for whatever reason.<br/>
+    /// </summary>
+    InvalidFile = 17,
+    
+    #endregion
+    
+    #region SQL Errors
 
     // 50000 and above are SQL errors, meant to match requirement of throwing between 50000 and 2147483647
     // These are for errors that would have been thrown by the database if not caught by the stored procedure
@@ -110,7 +121,12 @@ public enum CustomStatusCode
     /// For example, when a user tries to assign the same user to the same job twice.
     /// </summary>
     DuplicateKey = 50001,
-    ForeignKeyViolation = 50002,
+    
+    /// <summary>
+    /// A status code for when the user tries to perform an action outside the boundaries they are allowed to.<br/>
+    /// For example, trying to update a campaign that they are not part of.
+    /// </summary>
+    BoundaryViolation = 50002,
     CannotInsertNull = 50003,
 
     /// <summary>
@@ -230,4 +246,17 @@ public enum CustomStatusCode
     /// A status code for when the user tries to perform an action that requires financial data that does not exist - a case of bad input.<br/>
     /// </summary>
     FinancialDataNotFound = 50026,
+    
+    /// <summary>
+    /// A status code for when the user attempts to access a non-existent ledger.
+    /// </summary>
+    LedgerNotFound = 50027,
+    
+    /// <summary>
+    /// A status code for when the user attempts to access a non-existent ledger row,
+    /// via a ledger row id that does not exist.
+    /// </summary>
+    LedgerRowNotFound = 50028,
+    
+    #endregion
 }

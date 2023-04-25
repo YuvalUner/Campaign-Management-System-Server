@@ -45,6 +45,10 @@ public class UsersController : Controller
         try
         {
             int? userId = HttpContext.Session.GetInt32(Constants.UserId);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
             List<CampaignUser> campaigns = await _usersService.GetUserCampaigns(userId);
             // The CampaignUser model also holds fields that should not be getting out, such as UserId, CampaignId, RoleId.
             // Hence, it needs to be cleaned up first.
