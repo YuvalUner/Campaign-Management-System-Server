@@ -48,20 +48,22 @@ public static class PropertyNames
 public class ColumnMapping
 {
     
-    private readonly string? propertyName;
+    //private readonly string? _propertyName;
     public string? ColumnName { get; set; }
+    
+    public string? PropertyName { get; set; }
 
-    public string? PropertyName
-    {
-        get => propertyName;
-        init
-        {
-            if (!PropertyNames.IsValid(value))
-            {
-                throw new ArgumentException($"Invalid property name {value}");
-            }
-
-            propertyName = value;
-        }
-    }
+    // public string? PropertyName
+    // {
+    //     get => _propertyName;
+    //     init
+    //     {
+    //         if (!PropertyNames.IsValid(value))
+    //         {
+    //             throw new ArgumentException($"Invalid property name {value}");
+    //         }
+    //
+    //         _propertyName = value;
+    //     }
+    // }
 }
