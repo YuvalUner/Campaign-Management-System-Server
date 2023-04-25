@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System.Collections;
+using System.Data;
+using System.Text.Json.Serialization;
 using API.Utils;
 using DAL.DbAccess;
 using DAL.Models;
@@ -14,8 +16,9 @@ namespace API.Controllers;
 
 public class FileUploadParams
 {
-    public List<ColumnMapping> ColumnMappings { get; set; }
-    public IFormFile File { get; set; }
+    public List<string>? ColumnNames { get; set; }
+    public List<string>? PropertyNames { get; set; }
+    public IFormFile? File { get; set; }
 }
 
 #endregion
@@ -23,7 +26,6 @@ public class FileUploadParams
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-[Consumes("application/json")]
 [Authorize]
 public class CustomVotersLedgerController : Controller
 {
@@ -346,17 +348,17 @@ public class CustomVotersLedgerController : Controller
     #endregion
 
     #region Custom Voters Ledger Import
+    #region Helper Functions
 
     /// <summary>
     /// This function handles checking the validity of the file uploaded by the user.
     /// </summary>
-    /// <param name="fileUploadParams"></param>
+    /// <param name="columnMappings"></param>
+    /// <param name="file"></param>
     /// <returns>True and a DataTable if the file is of a valid format, false and null otherwise.</returns>
-    private (bool, DataTable?) CheckFormatValidity(FileUploadParams fileUploadParams)
+    private (bool, DataTable?) CheckFormatValidity(IEnumerable<ColumnMapping> columnMappings, IFormFile file)
     {
         IExcelDataReader excelReader;
-        var file = fileUploadParams.File;
-        var columnMappings = fileUploadParams.ColumnMappings;
         // Create a new ExcelReader based on the file type, or return false if the file type is not supported
         if (file.FileName.EndsWith(".xls"))
         {
@@ -420,7 +422,7 @@ public class CustomVotersLedgerController : Controller
     /// <param name="table">The table to adapt to models.</param>
     /// <returns>true and a list of <see cref="CustomVotersLedgerContent"/> if the table itself is entirely valid,
     /// false and null otherwise.</returns>
-    private (bool, List<CustomVotersLedgerContent>?) excelToModel(List<ColumnMapping> columnMappings, DataTable table)
+    private (bool, List<CustomVotersLedgerContent>?) excelToModel(IEnumerable<ColumnMapping> columnMappings, DataTable table)
     {
         var res = new List<CustomVotersLedgerContent>();
         // Go over the rows of the table and map each row to a CustomVotersLedgerContent model
@@ -447,10 +449,12 @@ public class CustomVotersLedgerController : Controller
 
         return (true, res);
     }
+    
+    #endregion
 
     [HttpPost("import/{campaignGuid:guid}/{ledgerGuid:guid}")]
     public async Task<IActionResult> ImportLedger(Guid campaignGuid, Guid ledgerGuid,
-        [FromBody] FileUploadParams fileUploadParams)
+        [FromForm] FileUploadParams fileUploadParams)
     {
         try
         {
@@ -465,17 +469,35 @@ public class CustomVotersLedgerController : Controller
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
             
-            if (HttpContext.Request.Form.Files.Count < 1)
+            if (fileUploadParams.File == null 
+                || fileUploadParams.PropertyNames == null 
+                || !fileUploadParams.PropertyNames.Any()
+                || fileUploadParams.ColumnNames == null
+                || !fileUploadParams.ColumnNames.Any()
+                || fileUploadParams.ColumnNames.Count != fileUploadParams.PropertyNames.Count
+               )
             {
-                return BadRequest(FormatErrorMessage(NoFileProvided, CustomStatusCode.ValueNullOrEmpty));
+                return BadRequest(FormatErrorMessage(InvalidFile, CustomStatusCode.InvalidFile));
             }
-            
-            var (formatValid, table) = CheckFormatValidity(fileUploadParams);
+
+            var file = fileUploadParams.File;
+            var columnMappings = new List<ColumnMapping>();
+
+            for (int i = 0; i < fileUploadParams.ColumnNames.Count; i++)
+            {
+                columnMappings.Add(new ColumnMapping()
+                {
+                    ColumnName = fileUploadParams.ColumnNames[i],
+                    PropertyName = fileUploadParams.PropertyNames[i]
+                });
+            }
+
+            var (formatValid, table) = CheckFormatValidity(columnMappings, file);
             if (!formatValid || table == null)
             {
                 return BadRequest(FormatErrorMessage(InvalidFile, CustomStatusCode.InvalidFile));
             }
-            var (tableValid, contentList) = excelToModel(fileUploadParams.ColumnMappings, table);
+            var (tableValid, contentList) = excelToModel(columnMappings, table);
             if (!tableValid || contentList == null)
             {
                 return BadRequest(FormatErrorMessage(InvalidFile, CustomStatusCode.InvalidFile));
@@ -486,7 +508,7 @@ public class CustomVotersLedgerController : Controller
             {
                 return NotFound(FormatErrorMessage(LedgerNotFound, CustomStatusCode.LedgerNotFound));
             }
-
+            
             foreach (var content in contentList)
             {
                 // Add each row to the ledger

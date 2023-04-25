@@ -117,8 +117,8 @@ builder.Logging.AddSerilog(new LoggerConfiguration()
 
 var app = builder.Build();
 
-// Anti-XSS middleware to prevent XSS attacks
-app.UseMiddleware<AntiXssMiddleware>();
+// // Anti-XSS middleware to prevent XSS attacks
+// app.UseMiddleware<AntiXssMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -142,5 +142,15 @@ app.UseCors("AllowAll");
 app.MapControllers();
 
 app.UseSession();
+
+// Exclude the import endpoint from the anti-xss middleware, as it is used to import data from a file and 
+// the middleware will prevent that from happening.
+app.UseWhen(
+    context => !context.Request.Path.StartsWithSegments("/api/CustomVotersLedger/import"),
+    appBuilder =>
+    {
+        appBuilder.UseMiddleware<AntiXssMiddleware>();
+    }
+);
 
 app.Run();
