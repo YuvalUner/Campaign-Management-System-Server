@@ -27,6 +27,9 @@ namespace API.Controllers;
 [Authorize]
 public class EventsController : Controller
 {
+    
+    #region Private fields and constructor
+    
     private readonly IEventsService _eventsService;
     private readonly ILogger<EventsController> _logger;
     private readonly IUsersService _usersService;
@@ -47,6 +50,10 @@ public class EventsController : Controller
         _smsMessageSendingService = smsMessageSendingService;
         _campaignsService = campaignsService;
     }
+    
+    #endregion
+    
+    #region Message sending methods
 
     /// <summary>
     /// A method for sending a message to users who were assigned to an event.<br/>
@@ -216,7 +223,11 @@ public class EventsController : Controller
             );
         }
     }
+    
+    #endregion
 
+    
+    #region Get methods
     /// <summary>
     /// Gets the list of events the user is a part of (either as a participant or a watcher).
     /// </summary>
@@ -268,6 +279,10 @@ public class EventsController : Controller
             return StatusCode(500, "Error while getting campaign events");
         }
     }
+    
+    #endregion
+    
+    #region Create methods
 
     /// <summary>
     /// Creates a new personal event for the user.
@@ -379,6 +394,10 @@ public class EventsController : Controller
             return BadRequest("Error while creating campaign event");
         }
     }
+    
+    #endregion
+    
+    #region Update methods
 
     /// <summary>
     /// Updates an event for a campaign.
@@ -551,6 +570,10 @@ public class EventsController : Controller
             return BadRequest("Error while updating personal event");
         }
     }
+    
+    #endregion
+    
+    #region Delete methods
 
     /// <summary>
     /// Deletes an event from a campaign.
@@ -708,6 +731,10 @@ public class EventsController : Controller
             return BadRequest("Error while deleting personal event");
         }
     }
+    
+    #endregion
+    
+    #region Event Watchers methods
 
     /// <summary>
     /// Adds the requesting user as a watcher of the event, giving them easy access to viewing the event in the app, and
@@ -771,6 +798,11 @@ public class EventsController : Controller
             return BadRequest("Error while removing event watcher");
         }
     }
+    
+    #endregion
+    
+    #region Event Participants methods
+    #region Add participant methods
 
     /// <summary>
     /// Adds a user as a participant to a personal event.
@@ -930,6 +962,10 @@ public class EventsController : Controller
             return BadRequest("Error while adding campaign event participant");
         }
     }
+    
+    #endregion
+    
+    #region Remove Event Participant methods
 
     /// <summary>
     /// Removes a user from being a participant in a personal event.
@@ -1063,7 +1099,10 @@ public class EventsController : Controller
             return BadRequest("Error while removing event participant from campaign event");
         }
     }
+    
+    #endregion
 
+    #region Get Event Participants methods
     /// <summary>
     /// Gets the list of participants for a personal event.
     /// </summary>
@@ -1145,7 +1184,12 @@ public class EventsController : Controller
             return BadRequest("Error while getting event participants from campaign event");
         }
     }
+    
+    #endregion
+    
+    #endregion
 
+    #region Events for managed users methods
     /// <summary>
     /// Allows a user to add an event for a user they manage.
     /// </summary>
@@ -1277,4 +1321,6 @@ public class EventsController : Controller
             return BadRequest("Error while getting managed user events");
         }
     }
+    
+    #endregion
 }
