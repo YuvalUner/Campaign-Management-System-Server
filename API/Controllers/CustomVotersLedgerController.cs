@@ -7,6 +7,7 @@ using DAL.DbAccess;
 using DAL.Models;
 using DAL.Services.Interfaces;
 using ExcelDataReader;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -450,13 +451,16 @@ public class CustomVotersLedgerController : Controller
     private (bool, List<CustomVotersLedgerContent>?) excelToModel(IEnumerable<ColumnMapping> columnMappings, DataTable table)
     {
         var res = new List<CustomVotersLedgerContent>();
+        var sanitizer = new HtmlSanitizer();
         // Go over the rows of the table and map each row to a CustomVotersLedgerContent model
         foreach (DataRow row in table.Rows)
         {
             var content = new CustomVotersLedgerContent();
             foreach (var mapping in columnMappings)
             {
-                content.SetProperty(mapping.PropertyName, row[mapping.ColumnName].ToString());
+                // Sanitize the value before setting it in the model, to prevent XSS attacks
+                var sanitizedValue = sanitizer.Sanitize(row[mapping.ColumnName].ToString());
+                content.SetProperty(mapping.PropertyName, sanitizedValue);
             }
             if (content.Identifier == null)
             {
