@@ -158,12 +158,13 @@ public class CustomVotersLedgerService: ICustomVotersLedgerService
     }
     
 
-    public async Task<CustomStatusCode> ImportLedger(Guid ledgerGuid, string jsonLedger)
+    public async Task<CustomStatusCode> ImportLedger(Guid ledgerGuid, string jsonLedger, bool shouldDeleteOnUnmatch)
     {
         var param = new DynamicParameters(new
         {
             ledgerGuid,
-            jsonLedger
+            jsonLedger,
+            shouldDeleteOnUnmatch
         });
         
         param.Add("returnVal", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
