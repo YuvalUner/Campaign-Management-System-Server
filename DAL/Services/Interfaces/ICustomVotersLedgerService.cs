@@ -82,6 +82,8 @@ public interface ICustomVotersLedgerService
     /// </summary>
     /// <param name="ledgerGuid">Guid of the ledger to import into.</param>
     /// <param name="jsonLedger">A JSON object containing the ledger to import.</param>
+    /// <param name="shouldDeleteOnUnmatch">Specifies the behavior of the stored procedure for rows that do not have
+    /// a match in the merge.</param>
     /// <returns></returns>
-    Task<CustomStatusCode> ImportLedger(Guid ledgerGuid, string jsonLedger);
+    Task<CustomStatusCode> ImportLedger(Guid ledgerGuid, string jsonLedger, bool shouldDeleteOnUnmatch);
 }
