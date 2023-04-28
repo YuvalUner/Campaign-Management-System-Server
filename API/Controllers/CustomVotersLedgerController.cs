@@ -483,7 +483,7 @@ public class CustomVotersLedgerController : Controller
 
     [HttpPost("import/{campaignGuid:guid}/{ledgerGuid:guid}")]
     public async Task<IActionResult> ImportLedger(Guid campaignGuid, Guid ledgerGuid,
-        [FromForm] FileUploadParams fileUploadParams)
+        [FromForm] FileUploadParams fileUploadParams, [FromQuery] bool shouldDeleteOnUnmatch = false)
     {
         try
         {
@@ -547,7 +547,7 @@ public class CustomVotersLedgerController : Controller
             var chunks = contentList.Chunk(chunkSize);
             foreach (var chunk in chunks)
             {
-                await _customVotersLedgerService.ImportLedger(ledgerGuid, JsonConvert.SerializeObject(chunk));
+                await _customVotersLedgerService.ImportLedger(ledgerGuid, JsonConvert.SerializeObject(chunk), shouldDeleteOnUnmatch);
             }
 
             return Ok();
