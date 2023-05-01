@@ -30,11 +30,11 @@ public interface ICampaignsService
     Task<Guid?> GetCampaignGuid(int? campaignId);
 
     /// <summary>
-    /// Gets the guid and name of a campaign by the guid of its invite link.
+    /// Gets the guid, whether the campaign is a custom campaign or not, and name of a campaign by the guid of its invite link.
     /// </summary>
     /// <param name="campaignInviteGuid"></param>
-    /// <returns>The Guid and name of the campaign inside the returned <see cref="Campaign"/> object, if campaign with that
-    /// invite Guid exists.</returns>
+    /// <returns>The Guid, isCustomCampaign property and name of the campaign inside the returned
+    /// <see cref="Campaign"/> object, if campaign with the invite Guid exists.</returns>
     Task<Campaign?> GetCampaignByInviteGuid(Guid? campaignInviteGuid);
 
     /// <summary>

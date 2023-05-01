@@ -24,7 +24,8 @@ public static class StoredProcedureNames
 
     /// <summary>
     /// Adds a campaign to the campaigns table.<br/>
-    /// Params: campaignName (string), campaignCreatorUserId (int), campaignDescription (string).<br/>
+    /// Params: campaignName (string), campaignCreatorUserId (int), campaignDescription (string), isMunicipal (bool),
+    /// campaignLogUrl (string), cityName (string), isCustomCampaign (bool).<br/>
     /// Returns: newly created campaign's id (int)
     /// </summary>
     public const string AddCampaign = "usp_CampaignAdd";

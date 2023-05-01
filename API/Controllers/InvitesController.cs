@@ -162,7 +162,8 @@ public class InvitesController : Controller
             }
 
             var userAccountAuthorizationStatus = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);
-            if (!userAccountAuthorizationStatus)
+            if (!userAccountAuthorizationStatus
+                && (!campaign.IsCustomCampaign.HasValue || !campaign.IsCustomCampaign.Value))
             {
                 return Unauthorized(FormatErrorMessage(VerificationStatusError,
                     CustomStatusCode.VerificationStatusError));

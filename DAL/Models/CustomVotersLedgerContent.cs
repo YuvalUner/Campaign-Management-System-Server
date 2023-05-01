@@ -18,10 +18,16 @@ public class CustomVotersLedgerContent
     public string? Phone1 { get; set; }
     public string? Phone2 { get; set; }
     public bool? SupportStatus { get; set; }
+    
+    public string? SupportStatusString { get; set; }
 
     
-    private bool? convertToBool(string val)
+    public bool? ConvertToBool(string? val)
     {
+        if (val == null)
+        {
+            return null;
+        }
         val = val.ToLower();
         if (val == "supporting" || val == "true")
         {
@@ -45,7 +51,7 @@ public class CustomVotersLedgerContent
                 "BallotId" => Decimal.Parse(value),
                 "HouseNumber" => Int32.Parse(value),
                 "ZipCode" => Int32.Parse(value),
-                "SupportStatus" => convertToBool(value),
+                "SupportStatus" => ConvertToBool(value),
                 _ => value
             };
         }

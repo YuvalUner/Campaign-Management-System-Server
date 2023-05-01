@@ -3,7 +3,7 @@
 public class CustomLedgerFilterParams
 {
     public Guid LedgerGuid { get; set; }
-    public int? Identifier { get; set; }
+    public int? IdNum { get; set; }
     public string? CityName { get; set; }
     public string? StreetName { get; set; }
     public Decimal? BallotId { get; set; }
