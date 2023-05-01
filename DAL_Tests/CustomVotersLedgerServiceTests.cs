@@ -243,7 +243,7 @@ public class CustomVotersLedgerServiceTests
         // Arrange
         var filter = new CustomLedgerFilterParams()
         {
-            Identifier = _testContents.Identifier
+            IdNum = _testContents.Identifier
         };
         
         // Act
@@ -305,7 +305,7 @@ public class CustomVotersLedgerServiceTests
         // Arrange
         var filter = new CustomLedgerFilterParams()
         {
-            Identifier = -1
+            IdNum = -1
         };
         
         // Act
