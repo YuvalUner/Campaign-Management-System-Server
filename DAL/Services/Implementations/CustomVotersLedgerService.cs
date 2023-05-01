@@ -153,6 +153,7 @@ public class CustomVotersLedgerService: ICustomVotersLedgerService
     public async Task<IEnumerable<CustomVotersLedgerContent>> FilterCustomVotersLedger(Guid ledgerGuid, 
         CustomLedgerFilterParams filter)
     {
+        filter.LedgerGuid = ledgerGuid;
         return await _dbAccess.GetData<CustomVotersLedgerContent, CustomLedgerFilterParams>
             (StoredProcedureNames.FilterCustomVotersLedger, filter);
     }

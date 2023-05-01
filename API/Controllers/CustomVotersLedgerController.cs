@@ -229,6 +229,8 @@ public class CustomVotersLedgerController : Controller
                 return BadRequest(FormatErrorMessage(IdentifierMissing, CustomStatusCode.ValueCanNotBeNull));
             }
             
+            content.SupportStatus = content.ConvertToBool(content.SupportStatusString);
+            
             var statusCode = await _customVotersLedgerService.AddCustomVotersLedgerRow(content, ledgerGuid);
             
             return statusCode switch
@@ -299,6 +301,8 @@ public class CustomVotersLedgerController : Controller
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
             
+            content.SupportStatus = content.ConvertToBool(content.SupportStatusString);
+            
             if (content.Identifier == null)
             {
                 return BadRequest(FormatErrorMessage(IdentifierMissing, CustomStatusCode.ValueCanNotBeNull));
@@ -320,9 +324,9 @@ public class CustomVotersLedgerController : Controller
         }
     }
 
-    [HttpGet("filter/{campaignGuid:guid}/{ledgerGuid:guid}")]
+    [HttpPost("filter/{campaignGuid:guid}/{ledgerGuid:guid}")]
     public async Task<IActionResult> FilterCustomLedger(Guid campaignGuid, Guid ledgerGuid,
-        [FromQuery] CustomLedgerFilterParams filter)
+        [FromBody] CustomLedgerFilterParams filter)
     {
         try
         {
