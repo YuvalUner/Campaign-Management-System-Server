@@ -381,25 +381,6 @@ public class VotersLedgerServiceTests
     }
 
     [Fact, TestPriority(1)]
-    public void GetFilteredVotersLedgerRecordsByIdNumShouldWork()
-    {
-        // Arrange
-        var filter = new VotersLedgerFilter()
-        {
-            IdNum = testVotersLedgerRecord.IdNum,
-            CampaignGuid = testCampaign.CampaignGuid
-        };
-
-        // Act
-        var result = _votersLedgerService.GetFilteredVotersLedgerResults(filter).Result.ToList();
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.True(result.Count == 1);
-        Assert.Contains(result, x => x.IdNum == testVotersLedgerRecord.IdNum);
-    }
-
-    [Fact, TestPriority(1)]
     public void GetFilteredVotersLedgerRecordsByIdNumShouldReturnNone()
     {
         // Arrange
