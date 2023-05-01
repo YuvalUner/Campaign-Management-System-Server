@@ -89,6 +89,11 @@ public class CampaignsController : Controller
                 return Unauthorized();
             }
 
+            if (campaign.IsCustomCampaign == true)
+            {
+                campaign.IsMunicipal = false;
+            }
+
             // Unauthenticated users (did not verify their identity) should not be able to create campaigns
             var authenticationStatus = HttpContext.Session.Get<bool>(Constants.UserAuthenticationStatus);
             if (!authenticationStatus)
@@ -302,6 +307,28 @@ public class CampaignsController : Controller
         {
             _logger.LogError(e, "Error getting campaign admins");
             return StatusCode(500, "Error getting campaign admins");
+        }
+    }
+    
+    [Authorize]
+    [HttpGet("get-is-custom-campaign/{campaignGuid:guid}")]
+    public async Task<IActionResult> GetIsCustomCampaign(Guid campaignGuid)
+    {
+        try
+        {
+            if (!CampaignAuthorizationUtils.IsUserAuthorizedForCampaign(HttpContext, campaignGuid)
+                || !CampaignAuthorizationUtils.DoesActiveCampaignMatch(HttpContext, campaignGuid))
+            {
+                return Unauthorized(FormatErrorMessage(AuthorizationError, CustomStatusCode.AuthorizationError));
+            }
+
+            var campaign = await _campaignService.GetCampaignBasicInfo(campaignGuid);
+            return Ok(new {isCustomCampaign = campaign?.IsCustomCampaign});
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting is custom campaign");
+            return StatusCode(500, "Error getting is custom campaign");
         }
     }
 }
