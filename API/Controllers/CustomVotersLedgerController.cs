@@ -320,9 +320,9 @@ public class CustomVotersLedgerController : Controller
         }
     }
 
-    [HttpGet("filter/{campaignGuid:guid}/{ledgerGuid:guid}")]
+    [HttpPost("filter/{campaignGuid:guid}/{ledgerGuid:guid}")]
     public async Task<IActionResult> FilterCustomLedger(Guid campaignGuid, Guid ledgerGuid,
-        [FromQuery] CustomLedgerFilterParams filter)
+        [FromBody] CustomLedgerFilterParams filter)
     {
         try
         {

@@ -39,4 +39,5 @@ public class Campaign
     public string? CampaignLogoUrl { get; set; }
     public int? CityId { get; set; }
     public string? CityName { get; set; }
+    public bool? IsCustomCampaign { get; set; }
 }

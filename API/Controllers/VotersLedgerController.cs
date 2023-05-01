@@ -58,6 +58,12 @@ public class VotersLedgerController : Controller
             // Verify that the campaign type is municipal or that that the campaign type is national and 
             // either a city was given or a first and last name or id number was given.
             CampaignType campaignType = await _campaignsService.GetCampaignType(campaignGuid);
+            
+            // Custom campaigns are not allowed to view the official voters ledger, they have their own methods.
+            if (campaignType.IsCustomCampaign)
+            {
+                return Unauthorized(FormatErrorMessage(AuthorizationError, CustomStatusCode.AuthorizationError));
+            }
             if (!campaignType.IsMunicipal && String.IsNullOrEmpty(filter.CityName)
                                           && String.IsNullOrEmpty(filter.FirstName)
                                           && String.IsNullOrEmpty(filter.LastName)
