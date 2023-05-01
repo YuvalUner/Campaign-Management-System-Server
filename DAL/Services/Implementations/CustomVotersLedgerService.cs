@@ -153,9 +153,19 @@ public class CustomVotersLedgerService: ICustomVotersLedgerService
     public async Task<IEnumerable<CustomVotersLedgerContent>> FilterCustomVotersLedger(Guid ledgerGuid, 
         CustomLedgerFilterParams filter)
     {
-        filter.LedgerGuid = ledgerGuid;
-        return await _dbAccess.GetData<CustomVotersLedgerContent, CustomLedgerFilterParams>
-            (StoredProcedureNames.FilterCustomVotersLedger, filter);
+        var param = new DynamicParameters(new
+        {
+            ledgerGuid,
+            filter.FirstName,
+            filter.LastName,
+            filter.CityName,
+            filter.BallotId,
+            filter.StreetName,
+            Identifier = filter.IdNum,
+            filter.SupportStatus
+        });
+        return await _dbAccess.GetData<CustomVotersLedgerContent, DynamicParameters>
+            (StoredProcedureNames.FilterCustomVotersLedger, param);
     }
     
 
