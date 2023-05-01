@@ -229,8 +229,6 @@ public class CustomVotersLedgerController : Controller
                 return BadRequest(FormatErrorMessage(IdentifierMissing, CustomStatusCode.ValueCanNotBeNull));
             }
             
-            content.SupportStatus = content.ConvertToBool(content.SupportStatusString);
-            
             var statusCode = await _customVotersLedgerService.AddCustomVotersLedgerRow(content, ledgerGuid);
             
             return statusCode switch
@@ -300,8 +298,6 @@ public class CustomVotersLedgerController : Controller
                 return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
                     CustomStatusCode.PermissionOrAuthorizationError));
             }
-            
-            content.SupportStatus = content.ConvertToBool(content.SupportStatusString);
             
             if (content.Identifier == null)
             {
