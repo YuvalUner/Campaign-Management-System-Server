@@ -25,8 +25,13 @@ public class CampaignsService : ICampaignsService
             campaign.CampaignLogoUrl,
             campaignCreatorUserId,
             campaign.CityName,
-            campaign.IsCustomCampaign
         });
+        
+        if (campaign.IsCustomCampaign != null)
+        {
+            param.Add("@IsCustomCampaign", campaign.IsCustomCampaign.Value, DbType.Binary);
+        }
+        
         param.Add("@CampaignId", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
         await _dbAccess.ModifyData(StoredProcedureNames.AddCampaign, param);
         return param.Get<int>("@CampaignId");
