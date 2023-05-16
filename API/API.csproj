@@ -40,4 +40,8 @@
       <ProjectReference Include="..\RestAPIServices\RestAPIServices.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="ExternalProcesses\PythonML\Resources\JsonFiles\" />
+    </ItemGroup>
+
 </Project>
