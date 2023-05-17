@@ -1,4 +1,4 @@
-﻿using API.ExternalProcesses;
+﻿using API.ExternalProcesses.PythonML;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,8 +20,9 @@ public class CampaignAdvisorController : Controller
     public async Task<IActionResult> Analyze([FromBody] string opponentName)
     {
         var articles = new string[] {"article1", "article2"};
-        var tweets = new string[] {"tweet1", "tweet2"};
-        var classifiedTexts = await _pythonMlRunner.RunPythonScript(articles, tweets);
+        var targetTweets = new string[] {"tweet1", "tweet2"};
+        var tweetsAboutTarget = new string[] {"tweet1", "tweet2"};
+        var classifiedTexts = await _pythonMlRunner.RunPythonScript(articles, targetTweets, tweetsAboutTarget);
         return Ok(classifiedTexts);
     }
     
