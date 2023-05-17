@@ -5,13 +5,13 @@ import snscrape.modules.twitter as sntwitter
 import datetime
 
 
-def scrape(search_query, max_tweets=150):
+def scrape(search_query, max_tweets=100):
     # Created a list to append all tweet attributes(data)
     attributes_container = []
 
     # Using TwitterSearchScraper to scrape data and append tweets to list
     for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query=search_query).get_items()):
-        if i > max_tweets:
+        if i > max_tweets - 1:
             break
         attributes_container.append(tweet.rawContent)
 

@@ -4,15 +4,19 @@ using Newtonsoft.Json;
 
 namespace API.ExternalProcesses.PythonWebScraping;
 
-public class PythonWebsrcaperRunner
+public class PythonWebscraperRunner : IPythonWebscraperRunner
 {
     private readonly string? _pythonPath;
     private readonly string? _pythonScriptLocation;
     
-    public PythonWebsrcaperRunner(IConfiguration configuration)
+    public PythonWebscraperRunner(IConfiguration configuration)
     {
         _pythonPath = configuration["PythonPath"];
-        _pythonScriptLocation = configuration["PythonWebScrapingScriptLocation"];
+        string? pythonScriptLocation = configuration["PythonWebScrapingScriptLocation"];
+        string exeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+        int apiDllBasePathIndex = exeFilePath.IndexOf("API", StringComparison.Ordinal);
+        string apiDllBasePath = exeFilePath.Substring(0, apiDllBasePathIndex + 3);
+        _pythonScriptLocation = apiDllBasePath + pythonScriptLocation;
     }
     
     public async Task<TweetsCollection?> RunPythonScript(string targetName, string? targetTwitterHandle, int? maxDays)
@@ -22,7 +26,7 @@ public class PythonWebsrcaperRunner
             targetTwitterHandle = "";
         }
 
-        if (maxDays is null or < 0)
+        if (maxDays is null or < 1)
         {
             // Default to 30 days - the python script will default to it anyway.
             maxDays = 30;
@@ -33,7 +37,7 @@ public class PythonWebsrcaperRunner
             StartInfo =
             {
                 FileName = _pythonPath,
-                Arguments = $"{_pythonScriptLocation} {targetName} {targetTwitterHandle} {maxDays}",
+                Arguments = $"{_pythonScriptLocation} \"{targetName}\" \"{targetTwitterHandle}\" {maxDays}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 CreateNoWindow = true
