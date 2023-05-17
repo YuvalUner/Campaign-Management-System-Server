@@ -105,6 +105,7 @@ public static class ErrorMessages
     public const string LedgerRowNotFound = "The requested ledger row was not found";
     public const string NoFileProvided = "No file was provided";
     public const string InvalidFile = "The provided file is invalid - please check the file and try again";
+    public const string OpponentNameRequired = "Opponent name is required";
 
     /// <summary>
     /// Formats an error message with a custom status code, such that it can be returned to the client in a consistent way.

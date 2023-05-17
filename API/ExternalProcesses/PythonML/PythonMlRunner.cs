@@ -25,8 +25,8 @@ public class PythonMlRunner : IPythonMlRunner
         _jsonFileDirectory = apiDllBasePath + jsonFileDirectory;
     }
     
-    public async Task<CombinedTextsList?> RunPythonScript(string[] articles, string[] targetTweets,
-        string[] tweetsAboutTarget)
+    public async Task<CombinedTextsList?> RunPythonScript(List<string>? articles, List<string>? targetTweets,
+        List<string>? tweetsAboutTarget)
     {
 
         // Lock the index, to prevent multiple server threads from using the same index.

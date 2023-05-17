@@ -51,7 +51,7 @@ def classify_hate(texts: [TextForClassification], model):
 
 if __name__ == '__main__':
 
-    input_json_file = open(sys.argv[1], 'r')
+    input_json_file = open(sys.argv[1], 'r', encoding='utf-8')
     input_texts = json.load(input_json_file)
     input_json_file.close()
 
