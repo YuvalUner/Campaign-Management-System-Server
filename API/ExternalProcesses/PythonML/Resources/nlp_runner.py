@@ -51,12 +51,13 @@ def classify_hate(texts: [TextForClassification], model):
 
 if __name__ == '__main__':
 
-    input_json_file = open(sys.argv[1], 'r')
+    input_json_file = open(sys.argv[1], 'r', encoding='utf-8')
     input_texts = json.load(input_json_file)
     input_json_file.close()
 
     articles = [TextForClassification(text) for text in input_texts['articles']]
-    tweets = [TextForClassification(text) for text in input_texts['tweets']]
+    target_tweets = [TextForClassification(text) for text in input_texts['targetTweets']]
+    tweets_about_target = [TextForClassification(text) for text in input_texts['tweetsAboutTarget']]
     model_collection = ModelCollection()
 
     # Load all the models in parallel
@@ -75,11 +76,14 @@ if __name__ == '__main__':
     # Classify all the texts in parallel
     classification_threads = [
         threading.Thread(target=classify_topic, args=(articles, model_collection.models['topic_classification'])),
-        threading.Thread(target=classify_topic, args=(tweets, model_collection.models['topic_classification'])),
+        threading.Thread(target=classify_topic, args=(target_tweets, model_collection.models['topic_classification'])),
+        threading.Thread(target=classify_topic, args=(tweets_about_target, model_collection.models['topic_classification'])),
         threading.Thread(target=classify_sentiment, args=(articles, model_collection.models['sentiment'])),
-        threading.Thread(target=classify_sentiment, args=(tweets, model_collection.models['sentiment'])),
+        threading.Thread(target=classify_sentiment, args=(target_tweets, model_collection.models['sentiment'])),
+        threading.Thread(target=classify_sentiment, args=(tweets_about_target, model_collection.models['sentiment'])),
         threading.Thread(target=classify_hate, args=(articles, model_collection.models['hate'])),
-        threading.Thread(target=classify_hate, args=(tweets, model_collection.models['hate']))
+        threading.Thread(target=classify_hate, args=(target_tweets, model_collection.models['hate'])),
+        threading.Thread(target=classify_hate, args=(tweets_about_target, model_collection.models['hate']))
     ]
 
     for thread in classification_threads:
@@ -89,8 +93,9 @@ if __name__ == '__main__':
         thread.join()
 
     output_articles = {"articles": [article.to_dict() for article in articles]}
-    output_tweets = {"tweets": [tweet.to_dict() for tweet in tweets]}
-    combined_json = {**output_articles, **output_tweets}
+    output_target_tweets = {"target_tweets": [tweet.to_dict() for tweet in target_tweets]}
+    output_tweets_about_target = {"tweets_about_target": [tweet.to_dict() for tweet in tweets_about_target]}
+    combined_json = {**output_articles, **output_target_tweets, **output_tweets_about_target}
     print(json.dumps(combined_json))
 
     exit(0)

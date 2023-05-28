@@ -1,4 +1,5 @@
-using API.ExternalProcesses;
+using API.ExternalProcesses.PythonML;
+using API.ExternalProcesses.PythonWebScraping;
 using API.Middleware;
 using DAL.DbAccess;
 using DAL.Models;
@@ -44,7 +45,8 @@ builder.Services.AddScoped<IFinancialDataService, FinancialDataService>();
 builder.Services.AddScoped<IElectionDayService, ElectionDayService>();
 builder.Services.AddScoped<ICitiesService, CitiesService>();
 builder.Services.AddScoped<ICustomVotersLedgerService, CustomVotersLedgerService>();
-builder.Services.AddScoped<IPythonMlRunner, PythonMlRunner>();
+builder.Services.AddSingleton<IPythonMlRunner, PythonMlRunner>();
+builder.Services.AddSingleton<IPythonWebscraperRunner, PythonWebscraperRunner>();
 
 // CORS policy - for now, just allow all. Change as needed
 builder.Services.AddCors(options => {
