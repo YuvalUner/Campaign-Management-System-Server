@@ -1,7 +1,10 @@
 ﻿using API.ExternalProcesses.PythonML;
 using API.ExternalProcesses.PythonWebScraping;
 using API.Models;
+using API.Utils;
 using DAL.DbAccess;
+using DAL.Models;
+using DAL.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static API.Utils.ErrorMessages;
@@ -17,6 +20,7 @@ public class CampaignAdvisorController : Controller
     private readonly IPythonMlRunner _pythonMlRunner;
     private readonly IPythonWebscraperRunner _pythonWebscraperRunner;
     private readonly string _apiKey;
+    private readonly ICampaignAdvisorAnalysisService _analysisService;
     
     public CampaignAdvisorController(IPythonMlRunner pythonMlRunner, IPythonWebscraperRunner pythonWebscraperRunner,
         IConfiguration configuration)
@@ -26,9 +30,106 @@ public class CampaignAdvisorController : Controller
         _apiKey = configuration["NewsApiKey"];
     }
 
-    [HttpPost("analyze")]
-    public async Task<IActionResult> Analyze([FromBody] AnalysisParams analysisParams)
+    /// <summary>
+    /// Aggregates the results of the analysis into a single list of AnalysisRow objects.
+    /// </summary>
+    /// <param name="analyzedText"></param>
+    /// <param name="rowType"></param>
+    /// <returns></returns>
+    private List<AnalysisRow> AggregateResults(List<TextForAnalysis> analyzedText, RowTypes rowType, Guid resultsGuid)
     {
+        // First, find all the unique categories
+        var categories = analyzedText.Select(text => text.Topic).Distinct().ToList();
+        var analysisRows = new List<AnalysisRow>();
+
+        // Then, for each category, find the relevant texts and aggregate the results
+        foreach (var category in categories)
+        {
+            var relevantTexts = analyzedText.Where(text => text.Topic == category).ToList();
+            var total = relevantTexts.Count;
+            var positive = relevantTexts.Count(text => text.Sentiment == "positive");
+            var negative = relevantTexts.Count(text => text.Sentiment == "negative");
+            var neutral = relevantTexts.Count(text => text.Sentiment == "neutral");
+            var hate = relevantTexts.Count(text => text.Hate == "hate");
+            analysisRows.Add(new AnalysisRow()
+            {
+                Topic = category,
+                RowType = rowType,
+                Hate = hate / total,
+                Negative = negative / total,
+                Neutral = neutral / total,
+                Positive = positive / total,
+                Total = total,
+                ResultsGuid = resultsGuid
+            });
+        }
+        
+        return analysisRows;
+    }
+
+    private async Task<Guid?> StoreAnalysisResults(AnalysisParams analysisParams, CombinedTextsList analysisResults,
+        Guid campaignGuid)
+    {
+        // First, store the analysis overview in the DB, to prepare for adding the results
+        var overview = new AnalysisOverview()
+        {
+            ResultsTitle = analysisParams.ResultsTitle,
+            AnalysisTarget = analysisParams.TargetName,
+            TargetTwitterHandle = analysisParams.TargetTwitterHandle,
+            MaxDaysBack = analysisParams.MaxDays,
+            AdditionalUserRequests = analysisParams.AdditionalUserRequests
+        };
+        var (statusCode, resultsGuid) = await _analysisService.AddAnalysisOverview(overview, campaignGuid);
+        if (statusCode != CustomStatusCode.Ok)
+        {
+            return null;
+        }
+        
+        // Second, aggregate the results of each category, such that they are all in the AnalysisRow format.
+        var articles = AggregateResults(analysisResults.Articles, RowTypes.Article, resultsGuid);
+        var tweetsAboutTarget = AggregateResults(analysisResults.TweetsAboutTarget, RowTypes.TweetFromTarget, resultsGuid);
+        var targetTweets = AggregateResults(analysisResults.TargetTweets, RowTypes.TweetAboutTarget, resultsGuid);
+        
+        // Third, add the results to the DB
+        await _analysisService.AddAnalysisDetailsRows(articles);
+        await _analysisService.AddAnalysisDetailsRows(tweetsAboutTarget); 
+        await _analysisService.AddAnalysisDetailsRows(targetTweets);
+        
+        // Finally, sample 10 articles and 10 tweets from the target, and add them to the DB
+        var articleSample = analysisResults.Articles.Take(10).Select(article => new AnalysisSample()
+        {
+            ResultsGuid = resultsGuid,
+            SampleText = article.Text,
+            IsArticle = true
+        }).ToList();
+        
+        var tweetSample = analysisResults.TargetTweets.Take(10).Select(tweet => new AnalysisSample()
+        {
+            ResultsGuid = resultsGuid,
+            SampleText = tweet.Text,
+            IsArticle = false
+        }).ToList();
+        
+        await _analysisService.AddAnalysisSamples(articleSample);
+        await _analysisService.AddAnalysisSamples(tweetSample);
+        
+        return resultsGuid;
+    }
+
+    [HttpPost("analyze/{campaignGuid:guid}")]
+    public async Task<IActionResult> Analyze(Guid campaignGuid, [FromBody] AnalysisParams analysisParams)
+    {
+        if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                new Permission()
+                {
+                    PermissionTarget = PermissionTargets.CampaignAdvisor,
+                    PermissionType = PermissionTypes.Edit
+                }))
+        {
+            return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                CustomStatusCode.PermissionOrAuthorizationError));
+        }
+        
         if (string.IsNullOrWhiteSpace(analysisParams.TargetName))
         {
             return BadRequest(FormatErrorMessage(OpponentNameRequired, CustomStatusCode.ValueNullOrEmpty));
@@ -41,6 +142,7 @@ public class CampaignAdvisorController : Controller
         var requestString = $"https://api.newscatcherapi.com/v2/search?q={queryString}&lang=en&search_in=title" +
                             $"&from={startDate.Date:yyyy/MM/dd}&page=1&page_size=100";
         using var client = new HttpClient();
+        
         var request = new HttpRequestMessage
         {
             Method = HttpMethod.Get,
@@ -50,6 +152,7 @@ public class CampaignAdvisorController : Controller
                 { "x-api-key", _apiKey }
             }
         };
+        
         var response = await client.SendAsync(request);
         if (!response.IsSuccessStatusCode)
         {
@@ -57,18 +160,8 @@ public class CampaignAdvisorController : Controller
         }
         var responseString = await response.Content.ReadAsStringAsync();
         var newsApiResponse = JsonConvert.DeserializeObject<NewsCatcherResponse>(responseString);
-        // var request = new EverythingRequest
-        // {
-        //     Q =  analysisParams.TargetName + " AND (says OR said OR say OR says OR declares OR declared " +
-        //         "OR declare OR declares OR announces OR announced OR announce OR announces OR claims OR claimed " +
-        //         "OR claim OR claims OR states)",
-        //     From = startDate.Date,
-        //     Language = Languages.EN,
-        //     SortBy = SortBys.Relevancy
-        // };
-        // var articlesResponse = await _newsApiClient.GetEverythingAsync(request);
-        // Get the first 100 article titles
         var articles = newsApiResponse.Articles.Select(article => article.Title).Take(100).ToList();
+        
         var tweetsCollection = await _pythonWebscraperRunner.RunPythonScript(analysisParams.TargetName,
             analysisParams.TargetTwitterHandle, analysisParams.MaxDays);
         List<string>? targetTweets;
@@ -83,8 +176,17 @@ public class CampaignAdvisorController : Controller
             targetTweets = tweetsCollection.TargetTweets;
             tweetsAboutTarget = tweetsCollection.TweetsAboutTarget;
         }
+        
         var classifiedTexts = await _pythonMlRunner.RunPythonScript(articles, targetTweets, tweetsAboutTarget);
-        return Ok(classifiedTexts);
+        var resultsGuid = await StoreAnalysisResults(analysisParams, classifiedTexts, campaignGuid);
+        if (resultsGuid is null)
+        {
+            return BadRequest();
+        }
+        return Ok(new
+        {
+            resultsGuid
+        });
     }
     
 }

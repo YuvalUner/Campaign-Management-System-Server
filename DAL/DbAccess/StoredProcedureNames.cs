@@ -963,4 +963,24 @@ public static class StoredProcedureNames
     /// </summary>
     public const string ImportLedger = "usp_CustomVotersLedgerImport";
 
+    /// <summary>
+    /// Adds a new analysis overview entry to the database, before adding the analysis itself.<br/>
+    /// Params: campaignGuid (Guid), resultsTitle (string), analysisTarget (string), targetTwitterHandle (string),
+    /// maxDaysBack (int), additionalUserRequests (string), newResultsGuid (Guid) - the guid of the new analysis, output.<br/>
+    /// </summary>
+    public const string AddAnalysisOverview = "usp_AdvisorAnalysisOverviewAdd";
+
+    /// <summary>
+    /// Adds a new analysis details entry, detailing the analysis of sentiment and hate by topic.<br/>
+    /// Params: resultsGuid (Guid), topic (string), positive (float), negative (float), neutral (float), hate (float),
+    /// rowType - int, 0 for articles, 1 for tweet from target, 2 for tweet about target.<br/>
+    /// </summary>
+    public const string AddAnalysisDetails = "usp_AdvisorAnalysisDetailsAdd";
+    
+    /// <summary>
+    /// Adds a new sample to an analysis, with samples being one of the tweets or articles that were analyzed.<br/>
+    /// Params: resultsGuid (Guid), sampleText (string), isArticle (bool). <br/>
+    /// </summary>
+    public const string AddAnalysisSample = "usp_AdvisorAnalysisSampleAdd";
+
 }

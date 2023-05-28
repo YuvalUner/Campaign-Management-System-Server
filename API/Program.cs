@@ -45,6 +45,7 @@ builder.Services.AddScoped<IFinancialDataService, FinancialDataService>();
 builder.Services.AddScoped<IElectionDayService, ElectionDayService>();
 builder.Services.AddScoped<ICitiesService, CitiesService>();
 builder.Services.AddScoped<ICustomVotersLedgerService, CustomVotersLedgerService>();
+builder.Services.AddScoped<ICampaignAdvisorAnalysisService, CampaignAdvisorAnalysisService>();
 builder.Services.AddSingleton<IPythonMlRunner, PythonMlRunner>();
 builder.Services.AddSingleton<IPythonWebscraperRunner, PythonWebscraperRunner>();
 
