@@ -2,7 +2,7 @@
 using API.Models;
 using Newtonsoft.Json;
 
-namespace API.ExternalProcesses;
+namespace API.ExternalProcesses.PythonML;
 
 
 public class PythonMlRunner : IPythonMlRunner
@@ -16,12 +16,19 @@ public class PythonMlRunner : IPythonMlRunner
     public PythonMlRunner(IConfiguration configuration)
     {
         _pythonPath = configuration["PythonPath"];
-        _pythonScriptLocation = configuration["PythonScriptLocation"];
-        _jsonFileDirectory = configuration["JsonFileDirectory"];
+        string? pythonScriptLocation = configuration["PythonMlScriptLocation"];
+        string? jsonFileDirectory = configuration["JsonFileDirectory"];
+        string exeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+        int apiDllBasePathIndex = exeFilePath.IndexOf("API", StringComparison.Ordinal);
+        string apiDllBasePath = exeFilePath.Substring(0, apiDllBasePathIndex + 3);
+        _pythonScriptLocation = apiDllBasePath + pythonScriptLocation;
+        _jsonFileDirectory = apiDllBasePath + jsonFileDirectory;
     }
     
-    public async Task<CombinedTextsList?> RunPythonScript(string[] articles, string[] tweets)
+    public async Task<CombinedTextsList?> RunPythonScript(List<string>? articles, List<string>? targetTweets,
+        List<string>? tweetsAboutTarget)
     {
+
         // Lock the index, to prevent multiple server threads from using the same index.
         string filePath;
         lock (_indexLock)
@@ -33,7 +40,8 @@ public class PythonMlRunner : IPythonMlRunner
         var combinedTexts = new
         {
             articles,
-            tweets
+            targetTweets,
+            tweetsAboutTarget
         };
         var json = JsonConvert.SerializeObject(combinedTexts);
         await File.WriteAllTextAsync(filePath, json);

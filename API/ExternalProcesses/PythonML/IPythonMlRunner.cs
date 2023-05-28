@@ -1,8 +1,9 @@
 ﻿using API.Models;
 
-namespace API.ExternalProcesses;
+namespace API.ExternalProcesses.PythonML;
 
 public interface IPythonMlRunner
 {
-    Task<CombinedTextsList> RunPythonScript(string[] articles, string[] tweets);
+    Task<CombinedTextsList> RunPythonScript(List<string>? articles, List<string>? targetTweets,
+        List<string>? tweetsAboutTarget);
 }
