@@ -982,5 +982,41 @@ public static class StoredProcedureNames
     /// Params: resultsGuid (Guid), sampleText (string), isArticle (bool). <br/>
     /// </summary>
     public const string AddAnalysisSample = "usp_AdvisorAnalysisSampleAdd";
+    
+    /// <summary>
+    /// Gets the overview of a single analysis.<br/>
+    /// Params: resultsGuid (Guid).<br/>
+    /// </summary>
+    public const string GetAnalysisOverview = "usp_AdvisorAnalysisOverviewGet";
+    
+    /// <summary>
+    /// Gets all the rows detailing the analysis of sentiment and hate by topic.<br/>
+    /// Params: resultsGuid (Guid).<br/>
+    /// </summary>
+    public const string GetAnalysisDetails = "usp_AdvisorAnalysisDetailsGet";
+    
+    /// <summary>
+    /// Gets all the stored samples for an analysis.<br/>
+    /// Params: resultsGuid (Guid).<br/>
+    /// </summary>
+    public const string GetAnalysisSamples = "usp_AdvisorAnalysisSamplesGet";
+    
+    /// <summary>
+    /// Gets the title, guid, analysis target and time performed of all analyses made for a campaign. <br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// </summary>
+    public const string GetAnalysisOverviewForCampaign = "usp_AnalysisOverviewsForCampaignGet";
+
+    /// <summary>
+    /// Adds or updates the response from the GPT model for a given analysis.<br/>
+    /// Params: resultsGuid (Guid), gptResponse (string).<br/>
+    /// </summary>
+    public const string UpdateAnalysisGptResponse = "usp_AdvisorAnalysisOverviewGptResponseUpdate";
+
+    /// <summary>
+    /// Deletes an analysis and all its details and samples.<br/>
+    /// Params: resultsGuid (Guid).<br/>
+    /// </summary>
+    public const string DeleteAnalysis = "usp_AdvisorAnalysisDelete";
 
 }
