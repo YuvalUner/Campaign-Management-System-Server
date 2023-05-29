@@ -23,10 +23,11 @@ public class CampaignAdvisorController : Controller
     private readonly ICampaignAdvisorAnalysisService _analysisService;
     
     public CampaignAdvisorController(IPythonMlRunner pythonMlRunner, IPythonWebscraperRunner pythonWebscraperRunner,
-        IConfiguration configuration)
+        IConfiguration configuration, ICampaignAdvisorAnalysisService analysisService)
     {
         _pythonMlRunner = pythonMlRunner;
         _pythonWebscraperRunner = pythonWebscraperRunner;
+        _analysisService = analysisService;
         _apiKey = configuration["NewsApiKey"];
     }
 
@@ -46,11 +47,13 @@ public class CampaignAdvisorController : Controller
         foreach (var category in categories)
         {
             var relevantTexts = analyzedText.Where(text => text.Topic == category).ToList();
-            var total = relevantTexts.Count;
-            var positive = relevantTexts.Count(text => text.Sentiment == "positive");
-            var negative = relevantTexts.Count(text => text.Sentiment == "negative");
-            var neutral = relevantTexts.Count(text => text.Sentiment == "neutral");
-            var hate = relevantTexts.Count(text => text.Hate == "hate");
+            // Decimal is used to avoid integer division, because that would result in 0 for all percentages
+            // This number will always be a natural number, however.
+            decimal total = relevantTexts.Count;
+            decimal positive = relevantTexts.Count(text => text.Sentiment == "positive");
+            decimal negative = relevantTexts.Count(text => text.Sentiment == "negative");
+            decimal neutral = relevantTexts.Count(text => text.Sentiment == "neutral");
+            decimal hate = relevantTexts.Count(text => text.Hate == "hate");
             analysisRows.Add(new AnalysisRow()
             {
                 Topic = category,
@@ -59,7 +62,8 @@ public class CampaignAdvisorController : Controller
                 Negative = negative / total,
                 Neutral = neutral / total,
                 Positive = positive / total,
-                Total = total,
+                // Cast to int to avoid storing the decimal point in the DB
+                Total = (int) total,
                 ResultsGuid = resultsGuid
             });
         }
@@ -96,17 +100,20 @@ public class CampaignAdvisorController : Controller
         await _analysisService.AddAnalysisDetailsRows(targetTweets);
         
         // Finally, sample 10 articles and 10 tweets from the target, and add them to the DB
-        var articleSample = analysisResults.Articles.Take(10).Select(article => new AnalysisSample()
+        var distinctArticleTitles = analysisResults.Articles.Select(article => article.Text).Distinct().ToList();
+        var distinctTweetTexts = analysisResults.TargetTweets.Select(tweet => tweet.Text).Distinct().ToList();
+        
+        var articleSample = distinctArticleTitles.Take(10).Select(article => new AnalysisSample()
         {
             ResultsGuid = resultsGuid,
-            SampleText = article.Text,
+            SampleText = article,
             IsArticle = true
         }).ToList();
         
-        var tweetSample = analysisResults.TargetTweets.Take(10).Select(tweet => new AnalysisSample()
+        var tweetSample = distinctTweetTexts.Take(10).Select(tweet => new AnalysisSample()
         {
             ResultsGuid = resultsGuid,
-            SampleText = tweet.Text,
+            SampleText = tweet,
             IsArticle = false
         }).ToList();
         
@@ -176,7 +183,7 @@ public class CampaignAdvisorController : Controller
             targetTweets = tweetsCollection.TargetTweets;
             tweetsAboutTarget = tweetsCollection.TweetsAboutTarget;
         }
-        
+
         var classifiedTexts = await _pythonMlRunner.RunPythonScript(articles, targetTweets, tweetsAboutTarget);
         var resultsGuid = await StoreAnalysisResults(analysisParams, classifiedTexts, campaignGuid);
         if (resultsGuid is null)
