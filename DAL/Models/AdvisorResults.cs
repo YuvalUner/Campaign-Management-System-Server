@@ -3,6 +3,6 @@
 public class AdvisorResults
 {
     public AnalysisOverview? Overview { get; set; }
-    public List<AnalysisRow>? Details { get; set; }
-    public List<AnalysisSample>? Samples { get; set; }
+    public IEnumerable<AnalysisRow>? Details { get; set; }
+    public IEnumerable<AnalysisSample>? Samples { get; set; }
 }
