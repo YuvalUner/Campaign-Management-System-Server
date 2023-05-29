@@ -27,6 +27,7 @@
         <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.1-dev-10301" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.1.1-dev-00901" />
         <PackageReference Include="Serilog.Sinks.Seq" Version="5.2.3-dev-00260" />
+        <PackageReference Include="Standard.AI.OpenAI" Version="0.6.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     </ItemGroup>
 

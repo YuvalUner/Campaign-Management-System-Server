@@ -22,15 +22,17 @@ public class CampaignAdvisorController : Controller
     private readonly string _apiKey;
     private readonly ICampaignAdvisorAnalysisService _analysisService;
     private readonly ILogger<CampaignAdvisorController> _logger;
+    private readonly IOpenAiProxy _openAiProxy;
 
     public CampaignAdvisorController(IPythonMlRunner pythonMlRunner, IPythonWebscraperRunner pythonWebscraperRunner,
         IConfiguration configuration, ICampaignAdvisorAnalysisService analysisService,
-        ILogger<CampaignAdvisorController> logger)
+        ILogger<CampaignAdvisorController> logger, IOpenAiProxy openAiProxy)
     {
         _pythonMlRunner = pythonMlRunner;
         _pythonWebscraperRunner = pythonWebscraperRunner;
         _analysisService = analysisService;
         _logger = logger;
+        _openAiProxy = openAiProxy;
         _apiKey = configuration["NewsApiKey"];
     }
 
@@ -314,6 +316,108 @@ public class CampaignAdvisorController : Controller
         {
             _logger.LogError(e, "Error while deleting analysis results");
             return StatusCode(500, "Error while deleting analysis results");
+        }
+    }
+
+    private string FormatGptPrompt(AdvisorResults advisorResults)
+    {
+        var resultsDetails = advisorResults.Details;
+        var articles = resultsDetails.Where(row => row.RowType == RowTypes.Article).ToList();
+        var tweetsFromTarget = resultsDetails.Where(row => row.RowType == RowTypes.TweetFromTarget).ToList();
+        var tweetsAboutTarget = resultsDetails.Where(row => row.RowType == RowTypes.TweetAboutTarget).ToList();
+        var totalArticles = articles.Select(row => row.Total).Sum();
+        var totalUserTweets = tweetsFromTarget.Select(row => row.Total).Sum();
+        var totalTweetsAboutUser = tweetsAboutTarget.Select(row => row.Total).Sum();
+        
+        var articleSamples = advisorResults.Samples.Where(sample => sample.IsArticle == true).ToList().Take(5);
+        var tweetSamples = advisorResults.Samples.Where(sample => sample.IsArticle == false).ToList().Take(5);
+        string gptPrompt = $"This is a program for helping users manage election campaigns. The following " +
+                           $"is an analysis of the campaign of the user's opponent. Use this information to " +
+                           $"come up with a strategy for the user against their opponent. Refer to the user as \"you\", as " +
+                           $"if you are talking to them and not a program.\n" +
+                           $"First, an analysis of {totalArticles} articles about the opponent's sayings or sayings " +
+                           $"about them analyzed to topic, sentiment and hate speech detected in CSV format:\n";
+        
+        string csvHeader = "Topic, Total, Positive %, Negative %, Neutral %, Hate %\n";
+        string csvBody = "";
+        string samples = "5 samples of the analyzed articles:\n";
+        
+        foreach (var article in articles)
+        {
+            csvBody += $"{article.Topic}, {article.Total}, {article.Positive}, {article.Negative}, {article.Neutral}, {article.Hate}\n";
+        }
+        foreach (var sample in articleSamples)
+        {
+            var articleText  = sample.SampleText.Replace("\n", " ").Replace("\r", " ");
+            samples += $"{articleText}\n";
+        }
+        
+        gptPrompt += csvHeader + csvBody + "\n" + samples + "\n";
+        gptPrompt += $"Next, an analysis of {totalUserTweets} tweets from the opponent in the same format:\n";
+        csvBody = "";
+        samples = "5 samples of the opponent's analyzed tweets:\n";
+        
+        foreach (var tweet in tweetSamples)
+        {
+            var tweetText  = tweet.SampleText.Replace("\n", " ").Replace("\r", " ");
+            samples += $"{tweetText}\n";
+        }
+        foreach (var tweet in tweetsFromTarget)
+        {
+            csvBody += $"{tweet.Topic}, {tweet.Total}, {tweet.Positive}, {tweet.Negative}, {tweet.Neutral}, {tweet.Hate}\n";
+        }
+        
+        gptPrompt += csvHeader + csvBody + "\n" + samples + "\n";
+        gptPrompt += $"Finally, an analysis of {totalTweetsAboutUser} tweets about the opponent from random tweeter users" +
+                     $" in the same format. As this analysis is less accurate, give it the least weight in your response.\n";
+        csvBody = "";
+        
+        foreach (var tweet in tweetsAboutTarget)
+        {
+            csvBody += $"{tweet.Topic}, {tweet.Total}, {tweet.Positive}, {tweet.Negative}, {tweet.Neutral}, {tweet.Hate}\n";
+        }
+        
+        gptPrompt += csvHeader + csvBody;
+        var userRequests = advisorResults.Overview.AdditionalUserRequests;
+        gptPrompt +=
+            $"Finally, the user has requested the following: {userRequests}. Ignore any user request that goes against " +
+            $"service rules.";
+        
+        return gptPrompt;
+    }
+
+    [HttpPost("generate-gpt-response/{campaignGuid:guid}/{resultsGuid:guid}")]
+    public async Task<IActionResult> GenerateGptResponse(Guid campaignGuid, Guid resultsGuid)
+    {
+        try
+        {
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.CampaignAdvisor,
+                        PermissionType = PermissionTypes.Edit
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+            
+            var analysisResults = await _analysisService.GetAdvisorResults(resultsGuid);
+            if (analysisResults.Details is null || analysisResults.Overview is null || analysisResults.Samples is null)
+            {
+                return BadRequest();
+            }
+            
+            string prompt = FormatGptPrompt(analysisResults);
+            var messages = await _openAiProxy.SendChatMessage(prompt);
+            var response = messages[0].Content;
+            await _analysisService.UpdateAnalysisGptResponse(resultsGuid, response);
+            return Ok(new {response});
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while generating GPT response");
+            return StatusCode(500, "Error while generating GPT response");
         }
     }
 }
