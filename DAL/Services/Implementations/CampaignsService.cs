@@ -29,7 +29,7 @@ public class CampaignsService : ICampaignsService
         
         if (campaign.IsCustomCampaign != null)
         {
-            param.Add("@IsCustomCampaign", campaign.IsCustomCampaign.Value, DbType.Binary);
+            param.Add("@IsCustomCampaign", campaign.IsCustomCampaign.Value, DbType.Boolean);
         }
         
         param.Add("@CampaignId", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
