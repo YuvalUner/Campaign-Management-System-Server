@@ -21,13 +21,16 @@ public class CampaignAdvisorController : Controller
     private readonly IPythonWebscraperRunner _pythonWebscraperRunner;
     private readonly string _apiKey;
     private readonly ICampaignAdvisorAnalysisService _analysisService;
-    
+    private readonly ILogger<CampaignAdvisorController> _logger;
+
     public CampaignAdvisorController(IPythonMlRunner pythonMlRunner, IPythonWebscraperRunner pythonWebscraperRunner,
-        IConfiguration configuration, ICampaignAdvisorAnalysisService analysisService)
+        IConfiguration configuration, ICampaignAdvisorAnalysisService analysisService,
+        ILogger<CampaignAdvisorController> logger)
     {
         _pythonMlRunner = pythonMlRunner;
         _pythonWebscraperRunner = pythonWebscraperRunner;
         _analysisService = analysisService;
+        _logger = logger;
         _apiKey = configuration["NewsApiKey"];
     }
 
@@ -71,6 +74,13 @@ public class CampaignAdvisorController : Controller
         return analysisRows;
     }
 
+    /// <summary>
+    /// Stores the results of the analysis in the DB.
+    /// </summary>
+    /// <param name="analysisParams"></param>
+    /// <param name="analysisResults"></param>
+    /// <param name="campaignGuid"></param>
+    /// <returns></returns>
     private async Task<Guid?> StoreAnalysisResults(AnalysisParams analysisParams, CombinedTextsList analysisResults,
         Guid campaignGuid)
     {
@@ -123,77 +133,187 @@ public class CampaignAdvisorController : Controller
         return resultsGuid;
     }
 
+    /// <summary>
+    /// Performs the analysis of an opponent for a campaign, and stores the results in the DB.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <param name="analysisParams"></param>
+    /// <returns></returns>
     [HttpPost("analyze/{campaignGuid:guid}")]
     public async Task<IActionResult> Analyze(Guid campaignGuid, [FromBody] AnalysisParams analysisParams)
     {
-        if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
-                new Permission()
-                {
-                    PermissionTarget = PermissionTargets.CampaignAdvisor,
-                    PermissionType = PermissionTypes.Edit
-                }))
+        try
         {
-            return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
-                CustomStatusCode.PermissionOrAuthorizationError));
-        }
-        
-        if (string.IsNullOrWhiteSpace(analysisParams.TargetName))
-        {
-            return BadRequest(FormatErrorMessage(OpponentNameRequired, CustomStatusCode.ValueNullOrEmpty));
-        }
-        
-        var currentDate = DateTime.Now;
-        var startDate = currentDate.AddDays(-14);
-        var queryString = $"\"{analysisParams.TargetName}\" AND (says OR said OR declares OR declared OR claims " +
-            $"OR claimed OR states OR stated OR announces OR announced)";
-        var requestString = $"https://api.newscatcherapi.com/v2/search?q={queryString}&lang=en&search_in=title" +
-                            $"&from={startDate.Date:yyyy/MM/dd}&page=1&page_size=100";
-        using var client = new HttpClient();
-        
-        var request = new HttpRequestMessage
-        {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri(requestString),
-            Headers =
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.CampaignAdvisor,
+                        PermissionType = PermissionTypes.Edit
+                    }))
             {
-                { "x-api-key", _apiKey }
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
             }
-        };
-        
-        var response = await client.SendAsync(request);
-        if (!response.IsSuccessStatusCode)
-        {
-            return BadRequest();
-        }
-        var responseString = await response.Content.ReadAsStringAsync();
-        var newsApiResponse = JsonConvert.DeserializeObject<NewsCatcherResponse>(responseString);
-        var articles = newsApiResponse.Articles.Select(article => article.Title).Take(100).ToList();
-        
-        var tweetsCollection = await _pythonWebscraperRunner.RunPythonScript(analysisParams.TargetName,
-            analysisParams.TargetTwitterHandle, analysisParams.MaxDays);
-        List<string>? targetTweets;
-        List<string>? tweetsAboutTarget;
-        if (tweetsCollection is null)
-        {
-            targetTweets = new List<string>();
-            tweetsAboutTarget = new List<string>();
-        }
-        else
-        {
-            targetTweets = tweetsCollection.TargetTweets;
-            tweetsAboutTarget = tweetsCollection.TweetsAboutTarget;
-        }
 
-        var classifiedTexts = await _pythonMlRunner.RunPythonScript(articles, targetTweets, tweetsAboutTarget);
-        var resultsGuid = await StoreAnalysisResults(analysisParams, classifiedTexts, campaignGuid);
-        if (resultsGuid is null)
-        {
-            return BadRequest();
+            if (string.IsNullOrWhiteSpace(analysisParams.TargetName))
+            {
+                return BadRequest(FormatErrorMessage(OpponentNameRequired, CustomStatusCode.ValueNullOrEmpty));
+            }
+
+            var currentDate = DateTime.Now;
+            var startDate = currentDate.AddDays(-14);
+            var queryString = $"\"{analysisParams.TargetName}\" AND (says OR said OR declares OR declared OR claims " +
+                              $"OR claimed OR states OR stated OR announces OR announced)";
+            var requestString = $"https://api.newscatcherapi.com/v2/search?q={queryString}&lang=en&search_in=title" +
+                                $"&from={startDate.Date:yyyy/MM/dd}&page=1&page_size=100";
+            using var client = new HttpClient();
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(requestString),
+                Headers =
+                {
+                    { "x-api-key", _apiKey }
+                }
+            };
+
+            var response = await client.SendAsync(request);
+            if (!response.IsSuccessStatusCode)
+            {
+                return BadRequest();
+            }
+
+            var responseString = await response.Content.ReadAsStringAsync();
+            var newsApiResponse = JsonConvert.DeserializeObject<NewsCatcherResponse>(responseString);
+            var articles = newsApiResponse.Articles.Select(article => article.Title).Take(100).ToList();
+
+            var tweetsCollection = await _pythonWebscraperRunner.RunPythonScript(analysisParams.TargetName,
+                analysisParams.TargetTwitterHandle, analysisParams.MaxDays);
+            List<string>? targetTweets;
+            List<string>? tweetsAboutTarget;
+            if (tweetsCollection is null)
+            {
+                targetTweets = new List<string>();
+                tweetsAboutTarget = new List<string>();
+            }
+            else
+            {
+                targetTweets = tweetsCollection.TargetTweets;
+                tweetsAboutTarget = tweetsCollection.TweetsAboutTarget;
+            }
+
+            var classifiedTexts = await _pythonMlRunner.RunPythonScript(articles, targetTweets, tweetsAboutTarget);
+            var resultsGuid = await StoreAnalysisResults(analysisParams, classifiedTexts, campaignGuid);
+            if (resultsGuid is null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(new
+            {
+                resultsGuid
+            });
         }
-        return Ok(new
+        catch (Exception e)
         {
-            resultsGuid
-        });
+            _logger.LogError(e, "Error while analyzing campaign");
+            return StatusCode(500, "Error while analyzing campaign");
+        }
+    }
+
+    /// <summary>
+    /// Gets all the details about a specific analysis results.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <param name="resultsGuid"></param>
+    /// <returns></returns>
+    [HttpGet("results/{campaignGuid:guid}/{resultsGuid:guid}")]
+    public async Task<IActionResult> GetAnalysisResults(Guid campaignGuid, Guid resultsGuid)
+    {
+        try
+        {
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.CampaignAdvisor,
+                        PermissionType = PermissionTypes.View
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+
+            AdvisorResults results = await _analysisService.GetAdvisorResults(resultsGuid);
+            return Ok(results);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while getting analysis results");
+            return StatusCode(500, "Error while getting analysis results");
+        }
     }
     
+    /// <summary>
+    /// Gets basic information about all the analysis results for a specific campaign.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <returns></returns>
+    [HttpGet("results/{campaignGuid:guid}")]
+    public async Task<IActionResult> GetAnalysisResults(Guid campaignGuid)
+    {
+        try
+        {
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.CampaignAdvisor,
+                        PermissionType = PermissionTypes.View
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+
+            var results = await _analysisService.GetAnalysisOverviewForCampaign(campaignGuid);
+            return Ok(results);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while getting analysis results");
+            return StatusCode(500, "Error while getting analysis results");
+        }
+    }
+
+    /// <summary>
+    /// Deletes a specific analysis results, including all of its details and samples.
+    /// </summary>
+    /// <param name="campaignGuid"></param>
+    /// <param name="resultsGuid"></param>
+    /// <returns></returns>
+    [HttpDelete("delete/{campaignGuid:guid}/{resultsGuid:guid}")]
+    public async Task<IActionResult> DeleteAnalysis(Guid campaignGuid, Guid resultsGuid)
+    {
+        try
+        {
+            if (!CombinedPermissionCampaignUtils.IsUserAuthorizedForCampaignAndHasPermission(HttpContext, campaignGuid,
+                    new Permission()
+                    {
+                        PermissionTarget = PermissionTargets.CampaignAdvisor,
+                        PermissionType = PermissionTypes.Edit
+                    }))
+            {
+                return Unauthorized(FormatErrorMessage(PermissionOrAuthorizationError,
+                    CustomStatusCode.PermissionOrAuthorizationError));
+            }
+
+            await _analysisService.DeleteAnalysis(resultsGuid);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while deleting analysis results");
+            return StatusCode(500, "Error while deleting analysis results");
+        }
+    }
 }
