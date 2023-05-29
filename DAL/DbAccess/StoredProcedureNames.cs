@@ -963,4 +963,60 @@ public static class StoredProcedureNames
     /// </summary>
     public const string ImportLedger = "usp_CustomVotersLedgerImport";
 
+    /// <summary>
+    /// Adds a new analysis overview entry to the database, before adding the analysis itself.<br/>
+    /// Params: campaignGuid (Guid), resultsTitle (string), analysisTarget (string), targetTwitterHandle (string),
+    /// maxDaysBack (int), additionalUserRequests (string), newResultsGuid (Guid) - the guid of the new analysis, output.<br/>
+    /// </summary>
+    public const string AddAnalysisOverview = "usp_AdvisorAnalysisOverviewAdd";
+
+    /// <summary>
+    /// Adds a new analysis details entry, detailing the analysis of sentiment and hate by topic.<br/>
+    /// Params: resultsGuid (Guid), topic (string), positive (float), negative (float), neutral (float), hate (float),
+    /// rowType - int, 0 for articles, 1 for tweet from target, 2 for tweet about target.<br/>
+    /// </summary>
+    public const string AddAnalysisDetails = "usp_AdvisorAnalysisDetailsAdd";
+    
+    /// <summary>
+    /// Adds a new sample to an analysis, with samples being one of the tweets or articles that were analyzed.<br/>
+    /// Params: resultsGuid (Guid), sampleText (string), isArticle (bool). <br/>
+    /// </summary>
+    public const string AddAnalysisSample = "usp_AdvisorAnalysisSampleAdd";
+    
+    /// <summary>
+    /// Gets the overview of a single analysis.<br/>
+    /// Params: resultsGuid (Guid).<br/>
+    /// </summary>
+    public const string GetAnalysisOverview = "usp_AdvisorAnalysisOverviewGet";
+    
+    /// <summary>
+    /// Gets all the rows detailing the analysis of sentiment and hate by topic.<br/>
+    /// Params: resultsGuid (Guid).<br/>
+    /// </summary>
+    public const string GetAnalysisDetails = "usp_AdvisorAnalysisDetailsGet";
+    
+    /// <summary>
+    /// Gets all the stored samples for an analysis.<br/>
+    /// Params: resultsGuid (Guid).<br/>
+    /// </summary>
+    public const string GetAnalysisSamples = "usp_AdvisorAnalysisSamplesGet";
+    
+    /// <summary>
+    /// Gets the title, guid, analysis target and time performed of all analyses made for a campaign. <br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// </summary>
+    public const string GetAnalysisOverviewForCampaign = "usp_AnalysisOverviewsForCampaignGet";
+
+    /// <summary>
+    /// Adds or updates the response from the GPT model for a given analysis.<br/>
+    /// Params: resultsGuid (Guid), gptResponse (string).<br/>
+    /// </summary>
+    public const string UpdateAnalysisGptResponse = "usp_AdvisorAnalysisOverviewGptResponseUpdate";
+
+    /// <summary>
+    /// Deletes an analysis and all its details and samples.<br/>
+    /// Params: resultsGuid (Guid).<br/>
+    /// </summary>
+    public const string DeleteAnalysis = "usp_AdvisorAnalysisDelete";
+
 }
