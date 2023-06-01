@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 namespace API.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 [Authorize]
 public class CampaignAdvisorController : Controller
 {
@@ -142,6 +142,7 @@ public class CampaignAdvisorController : Controller
     /// <param name="analysisParams"></param>
     /// <returns></returns>
     [HttpPost("analyze/{campaignGuid:guid}")]
+    [Authorize]
     public async Task<IActionResult> Analyze(Guid campaignGuid, [FromBody] AnalysisParams analysisParams)
     {
         try
@@ -231,6 +232,7 @@ public class CampaignAdvisorController : Controller
     /// <param name="resultsGuid"></param>
     /// <returns></returns>
     [HttpGet("results/{campaignGuid:guid}/{resultsGuid:guid}")]
+    [Authorize]
     public async Task<IActionResult> GetAnalysisResults(Guid campaignGuid, Guid resultsGuid)
     {
         try
@@ -262,6 +264,7 @@ public class CampaignAdvisorController : Controller
     /// <param name="campaignGuid"></param>
     /// <returns></returns>
     [HttpGet("results/{campaignGuid:guid}")]
+    [Authorize]
     public async Task<IActionResult> GetAnalysisResults(Guid campaignGuid)
     {
         try
@@ -294,6 +297,7 @@ public class CampaignAdvisorController : Controller
     /// <param name="resultsGuid"></param>
     /// <returns></returns>
     [HttpDelete("delete/{campaignGuid:guid}/{resultsGuid:guid}")]
+    [Authorize]
     public async Task<IActionResult> DeleteAnalysis(Guid campaignGuid, Guid resultsGuid)
     {
         try
@@ -387,6 +391,7 @@ public class CampaignAdvisorController : Controller
     }
 
     [HttpPost("generate-gpt-response/{campaignGuid:guid}/{resultsGuid:guid}")]
+    [Authorize]
     public async Task<IActionResult> GenerateGptResponse(Guid campaignGuid, Guid resultsGuid)
     {
         try
