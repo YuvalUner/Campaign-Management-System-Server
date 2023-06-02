@@ -27,4 +27,8 @@ public class Ballot
     /// True if it is accessible, false if it is not, null if it is unknown.<br/>
     /// </summary>
     public bool? Accessible { get; set; }
+
+    public bool? IsCustomBallot { get; set; } = false;
+    
+    public int? ElligibleVoters { get; set; }
 }
