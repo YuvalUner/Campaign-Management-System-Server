@@ -31,4 +31,6 @@ public class Ballot
     public bool? IsCustomBallot { get; set; } = false;
     
     public int? ElligibleVoters { get; set; }
+    
+    public int? BallotId { get; set; }
 }

@@ -110,6 +110,8 @@ public static class ErrorMessages
     public const string DuplicateBallotId = "Ballot ID already exists";
     public const string PartyNameRequired = "Party name is required";
     public const string IllegalPartyId = "Party ID must be greater than 0";
+    public const string PartyNotFound = "Party not found";
+    public const string BallotNotFound = "Ballot not found";
 
     /// <summary>
     /// Formats an error message with a custom status code, such that it can be returned to the client in a consistent way.
