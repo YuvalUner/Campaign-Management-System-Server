@@ -106,6 +106,8 @@ public static class ErrorMessages
     public const string NoFileProvided = "No file was provided";
     public const string InvalidFile = "The provided file is invalid - please check the file and try again";
     public const string OpponentNameRequired = "Opponent name is required";
+    public const string IllegalBallotId = "Ballot ID must be greater than 0";
+    public const string DuplicateBallotId = "Ballot ID already exists";
 
     /// <summary>
     /// Formats an error message with a custom status code, such that it can be returned to the client in a consistent way.

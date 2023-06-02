@@ -43,6 +43,8 @@ public static class PermissionTargets
     public const string Financial = "Financial";
     public const string CustomVotersLedger = "Custom Voters Ledger";
     public const string CampaignAdvisor = "Campaign Advisor";
+    public const string BallotManagement = "Ballot Management";
+    public const string BallotCounting = "Ballot Counting";
 
     private static readonly string[] All =
     {
@@ -59,7 +61,9 @@ public static class PermissionTargets
         Publishing,
         Financial,
         CustomVotersLedger,
-        CampaignAdvisor
+        CampaignAdvisor,
+        BallotManagement,
+        BallotCounting
     };
 
     /// <summary>
