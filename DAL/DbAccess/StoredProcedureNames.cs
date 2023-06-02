@@ -1075,4 +1075,16 @@ public static class StoredProcedureNames
     /// </summary>
     public const string GetPartiesForCampaign = "usp_PartiesForCampaignGet";
 
+    /// <summary>
+    /// Increments or decrements the vote count for a given ballot and party.<br/>
+    /// Params: campaignGuid (Guid), ballotId (int), partyId (int), isCustomBallot (bool), increment (bool).<br/> 
+    /// </summary>
+    public const string ModifyVoteCount = "usp_VotesCountModify";
+
+    /// <summary>
+    /// Gets the vote count for all ballots and parties in a campaign.<br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// </summary>
+    public const string GetVoteCount = "usp_GetVoteCounts";
+
 }
