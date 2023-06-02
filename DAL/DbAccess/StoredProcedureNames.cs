@@ -1048,5 +1048,31 @@ public static class StoredProcedureNames
     /// Params: campaignGuid (Guid).<br/>
     /// </summary>
     public const string GetAllCampaignBallots = "usp_AllBallotsForCampaignGet";
+    
+    /// <summary>
+    /// Adds a new party for a campaign.<br/>
+    /// Params: campaignGuid (Guid), partyName (string), partyLetter (string).<br/>
+    /// Returns: CampaignNotFound if the campaign does not exist.<br/>
+    /// </summary>
+    public const string AddParty = "usp_PartyAdd";
+    
+    /// <summary>
+    /// Updates an existing party for a campaign.<br/>
+    /// Params: campaignGuid (Guid), partyName (string), partyLetter (string), partyId (int).<br/>
+    /// Returns: CampaignNotFound if the campaign does not exist.<br/>
+    /// </summary>
+    public const string UpdateParty = "usp_PartyUpdate";
+    
+    /// <summary>
+    /// Deletes an existing party for a campaign.<br/>
+    /// Params: campaignGuid (Guid), partyId (int).<br/>
+    /// </summary>
+    public const string DeleteParty = "usp_PartyDelete";
+    
+    /// <summary>
+    /// Gets a list of all the parties a campaign has registered.<br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// </summary>
+    public const string GetPartiesForCampaign = "usp_PartiesForCampaignGet";
 
 }
