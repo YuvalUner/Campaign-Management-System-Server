@@ -258,5 +258,15 @@ public enum CustomStatusCode
     /// </summary>
     LedgerRowNotFound = 50028,
     
+    /// <summary>
+    /// A status code for when the user attempts to perform an operation on a ballot that does not exist.
+    /// </summary>
+    BallotNotFound = 50029,
+    
+    /// <summary>
+    /// A status code for when the user attempts to perform an operation on a party that does not exist.
+    /// </summary>
+    PartyNotFound = 50030,
+    
     #endregion
 }
