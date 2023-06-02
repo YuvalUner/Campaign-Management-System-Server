@@ -48,6 +48,7 @@ builder.Services.AddScoped<ICitiesService, CitiesService>();
 builder.Services.AddScoped<ICustomVotersLedgerService, CustomVotersLedgerService>();
 builder.Services.AddScoped<ICampaignAdvisorAnalysisService, CampaignAdvisorAnalysisService>();
 builder.Services.AddScoped<IBallotsService, BallotsService>();
+builder.Services.AddScoped<IPartiesService, PartiesService>();
 builder.Services.AddSingleton<IPythonMlRunner, PythonMlRunner>();
 builder.Services.AddSingleton<IPythonWebscraperRunner, PythonWebscraperRunner>();
 builder.Services.AddSingleton<IOpenAiProxy, OpenAiProxy>();
