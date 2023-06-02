@@ -1019,4 +1019,34 @@ public static class StoredProcedureNames
     /// </summary>
     public const string DeleteAnalysis = "usp_AdvisorAnalysisDelete";
 
+    /// <summary>
+    /// Adds a new custom ballot to the database for a campaign.<br/>
+    /// Params: campaignGuid (Guid), innerCityBallotId (float), cityName (string), ballotAddress (string),
+    /// ballotLocation (string), accessible (bit), elligibleVoters (int). <br/>
+    /// Returns: CampaignNotFound if the campaign does not exist, DuplicateKey if the inner city ballot id already
+    /// exists in the campaign.<br/>
+    /// </summary>
+    public const string AddCustomBallot = "usp_CustomBallotAdd";
+    
+    /// <summary>
+    /// Updates an existing custom ballot. Updates all the provided non-null fields<br/>
+    /// Params: campaignGuid (Guid), innerCityBallotId (float), cityName (string), ballotAddress (string),
+    /// ballotLocation (string), accessible (bit), elligibleVoters (int). <br/>
+    /// Returns: CampaignNotFound if the campaign does not exist.<br/>
+    /// </summary>
+    public const string UpdateCustomBallot = "usp_CustomBallotUpdate";
+    
+    /// <summary>
+    /// Deletes an existing custom ballot.<br/>
+    /// Params: campaignGuid (Guid), innerCityBallotId (float). <br/>
+    /// Returns: CampaignNotFound if the campaign does not exist.<br/>
+    /// </summary>
+    public const string DeleteCustomBallot = "usp_CustomBallotDelete";
+
+    /// <summary>
+    /// Gets all custom and non-custom ballots for a campaign.<br/>
+    /// Params: campaignGuid (Guid).<br/>
+    /// </summary>
+    public const string GetAllCampaignBallots = "usp_AllBallotsForCampaignGet";
+
 }
