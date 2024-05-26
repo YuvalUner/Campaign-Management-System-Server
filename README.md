@@ -25,4 +25,5 @@ And more.
 3. Create a new Azure SQL Database
 4. Use the provided campaign_database.sql file to create the required tables and stored procedures
 5. Update the connection string in the appsettings.json file
-6. Run the server
+6. Replace all of the credentials in the appsettings.json file. Specifically, replace the Google credentials, OpenAIApiKey, NewsApiKey and Telesign. 
+7. Run the server
