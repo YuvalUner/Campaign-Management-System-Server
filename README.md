@@ -9,8 +9,9 @@ The server is meant to be used by a client application, which is not included in
 Among the features provided by the server are:
 - User authentication
 - Campaign creation, editing and deletion
-- Useful functions for managing campaigns, such as voter and ballot management, campaign member management, campaign event management, etc.
+- Useful functions for managing campaigns, such as voter and ballot management, campaign member management (adding and removing, roles, permissions), campaign event management jobs management, etc.
 - Sending emails and SMS messages to voters
+- Getting campaign advice via the AI assistant, based on analysis of online activity on social media platforms.
 
 And more.
 
