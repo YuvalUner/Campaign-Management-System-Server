@@ -2,7 +2,8 @@
 ## Brief Description
 Server side of an application for managing election campaigns.\
 Contains an ASP.NET Core Web API project, working with a MS SQL Server hosted on Azure.\
-Developed as part of my final project of my bachelor's degree at Bar-Ilan University, 2023.
+Developed as part of a final project of for a bachelor's degree at Bar-Ilan University, 2023.\
+Meant to work in tandem with the web client, which can be found at https://github.com/YuvalUner/Campaign-Management-System-Frontend 
 
 ## Features
 The server is meant to be used by a client application, which is not included in this repository.\
